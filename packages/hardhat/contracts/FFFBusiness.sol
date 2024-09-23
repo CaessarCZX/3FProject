@@ -7,7 +7,7 @@ contract FFFBusiness {
     uint128 private _totalActiveMembers;
 
     uint128 private _minAmountToTransfer = 10000000000000000;  // Currently is a wei unit (0.01 Ether)
-    uint8 constant private _MAX_TICKETS = 8;
+    uint8 constant private _MAX_TICKETS = 3; // NOTE: this feature remains to be seen
     
     uint8 private _refundTierOne = 5;
     uint8 private _refundTierTwo = 10;
@@ -15,7 +15,7 @@ contract FFFBusiness {
     uint8 private _refundTierFour = 20;
     uint8 private _refundTierFive = 25;
 
-    uint8 private _qualifyToImproveRank = 3;
+    uint8 private _qualifyToImproveRank = 3; // NOTE: this feature remains to be seen
 
     enum Ranks {
         Sapphire,   // 0
@@ -41,7 +41,7 @@ contract FFFBusiness {
 
     mapping(address => Member) private members;
     mapping(address => address[]) private enrolled;
-    mapping(address => WithdrawTicket[]) private withdrawals;
+    mapping(address => WithdrawTicket[]) private withdrawals; // NOTE: this feature remains to be seen
 
     modifier onlyBusiness() {
         require(msg.sender == _businessWallet, "Error: Not the business");
@@ -102,11 +102,14 @@ contract FFFBusiness {
     event NewMember(address indexed member);
     event NewRankReached(address indexed member, string rank);
 
-    constructor() {
-        _businessWallet = payable(msg.sender);
+    constructor(address _mainWallet) {
+        // NOTE: modify constructor only for test deploy
+        // _businessWallet = payable(msg.sender);
+        _businessWallet = payable(_mainWallet);
         _totalMembers = 0;
         _totalActiveMembers = 0;
         emit BusinessWalletSet(address(0), _businessWallet);
+        createMember(_businessWallet);
     }
 
     function deposit() public payable {}
@@ -126,6 +129,15 @@ contract FFFBusiness {
     function changeBusinessWallet(address _newBusinessWallet) public onlyBusiness {
         emit BusinessWalletSet(_businessWallet, _newBusinessWallet);
         _businessWallet = payable(_newBusinessWallet);
+    }
+
+    function getMemberBalance(address _currentMember) 
+        public
+        view
+        onlyActiveMemberAddress(_currentMember)
+        returns(uint)
+    {
+        return members[_currentMember].balance;
     }
 
     function getMemberDetails(Member memory member)
@@ -169,20 +181,6 @@ contract FFFBusiness {
         );
     }
 
-    function createMember(address payable _newMember) public {
-        
-        Member storage newMember = members[_newMember];
-        newMember.memberWallet = _newMember;
-        newMember.isActive = true;
-        newMember.balance = 0;
-        newMember.rank = Ranks.Sapphire;
-
-        _totalMembers++;
-        _totalActiveMembers++;
-
-        emit NewMember(_newMember);
-    }
-
     function addReferralToUpline(address _to, address _from)
         public
         onlyActiveMemberAddress(_to)
@@ -219,6 +217,7 @@ contract FFFBusiness {
         emit Refund(msg.sender, refundToMember);
     }
 
+    // NOTE: this feature remains to be seen
     function withdrawalRequest(uint128 _requestedAmount)
         public
         preventZeroAmount(_requestedAmount)
@@ -244,6 +243,23 @@ contract FFFBusiness {
         preventZeroAmount(_amount)
     {
 
+    }
+
+    function createMember(address payable _newMember)
+        internal
+        checkValidAddress(_newMember)
+    {
+        
+        Member storage newMember = members[_newMember];
+        newMember.memberWallet = _newMember;
+        newMember.isActive = true;
+        newMember.balance = 0;
+        newMember.rank = Ranks.Sapphire;
+
+        _totalMembers++;
+        _totalActiveMembers++;
+
+        emit NewMember(_newMember);
     }
 
     function _payment(address payable _to, uint _amount)
