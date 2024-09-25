@@ -197,10 +197,10 @@ contract FFFBusiness {
         checkMinimumAmount
     {
 
-        if (!members[msg.sender].isActive) {
-            createMember(payable(msg.sender));
-            addReferralToUpline(_uplineAddress, msg.sender);
-        }
+        if (!members[msg.sender].isActive) createMember(payable(msg.sender));
+
+        if (_uplineAddress != address(0)) addReferralToUpline(_uplineAddress, msg.sender);
+
         depositMemeberFunds();
     }
 

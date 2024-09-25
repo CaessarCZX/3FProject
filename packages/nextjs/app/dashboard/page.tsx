@@ -25,8 +25,6 @@ const Dashboard: NextPage = () => {
 
   const { writeContractAsync: depositMemberFunds } = useScaffoldWriteContract("FFFBusiness");
 
-  // const dollarBalance = parseThreeDecimals( parseCurrency(Number(formatEther(memberBalance || BigInt(0))), +exchangeRatio.USDT));
-
   const handleDeposit = async () => {
     try {
       await depositMemberFunds({
@@ -67,7 +65,7 @@ const Dashboard: NextPage = () => {
                     <span className="font-semibold">Tus referidos</span>
                     <ul className="flex flex-col mt-3">
                       <li>
-                        <p className="m-0">0x0047jwhd9ye9ruq30ifq039yu034u93u8</p>
+                        <p className="m-0">3 activos</p>
                       </li>
                     </ul>
                   </div>
@@ -80,7 +78,7 @@ const Dashboard: NextPage = () => {
               <div className="card-body">
                 <h2 className="card-title">Nuevo deposito</h2>
                 <div className="card-actions">
-                  <div className="flex-grow mr-8">
+                  <div className="flex-grow mr-2">
                     <IntegerInput
                       value={deposit}
                       onChange={updatedDeposit => {
@@ -90,15 +88,12 @@ const Dashboard: NextPage = () => {
                     />
                     <p>Deposito minimo 25 USDT</p>
                   </div>
-                  <div className="space-x-2">
+                  <div className="space-x-4">
                     <select className="select select-bordered max-w-xs">
-                      <option disabled selected>
-                        Elegir cripto
-                      </option>
-                      <option>USDT</option>
-                      <option>ETH</option>
+                      <option selected>USDT</option>
+                      <option disabled>ETH</option>
                     </select>
-                    <button className="btn btn-primary" onClick={() => handleDeposit()}>
+                    <button className="btn btn-primary px-8" onClick={() => handleDeposit()}>
                       Enviar
                     </button>
                   </div>
