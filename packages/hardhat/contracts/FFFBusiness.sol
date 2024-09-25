@@ -191,7 +191,7 @@ contract FFFBusiness {
         updateReferralRank(member, _to);
     }
 
-    function depositMemeberFunds(address _uplineAddress) 
+    function memberEntrance(address _uplineAddress) 
         public
         payable
         checkMinimumAmount
@@ -201,7 +201,15 @@ contract FFFBusiness {
             createMember(payable(msg.sender));
             addReferralToUpline(_uplineAddress, msg.sender);
         }
+        depositMemeberFunds();
+    }
 
+    // NOTE: This is a provisional function for active members
+    function depositMemeberFunds()
+        public
+        payable
+        checkMinimumAmount
+    {
         Member storage member = members[msg.sender];
         member.balance += msg.value;
         emit Deposit(msg.sender, msg.value);
