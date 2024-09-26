@@ -102,10 +102,8 @@ contract FFFBusiness {
     event NewMember(address indexed member);
     event NewRankReached(address indexed member, string rank);
 
-    constructor(address _mainWallet) {
-        // NOTE: modify constructor only for test deploy
-        // _businessWallet = payable(msg.sender);
-        _businessWallet = payable(_mainWallet);
+    constructor() {
+        _businessWallet = payable(msg.sender);
         _totalMembers = 0;
         _totalActiveMembers = 0;
         emit BusinessWalletSet(address(0), _businessWallet);
@@ -253,6 +251,14 @@ contract FFFBusiness {
 
     }
 
+    function isCurrentlyActiveUser(address _currentMember)
+        public
+        view
+        returns(bool)
+    {
+        return members[_currentMember].isActive;
+    }
+
     function createMember(address payable _newMember)
         internal
         checkValidAddress(_newMember)
@@ -268,6 +274,15 @@ contract FFFBusiness {
         _totalActiveMembers++;
 
         emit NewMember(_newMember);
+    }
+
+    function getTotalAffiliatesPerMember(address _currentMember)
+        public
+        view
+        onlyActiveMemberAddress(_currentMember)
+        returns(uint)
+    {
+        return enrolled[_currentMember].length;
     }
 
     function _payment(address payable _to, uint _amount)

@@ -1,6 +1,6 @@
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { DeployFunction } from "hardhat-deploy/types";
 import { Contract } from "ethers";
+import { DeployFunction } from "hardhat-deploy/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 const deployFFFBusiness: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
@@ -8,7 +8,7 @@ const deployFFFBusiness: DeployFunction = async function (hre: HardhatRuntimeEnv
 
   await deploy("FFFBusiness", {
     from: deployer,
-    args: ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"],
+    args: [],
     log: true,
     autoMine: true,
   });

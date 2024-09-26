@@ -3,44 +3,58 @@
 import React from "react";
 import { useState } from "react";
 import type { NextPage } from "next";
-import { formatEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
-import { IntegerInput } from "~~/components/scaffold-eth";
+import { UserGroupIcon } from "@heroicons/react/24/outline";
+import { EtherInput } from "~~/components/scaffold-eth";
 import { useDateEs } from "~~/hooks/3FProject/useDateEs";
 import { useExchangeRatios } from "~~/hooks/3FProject/useExchangeRatios";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { parseCurrency, parseThreeDecimals } from "~~/utils/3FContract/currencyConvertion";
 
+// import ProtectedRoute from "~~/services/Auth/ProtectedRoute";
+
 const Dashboard: NextPage = () => {
-  const currentAccount = useAccount();
-  const [deposit, setDeposit] = useState<string | bigint>("");
+  const currentMember = useAccount();
+  const [deposit, setDeposit] = useState("");
+  const [currencyType, setCurrencyType] = useState<string>("USDT");
   const { exchangeRatio, loadingData } = useExchangeRatios("ETH");
   const currentDate = useDateEs();
 
   const { data: memberBalance } = useScaffoldReadContract({
     contractName: "FFFBusiness",
     functionName: "getMemberBalance",
-    args: [currentAccount?.address ?? ""],
+    args: [currentMember?.address],
+  });
+
+  const { data: totalAffiliates } = useScaffoldReadContract({
+    contractName: "FFFBusiness",
+    functionName: "getTotalAffiliatesPerMember",
+    args: [currentMember?.address],
   });
 
   const { writeContractAsync: depositMemberFunds } = useScaffoldWriteContract("FFFBusiness");
 
   const handleDeposit = async () => {
     try {
+      const convertDepositToWei = parseEther(deposit);
       await depositMemberFunds({
         functionName: "depositMemeberFunds",
-        value: BigInt(deposit),
+        value: convertDepositToWei,
       });
     } catch (e) {
-      console.error("Error setting greeting:", e);
+      console.error("Error Deposit:", e);
     }
   };
 
   return (
     <>
-      <div className=" pt-12 max-w-7xl flex items-center justify-center mx-auto">
-        <ul className="grid gap-8 grid-cols-6 grid-rows-2 w-full py-4 sm:px-4">
-          <li className="col-span-2 row-span-2">
+      <p className=" text-center text-xs font-semibold text-slate-400">
+        This a dashboard template for Friends and Family Funds
+      </p>
+      <div className="max-w-7xl w-full flex items-center justify-center mx-auto px-4">
+        <ul className="grid w-full gap-8 grid-cols-1 grid-rows-[1fr_225px_1fr] sm:px-4 md:grid-cols-6 md:grid-rows-3 md:pt-8 lg:max-h-[600px]">
+          <li className="col-span-4 md:col-span-2 md:row-span-2">
             <div className="card h-full bg-base-100 shadow-xl">
               <div className="card-body">
                 <h2 className="card-title">Balance</h2>
@@ -61,37 +75,58 @@ const Dashboard: NextPage = () => {
                   </article>
                   <span className="text-cyan-600 font-light">{`${formatEther(memberBalance || BigInt(0))} ETH`}</span>
                   <p className="text-sm text-slate-500">{currentDate}</p>
-                  <div>
-                    <span className="font-semibold">Tus referidos</span>
-                    <ul className="flex flex-col mt-3">
-                      <li>
-                        <p className="m-0">3 activos</p>
-                      </li>
+                  <div className="w-full">
+                    <span className="font-semibold ml-2 text-slate-800">Tus referidos</span>
+                    <ul className="flex mt-3">
+                      <button className="btn justify-between w-full">
+                        <UserGroupIcon className="w-6 h-6" />
+                        <div className="flex gap-2 items-center">
+                          Activos
+                          <div
+                            className={`badge badge-secondary py-3 text-white px-4 ${
+                              totalAffiliates != undefined && totalAffiliates > 0
+                                ? "bg-gradient-to-b from-cyan-500 to-blue-500"
+                                : "bg-gradient-to-b from-red-600 to-red-950"
+                            }`}
+                          >
+                            {totalAffiliates == null ? (
+                              <span className="loading loading-bars loading-xs"></span>
+                            ) : (
+                              <p>{Number(totalAffiliates)}</p>
+                            )}
+                          </div>
+                        </div>
+                      </button>
                     </ul>
                   </div>
                 </div>
               </div>
             </div>
           </li>
-          <li className="col-span-4">
-            <div className="card card-compact bg-base-100 shadow-xl">
+          <li className="col-span-4 md:row-span-1">
+            <div className="card card-compact h-full bg-base-100 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title">Nuevo deposito</h2>
+                <h2 className="card-title ml-2">Deposita a tu cuenta</h2>
                 <div className="card-actions">
-                  <div className="flex-grow mr-2">
-                    <IntegerInput
+                  <div className="flex-grow mx-2">
+                    <EtherInput
+                      usdMode
+                      placeholder="Ingresa la cantidad de USDT"
                       value={deposit}
-                      onChange={updatedDeposit => {
-                        setDeposit(updatedDeposit);
-                      }}
-                      placeholder="value (wei)"
+                      onChange={amount => setDeposit(amount)}
                     />
-                    <p>Deposito minimo 25 USDT</p>
+                    <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo 27 USDT</p>
                   </div>
-                  <div className="space-x-4">
-                    <select className="select select-bordered max-w-xs">
-                      <option selected>USDT</option>
-                      <option disabled>ETH</option>
+                  <div className="w-full space-x-4 flex justify-end  md:w-auto lg:self-auto">
+                    <select
+                      value={currencyType}
+                      onChange={e => setCurrencyType(e.target.value)}
+                      className="select select-bordered max-w-xs"
+                    >
+                      <option value="USDT">USDT</option>
+                      <option value="ETH" disabled>
+                        ETH
+                      </option>
                     </select>
                     <button className="btn btn-primary px-8" onClick={() => handleDeposit()}>
                       Enviar
@@ -101,11 +136,13 @@ const Dashboard: NextPage = () => {
               </div>
             </div>
           </li>
-          <li>
-            <div className="card card-compact bg-base-100 shadow-xl">
+          <li className="col-span-4">
+            <div className="card card-compact h-full bg-base-100 shadow-xl">
               <div className="card-body">
                 <h2 className="card-title">Ingresos y egresos</h2>
-                <div className="card-actions justify-end"></div>
+                <div className="card-actions">
+                  <p className="mb-16">Under construction, comming soon available!</p>
+                </div>
               </div>
             </div>
           </li>
