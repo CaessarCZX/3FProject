@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useState } from "react";
+import BlockExplorer from "./_components/BlockExplorer";
 import type { NextPage } from "next";
 import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
@@ -27,11 +28,11 @@ const Dashboard: NextPage = () => {
     args: [currentMember?.address],
   });
 
-  const { data: totalAffiliates } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "getTotalAffiliatesPerMember",
-    args: [currentMember?.address],
-  });
+  // const { data: totalAffiliates } = useScaffoldReadContract({
+  //   contractName: "FFFBusiness",
+  //   functionName: "getTotalAffiliatesPerMember",
+  //   args: [currentMember?.address],
+  // });
 
   const { writeContractAsync: depositMemberFunds } = useScaffoldWriteContract("FFFBusiness");
 
@@ -83,6 +84,12 @@ const Dashboard: NextPage = () => {
                         <div className="flex gap-2 items-center">
                           Activos
                           <div
+                            className={`badge badge-secondary py-3 text-white px-4 bg-gradient-to-b from-red-600 to-red-950`}
+                          >
+                            <p>{Number(0)}</p>
+                          </div>
+                          {/* This part of code will remain commented out until the new version of the contract is implemented
+                          <div
                             className={`badge badge-secondary py-3 text-white px-4 ${
                               totalAffiliates != undefined && totalAffiliates > 0
                                 ? "bg-gradient-to-b from-cyan-500 to-blue-500"
@@ -94,7 +101,7 @@ const Dashboard: NextPage = () => {
                             ) : (
                               <p>{Number(totalAffiliates)}</p>
                             )}
-                          </div>
+                          </div> */}
                         </div>
                       </button>
                     </ul>
@@ -106,7 +113,7 @@ const Dashboard: NextPage = () => {
           <li className="col-span-4 md:row-span-1">
             <div className="card card-compact h-full bg-base-100 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title ml-2">Deposita a tu cuenta</h2>
+                <h2 className="card-title ml-2">Nuevos ahorros!</h2>
                 <div className="card-actions">
                   <div className="flex-grow mx-2">
                     <EtherInput
@@ -139,9 +146,10 @@ const Dashboard: NextPage = () => {
           <li className="col-span-4">
             <div className="card card-compact h-full bg-base-100 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title">Ingresos y egresos</h2>
+                <h2 className="card-title">Mis ahorros!</h2>
+                <p>Solo cantidades de dinero (solo dolares) que he ingresado, fecha, hash</p>
                 <div className="card-actions">
-                  <p className="mb-16">Under construction, comming soon available!</p>
+                  <BlockExplorer />
                 </div>
               </div>
             </div>
