@@ -9,11 +9,12 @@ interface ExchangeRates {
 export const useExchangeRatios = (coin: string) => {
   const [exchangeRatio, setExchangeRatio] = useState<ExchangeRates>({});
   const [loadingData, setLoadingData] = useState(true);
+  const getCoinbaseApi = process.env.API_EXCHANGE_RATES_ETH;
 
   useEffect(() => {
     const getExchangeRates = async () => {
       try {
-        const response = await axios.get("https://api.coinbase.com/v2/exchange-rates", {
+        const response = await axios.get(`${getCoinbaseApi}`, {
           params: { currency: coin },
         });
         setExchangeRatio(response.data.data.rates);
@@ -25,7 +26,7 @@ export const useExchangeRatios = (coin: string) => {
     };
 
     getExchangeRates();
-  }, [coin]);
+  }, [coin, getCoinbaseApi]);
 
   return {
     exchangeRatio,
