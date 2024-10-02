@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PaginationButton } from "./PaginationButton";
 import { TransactionsTable } from "./TransactionsTable";
 import { useFetchFilteredBlocks } from "~~/hooks/3FProject/useFetchFilteredBlocks";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { notification } from "~~/utils/scaffold-eth";
 
-const BlockExplorer = () => {
-  // const { blocks, transactionReceipts, currentPage, totalBlocks, setCurrentPage, error } = useFetchBlocks();
-  const { filteredTransactions, transactionReceipts, error } = useFetchFilteredBlocks("asd");
+type BlockExplorerAddress = {
+  address: string | undefined;
+};
+
+const BlockExplorer = ({ address }: BlockExplorerAddress) => {
+  const { filteredTransactions, transactionReceipts, currentPage, totalBlocks, setCurrentPage, error } =
+    useFetchFilteredBlocks(address);
   const { targetNetwork } = useTargetNetwork();
   const [hasError, setHasError] = useState(false);
 
@@ -37,8 +42,7 @@ const BlockExplorer = () => {
   return (
     <div className="container mx-auto">
       <TransactionsTable transactions={filteredTransactions} transactionReceipts={transactionReceipts} />
-      {/* <TransactionsTable blocks={blocks} transactionReceipts={transactionReceipts} /> */}
-      {/* <PaginationButton currentPage={currentPage} totalItems={Number(totalBlocks)} setCurrentPage={setCurrentPage} /> */}
+      <PaginationButton currentPage={currentPage} totalItems={Number(totalBlocks)} setCurrentPage={setCurrentPage} />
     </div>
   );
 };

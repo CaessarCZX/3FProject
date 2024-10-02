@@ -13,7 +13,7 @@ export const testClient = createTestClient({
   .extend(publicActions)
   .extend(walletActions);
 
-export const useFetchFilteredBlocks = (address: string) => {
+export const useFetchFilteredBlocks = (address?: string) => {
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [transactionReceipts, setTransactionReceipts] = useState<{ [key: string]: TransactionReceipt }>({});
   const [currentPage, setCurrentPage] = useState(0);
@@ -23,6 +23,7 @@ export const useFetchFilteredBlocks = (address: string) => {
   // Fetch blocks and filter transactions for the given address
   const fetchBlocks = useCallback(async () => {
     setError(null);
+    const normalizeAddress = address?.toLowerCase();
     try {
       const blockNumber = await testClient.getBlockNumber();
       setTotalBlocks(blockNumber);
@@ -39,7 +40,9 @@ export const useFetchFilteredBlocks = (address: string) => {
       const fetchedBlocks = await Promise.all(blocksWithTransactions);
 
       const relevantTransactions = fetchedBlocks.flatMap(block =>
-        block.transactions.filter(tx => (tx as Transaction).from === address || (tx as Transaction).to === address),
+        block.transactions.filter(
+          tx => (tx as Transaction).from === normalizeAddress || (tx as Transaction).to === normalizeAddress,
+        ),
       );
 
       // Decode and set the relevant transactions
@@ -62,6 +65,11 @@ export const useFetchFilteredBlocks = (address: string) => {
 
   // Update transactions and receipts when new blocks are created
   useEffect(() => {
+    if (!address) {
+      setError(new Error("Non valid address."));
+      return;
+    }
+
     const handleNewBlock = async (newBlock: any) => {
       try {
         // Fetch only if it's the first page (latest transactions)
@@ -107,8 +115,12 @@ export const useFetchFilteredBlocks = (address: string) => {
 
   // Fetch initial blocks when the hook is first used
   useEffect(() => {
+    if (!address) {
+      setError(new Error("Non valid address."));
+      return;
+    }
     fetchBlocks();
-  }, [fetchBlocks]);
+  }, [fetchBlocks, address]);
 
   return {
     filteredTransactions,

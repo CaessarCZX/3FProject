@@ -113,7 +113,7 @@ const Dashboard: NextPage = () => {
           <li className="col-span-4 md:row-span-1">
             <div className="card card-compact h-full bg-base-100 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title ml-2">Nuevos ahorros!</h2>
+                <h2 className="card-title ml-2">Nuevos ahorros</h2>
                 <div className="card-actions">
                   <div className="flex-grow mx-2">
                     <EtherInput
@@ -122,7 +122,7 @@ const Dashboard: NextPage = () => {
                       value={deposit}
                       onChange={amount => setDeposit(amount)}
                     />
-                    <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo 27 USDT</p>
+                    <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo 1000 USDT</p>
                   </div>
                   <div className="w-full space-x-4 flex justify-end  md:w-auto lg:self-auto">
                     <select
@@ -145,11 +145,10 @@ const Dashboard: NextPage = () => {
           </li>
           <li className="col-span-4">
             <div className="card card-compact h-full bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title">Mis ahorros!</h2>
-                <p>Solo cantidades de dinero (solo dolares) que he ingresado, fecha, hash</p>
+              <div className="card-body flex-none">
+                <h2 className="card-title">Mis ahorros</h2>
                 <div className="card-actions">
-                  <BlockExplorer />
+                  <BlockExplorer address={currentMember?.address} />
                 </div>
               </div>
             </div>
