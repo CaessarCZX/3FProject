@@ -40,7 +40,7 @@ const BlockExplorer = ({ address }: BlockExplorerAddress) => {
   }, [hasError]);
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto rounded-xl overflow-hidden">
       <TransactionsTable transactions={filteredTransactions} transactionReceipts={transactionReceipts} />
       <PaginationButton currentPage={currentPage} totalItems={Number(totalBlocks)} setCurrentPage={setCurrentPage} />
     </div>

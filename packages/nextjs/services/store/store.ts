@@ -18,6 +18,12 @@ type GlobalState = {
   };
   setNativeCurrencyPrice: (newNativeCurrencyPriceState: number) => void;
   setIsNativeCurrencyFetching: (newIsNativeCurrencyFetching: boolean) => void;
+  mexicanPeso: {
+    price: number;
+    isFetching: boolean;
+  };
+  setMexicanPesoPrice: (newMexicanPesoPriceState: number) => void;
+  setIsMexicanPesoFetching: (newIsMexicanPesoFetching: boolean) => void;
   targetNetwork: ChainWithAttributes;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
 };
@@ -31,6 +37,14 @@ export const useGlobalState = create<GlobalState>(set => ({
     set(state => ({ nativeCurrency: { ...state.nativeCurrency, price: newValue } })),
   setIsNativeCurrencyFetching: (newValue: boolean): void =>
     set(state => ({ nativeCurrency: { ...state.nativeCurrency, isFetching: newValue } })),
+  mexicanPeso: {
+    price: 0,
+    isFetching: true,
+  },
+  setMexicanPesoPrice: (newValue: number): void =>
+    set(state => ({ mexicanPeso: { ...state.mexicanPeso, price: newValue } })),
+  setIsMexicanPesoFetching: (newValue: boolean): void =>
+    set(state => ({ mexicanPeso: { ...state.mexicanPeso, isFetching: newValue } })),
   targetNetwork: scaffoldConfig.targetNetworks[0],
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
 }));

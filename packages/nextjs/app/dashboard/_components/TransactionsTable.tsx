@@ -9,7 +9,7 @@ export const TransactionsTable = ({ transactions, transactionReceipts }: Transac
   const { targetNetwork } = useTargetNetwork();
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center max-h-56 overflow-y-auto">
       <div className="overflow-x-auto w-full shadow-2xl rounded-xl">
         <table className="table text-xl bg-base-100 table-zebra w-full md:table-md table-sm">
           <thead>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BlockExplorer from "./_components/BlockExplorer";
 import type { NextPage } from "next";
 import { formatEther, parseEther } from "viem";
@@ -11,7 +11,7 @@ import { EtherInput } from "~~/components/scaffold-eth";
 import { useDateEs } from "~~/hooks/3FProject/useDateEs";
 import { useExchangeRatios } from "~~/hooks/3FProject/useExchangeRatios";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { parseCurrency, parseThreeDecimals } from "~~/utils/3FContract/currencyConvertion";
+import { formatCurrency, parseCurrency, parseThreeDecimals } from "~~/utils/3FContract/currencyConvertion";
 
 // import ProtectedRoute from "~~/services/Auth/ProtectedRoute";
 
@@ -20,6 +20,8 @@ const Dashboard: NextPage = () => {
   const [deposit, setDeposit] = useState("");
   const [currencyType, setCurrencyType] = useState<string>("USDT");
   const { exchangeRatio, loadingData } = useExchangeRatios("ETH");
+  const { exchangeRatio: exchangeUSD, loadingData: loadingUSD } = useExchangeRatios("USD");
+  const [dollarValue, setDollarValue] = useState(0);
   const currentDate = useDateEs();
 
   const { data: memberBalance } = useScaffoldReadContract({
@@ -48,13 +50,22 @@ const Dashboard: NextPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (!loadingData && exchangeRatio?.USDT) {
+      const dollarPrice = parseThreeDecimals(
+        parseCurrency(Number(formatEther(memberBalance || BigInt(0))), Number(exchangeRatio.USDT)),
+      );
+      setDollarValue(dollarPrice);
+    }
+  }, [loadingData, exchangeRatio, memberBalance]);
+
   return (
     <>
       <p className=" text-center text-xs font-semibold text-slate-400">
         This a dashboard template for Friends and Family Funds
       </p>
       <div className="max-w-7xl w-full flex items-center justify-center mx-auto px-4">
-        <ul className="grid w-full gap-8 grid-cols-1 grid-rows-[1fr_225px_1fr] sm:px-4 md:grid-cols-6 md:grid-rows-3 md:pt-8 lg:max-h-[600px]">
+        <ul className="grid w-full gap-8 grid-cols-1 grid-rows-[1fr_225px_1fr] sm:px-4 md:grid-cols-6 md:grid-rows-[150px_1fr] md:pt-8 lg:max-h-[800px]">
           <li className="col-span-4 md:col-span-2 md:row-span-2">
             <div className="card h-full bg-base-100 shadow-xl">
               <div className="card-body">
@@ -64,17 +75,25 @@ const Dashboard: NextPage = () => {
                     {loadingData ? (
                       <span className="loading loading-dots loading-lg"></span>
                     ) : exchangeRatio && exchangeRatio.USDT ? (
-                      <p className="text-4xl font-bold m-0">
-                        {parseThreeDecimals(
-                          parseCurrency(Number(formatEther(memberBalance || BigInt(0))), Number(exchangeRatio.USDT)),
-                        )}
-                      </p>
+                      <p className="text-4xl font-bold m-0">{formatCurrency(dollarValue)}</p>
                     ) : (
                       <p className="text-xl font-semibold m-0">Not available</p>
                     )}
                     <span className="text-slate-500">USDT</span>
                   </article>
-                  <span className="text-cyan-600 font-light">{`${formatEther(memberBalance || BigInt(0))} ETH`}</span>
+                  <span>
+                    {loadingUSD ? (
+                      <span className="loading loading-spinner text-accent"></span>
+                    ) : exchangeUSD && exchangeUSD.MXN && dollarValue ? (
+                      <span className="text-cyan-600 font-light">
+                        {`${formatCurrency(
+                          parseThreeDecimals(parseCurrency(dollarValue, Number(exchangeUSD.MXN))),
+                        )} MXN`}
+                      </span>
+                    ) : (
+                      <p className="text-xl font-semibold m-0">Not available</p>
+                    )}
+                  </span>
                   <p className="text-sm text-slate-500">{currentDate}</p>
                   <div className="w-full">
                     <span className="font-semibold ml-2 text-slate-800">Tus referidos</span>
@@ -143,7 +162,7 @@ const Dashboard: NextPage = () => {
               </div>
             </div>
           </li>
-          <li className="col-span-4">
+          <li className="col-span-4 max-h-[300px]">
             <div className="card card-compact h-full bg-base-100 shadow-xl">
               <div className="card-body flex-none">
                 <h2 className="card-title">Mis ahorros</h2>

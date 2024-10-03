@@ -94,6 +94,7 @@ export const useFetchFilteredBlocks = (address?: string) => {
             }),
           );
 
+          // Update the state with new transactions and receipts
           setFilteredTransactions(prev => [...relevantTransactions, ...prev.slice(0, BLOCKS_PER_PAGE - 1)]);
           setTransactionReceipts(prevReceipts => ({ ...prevReceipts, ...Object.assign({}, ...receipts) }));
         }
