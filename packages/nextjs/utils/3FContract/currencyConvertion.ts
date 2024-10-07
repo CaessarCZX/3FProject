@@ -14,3 +14,14 @@ export const formatCurrency = (value: number, currency = "USD") => {
     maximumFractionDigits: 2,
   }).format(value);
 };
+
+type DisplayCurreciesProps = {
+  longCurrenci: number;
+  exchangeRatio: number;
+};
+
+export const displayCurrencyConvertion = ({ longCurrenci, exchangeRatio }: DisplayCurreciesProps): string => {
+  const convertCurrency = parseCurrency(longCurrenci, exchangeRatio);
+  const currencyFixed = parseThreeDecimals(convertCurrency);
+  return formatCurrency(currencyFixed);
+};

@@ -16,19 +16,24 @@ type GlobalState = {
     price: number;
     isFetching: boolean;
   };
-  setNativeCurrencyPrice: (newNativeCurrencyPriceState: number) => void;
-  setIsNativeCurrencyFetching: (newIsNativeCurrencyFetching: boolean) => void;
   mexicanPeso: {
     price: number;
     isFetching: boolean;
   };
+  targetNetwork: ChainWithAttributes;
+};
+
+type GlobalActions = {
+  setNativeCurrencyPrice: (newNativeCurrencyPriceState: number) => void;
+  setIsNativeCurrencyFetching: (newIsNativeCurrencyFetching: boolean) => void;
   setMexicanPesoPrice: (newMexicanPesoPriceState: number) => void;
   setIsMexicanPesoFetching: (newIsMexicanPesoFetching: boolean) => void;
-  targetNetwork: ChainWithAttributes;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
 };
 
-export const useGlobalState = create<GlobalState>(set => ({
+type GlobalStorage = GlobalState & GlobalActions;
+
+export const useGlobalState = create<GlobalStorage>(set => ({
   nativeCurrency: {
     price: 0,
     isFetching: true,
