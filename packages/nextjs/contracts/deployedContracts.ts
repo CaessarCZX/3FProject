@@ -7,31 +7,18 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     FFFBusiness: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
       abi: [
         {
-          inputs: [],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          anonymous: false,
           inputs: [
             {
-              indexed: true,
               internalType: "address",
-              name: "oldBusinessWallet",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "newBusinessWallet",
+              name: "tokenAddress",
               type: "address",
             },
           ],
-          name: "BusinessWalletSet",
-          type: "event",
+          stateMutability: "nonpayable",
+          type: "constructor",
         },
         {
           anonymous: false,
@@ -148,37 +135,6 @@ const deployedContracts = {
           type: "event",
         },
         {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_to",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_from",
-              type: "address",
-            },
-          ],
-          name: "addReferralToUpline",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_newBusinessWallet",
-              type: "address",
-            },
-          ],
-          name: "changeBusinessWallet",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
           inputs: [],
           name: "deposit",
           outputs: [],
@@ -186,10 +142,16 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_amount",
+              type: "uint256",
+            },
+          ],
           name: "depositMemeberFunds",
           outputs: [],
-          stateMutability: "payable",
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -214,109 +176,6 @@ const deployedContracts = {
             },
           ],
           name: "getMemberBalance",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_memberAddress",
-              type: "address",
-            },
-          ],
-          name: "getMemberDetails",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              internalType: "enum FFFBusiness.Ranks",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              components: [
-                {
-                  internalType: "address payable",
-                  name: "memberWallet",
-                  type: "address",
-                },
-                {
-                  internalType: "bool",
-                  name: "isActive",
-                  type: "bool",
-                },
-                {
-                  internalType: "uint256",
-                  name: "balance",
-                  type: "uint256",
-                },
-                {
-                  internalType: "enum FFFBusiness.Ranks",
-                  name: "rank",
-                  type: "uint8",
-                },
-              ],
-              internalType: "struct FFFBusiness.Member",
-              name: "member",
-              type: "tuple",
-            },
-          ],
-          name: "getMemberDetails",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              internalType: "enum FFFBusiness.Ranks",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "pure",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "getTotalActiveMembers",
           outputs: [
             {
               internalType: "uint256",
@@ -363,39 +222,7 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "address",
-              name: "_currentMember",
-              type: "address",
-            },
-          ],
-          name: "isCurrentlyActiveUser",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
               name: "_uplineAddress",
-              type: "address",
-            },
-          ],
-          name: "memberEntrance",
-          outputs: [],
-          stateMutability: "payable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_memberAddress",
               type: "address",
             },
             {
@@ -404,23 +231,27 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "payToMember",
+          name: "memberEntrance",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
         {
-          inputs: [
+          inputs: [],
+          name: "token",
+          outputs: [
             {
-              internalType: "uint128",
-              name: "_requestedAmount",
-              type: "uint128",
+              internalType: "contract IERC20",
+              name: "",
+              type: "address",
             },
           ],
-          name: "withdrawalRequest",
-          outputs: [],
-          stateMutability: "nonpayable",
+          stateMutability: "view",
           type: "function",
+        },
+        {
+          stateMutability: "payable",
+          type: "receive",
         },
       ],
       inheritedFunctions: {},
@@ -428,37 +259,18 @@ const deployedContracts = {
   },
   11155111: {
     FFFBusiness: {
-      address: "0xa076ECA5a4751496AC055Eb31151DAE50cA9EB79",
+      address: "0x0CC3E5D20216dfAC53105F58909cbFeaf8E4a89e",
       abi: [
         {
           inputs: [
             {
               internalType: "address",
-              name: "_mainWallet",
+              name: "tokenAddress",
               type: "address",
             },
           ],
           stateMutability: "nonpayable",
           type: "constructor",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "oldBusinessWallet",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "newBusinessWallet",
-              type: "address",
-            },
-          ],
-          name: "BusinessWalletSet",
-          type: "event",
         },
         {
           anonymous: false,
@@ -575,37 +387,6 @@ const deployedContracts = {
           type: "event",
         },
         {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_to",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_from",
-              type: "address",
-            },
-          ],
-          name: "addReferralToUpline",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_newBusinessWallet",
-              type: "address",
-            },
-          ],
-          name: "changeBusinessWallet",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
           inputs: [],
           name: "deposit",
           outputs: [],
@@ -613,10 +394,16 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_amount",
+              type: "uint256",
+            },
+          ],
           name: "depositMemeberFunds",
           outputs: [],
-          stateMutability: "payable",
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -655,95 +442,11 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "address",
-              name: "_memberAddress",
+              name: "_currentMember",
               type: "address",
             },
           ],
-          name: "getMemberDetails",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              internalType: "enum FFFBusiness.Ranks",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              components: [
-                {
-                  internalType: "address payable",
-                  name: "memberWallet",
-                  type: "address",
-                },
-                {
-                  internalType: "bool",
-                  name: "isActive",
-                  type: "bool",
-                },
-                {
-                  internalType: "uint256",
-                  name: "balance",
-                  type: "uint256",
-                },
-                {
-                  internalType: "enum FFFBusiness.Ranks",
-                  name: "rank",
-                  type: "uint8",
-                },
-              ],
-              internalType: "struct FFFBusiness.Member",
-              name: "member",
-              type: "tuple",
-            },
-          ],
-          name: "getMemberDetails",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              internalType: "enum FFFBusiness.Ranks",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "pure",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "getTotalActiveMembers",
+          name: "getTotalAffiliatesPerMember",
           outputs: [
             {
               internalType: "uint256",
@@ -768,36 +471,10 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "isCurrentlyActiveUser",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
             {
               internalType: "address",
               name: "_uplineAddress",
-              type: "address",
-            },
-          ],
-          name: "memberEntrance",
-          outputs: [],
-          stateMutability: "payable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_memberAddress",
               type: "address",
             },
             {
@@ -806,23 +483,27 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "payToMember",
+          name: "memberEntrance",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
         {
-          inputs: [
+          inputs: [],
+          name: "token",
+          outputs: [
             {
-              internalType: "uint128",
-              name: "_requestedAmount",
-              type: "uint128",
+              internalType: "contract IERC20",
+              name: "",
+              type: "address",
             },
           ],
-          name: "withdrawalRequest",
-          outputs: [],
-          stateMutability: "nonpayable",
+          stateMutability: "view",
           type: "function",
+        },
+        {
+          stateMutability: "payable",
+          type: "receive",
         },
       ],
       inheritedFunctions: {},

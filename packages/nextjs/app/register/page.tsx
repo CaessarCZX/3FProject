@@ -6,12 +6,11 @@ import { useRouter } from "next/navigation";
 // import Link from "next/link";
 import userIcon from "../../public/userIcon.svg";
 import type { NextPage } from "next";
-import { parseEther } from "viem";
-import { EtherInput } from "~~/components/scaffold-eth";
+import { UsdtInput } from "~~/components/3F/UsdtInput";
 import { AddressInput } from "~~/components/scaffold-eth";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
-const Home: NextPage = () => {
+const Register: NextPage = () => {
   // const { address: connectedAddress } = useAccount();
   const [address, setAddress] = useState("");
   const [deposit, setDeposit] = useState("");
@@ -24,14 +23,13 @@ const Home: NextPage = () => {
       // IMPORTANT: THIS ADDRES IS JUST PROVISIONAL DEVELOPMENT
       if (address == null) setAddress("");
 
-      const convertDepositToWei = parseEther(deposit);
+      const convertDepositToWei = Math.round(Number(deposit) * 10 ** 6);
       await memberEntrance({
         functionName: "memberEntrance",
-        args: [address],
-        value: convertDepositToWei,
+        args: [address, BigInt(convertDepositToWei)],
       });
 
-      router.push("/");
+      router.push("/dashboard");
     } catch (e) {
       console.error("Error", e);
     }
@@ -53,13 +51,8 @@ const Home: NextPage = () => {
                 <div className="w-full">
                   <AddressInput onChange={setAddress} value={address} placeholder="Pon la dirección de tu Upline" />
                   <div className="flex-grow pt-4">
-                    <EtherInput
-                      usdMode
-                      placeholder="Ingresa la cantidad de USDT"
-                      value={deposit}
-                      onChange={amount => setDeposit(amount)}
-                    />
-                    <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo 27 USDT</p>
+                    <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
+                    <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo de 2000 USDT</p>
                   </div>
                 </div>
                 <button
@@ -78,4 +71,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default Register;

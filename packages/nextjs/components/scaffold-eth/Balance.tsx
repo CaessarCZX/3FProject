@@ -1,17 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Address, formatEther } from "viem";
+import { Address, formatUnits } from "viem";
+import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { useDisplayPreferredCurrencies } from "~~/hooks/3FProject/useDisplayPreferredCurrencies";
-import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useWatchBalance } from "~~/hooks/scaffold-eth/useWatchBalance";
 import { useGlobalState } from "~~/services/store/store";
-import {
-  displayCurrencyConvertion,
-  formatCurrency,
-  parseCurrency,
-  parseThreeDecimals,
-} from "~~/utils/3FContract/currencyConvertion";
+import { displayCurrencyConvertion, formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 
 type BalanceProps = {
   address?: Address;
@@ -23,12 +18,9 @@ type BalanceProps = {
  * Display (ETH & USD/ ETH to MXN) balance of an ETH address.
  */
 export const Balance = ({ address, className = "", currenciesMode }: BalanceProps) => {
-  const { targetNetwork } = useTargetNetwork();
-  const nativeCurrencyPrice = useGlobalState(state => state.nativeCurrency.price);
-  const isNativeCurrencyPriceFetching = useGlobalState(state => state.nativeCurrency.isFetching);
   const mexicanPesoPrice = useGlobalState(state => state.mexicanPeso.price);
   const isMexicanPesoPriceFetching = useGlobalState(state => state.mexicanPeso.isFetching);
-  const [currentDollarBalance, setCurrentDollarBalance] = useState<number>(0);
+  const [currentUsdtBalance, setCurrentUsdtBalance] = useState(0);
 
   const {
     data: balance,
@@ -41,22 +33,16 @@ export const Balance = ({ address, className = "", currenciesMode }: BalanceProp
   const { displayCurrenciesMode, toggleDisplayCurrenciesMode } = useDisplayPreferredCurrencies({
     defaultDisplayMode: currenciesMode,
   });
-  const currentEtherBalance = balance ? Number(formatEther(balance.value)) : 0;
 
   useEffect(() => {
-    if (!isNativeCurrencyPriceFetching && nativeCurrencyPrice != 0) {
-      const dolarBalance = parseThreeDecimals(parseCurrency(currentEtherBalance, nativeCurrencyPrice));
-      setCurrentDollarBalance(dolarBalance);
+    if (!isLoading && !isError) {
+      const dolarBalance = balance ? Number(formatUnits(balance?.value, 6)) : 0;
+      console.log(balance?.value);
+      setCurrentUsdtBalance(dolarBalance);
     }
-  }, [isNativeCurrencyPriceFetching, nativeCurrencyPrice, currentEtherBalance]);
+  }, [isLoading, isError, balance]);
 
-  if (
-    !address ||
-    isLoading ||
-    balance === null ||
-    (isNativeCurrencyPriceFetching && nativeCurrencyPrice === 0) ||
-    (isMexicanPesoPriceFetching && mexicanPesoPrice === 0)
-  ) {
+  if (!address || isLoading || balance === null || (isMexicanPesoPriceFetching && mexicanPesoPrice === 0)) {
     return (
       <div className="animate-pulse flex space-x-4">
         <div className="rounded-md bg-slate-300 h-6 w-6"></div>
@@ -81,25 +67,20 @@ export const Balance = ({ address, className = "", currenciesMode }: BalanceProp
       onClick={toggleDisplayCurrenciesMode}
     >
       <div className="w-full flex items-center justify-center">
+        <span className="mr-1">
+          <BanknotesIcon className="h-4 w-4" />
+        </span>
         {displayCurrenciesMode ? (
           <>
-            <article className="flex gap-4">
-              <div>
-                <span className="text-[0.8em] font-bold mr-1"> USD</span>
-                <span>{formatCurrency(currentDollarBalance)}</span>
-              </div>
-              <div>
-                <span className="text-[0.8em] font-bold mr-1">MXN</span>
-                <span>
-                  {displayCurrencyConvertion({ longCurrenci: currentDollarBalance, exchangeRatio: mexicanPesoPrice })}
-                </span>
-              </div>
-            </article>
+            <span className="text-[0.8em] font-bold mr-1">MXN</span>
+            <span>
+              {displayCurrencyConvertion({ longCurrenci: currentUsdtBalance, exchangeRatio: mexicanPesoPrice })}
+            </span>
           </>
         ) : (
           <>
-            <span>{currentEtherBalance.toFixed(4)}</span>
-            <span className="text-[0.8em] font-bold ml-1">{targetNetwork.nativeCurrency.symbol}</span>
+            <span className="text-[0.8em] font-bold mr-1">USDT</span>
+            <span>{formatCurrency(currentUsdtBalance)}</span>
           </>
         )}
       </div>

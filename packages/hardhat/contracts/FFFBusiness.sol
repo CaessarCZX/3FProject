@@ -1,29 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.2 <0.9.0;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 contract FFFBusiness {
+    IERC20 public token;
     address payable private _businessWallet;
     uint128 private _totalMembers;
-    uint128 private _totalActiveMembers;
 
-    uint128 private _minAmountToTransfer = 10000000000000000;  // Currently is a wei unit (0.01 Ether)
-    uint8 constant private _MAX_TICKETS = 3; // NOTE: this feature remains to be seen
-    
-    uint8 private _refundTierOne = 5;
-    uint8 private _refundTierTwo = 10;
-    uint8 private _refundTierThree = 15;
-    uint8 private _refundTierFour = 20;
-    uint8 private _refundTierFive = 25;
+   // To modify when contract is changed to USDT
+    uint128 private constant _MIN_AMOUNT_TO_TRANSFER = 2000 * 10**6; // 2000 USDT
+    uint128 private constant _MAX_MEMBER_BALANCE = 50000 * 10**6; // 50,000 USDT en ether (31.07 ETH)
+    uint128 private constant _DEPOSIT_MULTIPLE = 1000 * 10**6; // Múltiplo de 1000 USDT en ether (0.62 ETH)
 
-    uint8 private _qualifyToImproveRank = 3; // NOTE: this feature remains to be seen
+    uint8 private constant _REFUND_TIER_ONE = 5;
+    uint8 private constant _REFUND_TIER_TWO = 10;
+    uint8 private constant _REFUND_TIER_THREE = 15;
+    uint8 private constant _REFUND_TIER_FOUR = 20;
+    uint8 private constant _REFUND_TIER_FIVE = 25;
 
-    enum Ranks {
-        Sapphire,   // 0
-        Pearl,      // 1
-        Ruby,       // 2
-        Emerald,    // 3
-        Diamond     // 4
-    }
+    uint8 private constant _QUALIFY_TO_IMPROVE_RANK = 3;
+
+    enum Ranks { Sapphire, Pearl, Ruby, Emerald, Diamond }
 
     struct Member {
         address payable memberWallet;
@@ -32,334 +30,132 @@ contract FFFBusiness {
         Ranks rank;
     }
 
-    struct WithdrawTicket {
-        address payable to;
-        uint128 requestedAmount;
-        uint32 requestDate;
-        bool isPaid;
-    }
-
     mapping(address => Member) private members;
     mapping(address => address[]) private enrolled;
-    mapping(address => WithdrawTicket[]) private withdrawals; // NOTE: this feature remains to be seen
-
-    modifier onlyBusiness() {
-        require(msg.sender == _businessWallet, "Error: Not the business");
-        _;
-    }
-
-    modifier onlyActiveMember() {
-        require(members[msg.sender].isActive, "Member not active");
-        _;
-    }
-
-    modifier onlyActiveMemberStruct(Member memory _currentMember){
-        require(_currentMember.isActive, "Member not active");
-        _;
-    }
-
-    modifier onlyActiveMemberAddress(address _currentMember){
-        require(members[_currentMember].isActive, "Member not active");
-        _;
-    }
-
-    modifier checkMemberBalance(uint _amount) {
-        require(members[msg.sender].balance >= _amount, "Insufficient balance");
-        _;
-    }
-
-    modifier checkMemberBalanceStruct(Member memory _currentMember, uint _amount) {
-        require(_currentMember.balance >= _amount, "Insufficient balance");
-        _;
-    }
-
-    modifier checkContractBalance(uint _amount) {
-        require(address(this).balance >= _amount, "The contract doesn't have sufficient balance");
-        _;
-    }
-
-    modifier checkValidAddress(address _recipient) {
-        require(_recipient != address(0), "Invalid address");
-        _;
-    }
-
-    modifier checkMinimumAmount() {
-        require(msg.value >= _minAmountToTransfer, "Minimum amount is 0.01 Ethers");
-        _;
-    }
-
-    modifier preventZeroAmount(uint _currentAmount) {
-        require(_currentAmount > 0, "The amount must be greater than zero");
-        _;
-    }
 
     event Deposit(address indexed from, uint amount);
     event Transfer(address indexed from, address indexed to, uint amount);
     event WithdrawalRequest(address indexed to, uint amount);
     event Refund(address indexed to, uint amount);
-    
-    event BusinessWalletSet(address indexed oldBusinessWallet, address indexed newBusinessWallet);
     event NewMember(address indexed member);
     event NewRankReached(address indexed member, string rank);
 
-    constructor() {
+    constructor(address tokenAddress) {
         _businessWallet = payable(msg.sender);
-        _totalMembers = 0;
-        _totalActiveMembers = 0;
-        emit BusinessWalletSet(address(0), _businessWallet);
+        token = IERC20(tokenAddress);  
         createMember(_businessWallet);
     }
 
-    function deposit() public payable {}
-
-    function getTotalMembers() public view returns (uint) {
-        return _totalMembers;
+    modifier onlyActiveMember() {
+        require(members[msg.sender].isActive, "Miembro no activo");
+        _;
     }
 
-    function getTotalActiveMembers() public view returns (uint) {
-        return _totalActiveMembers;
+    modifier checkValidAddress(address _recipient) {
+        require(_recipient != address(0), "Direccion invalida");
+        _;
     }
 
+    // Only for development
     function getBusinessWallet() public view returns (address) {
         return _businessWallet;
     }
 
-    function changeBusinessWallet(address _newBusinessWallet) public onlyBusiness {
-        emit BusinessWalletSet(_businessWallet, _newBusinessWallet);
-        _businessWallet = payable(_newBusinessWallet);
+    function getTotalMembers() public view returns (uint) {
+        return _totalMembers;
     }
+    // =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 
-    function getMemberBalance(address _currentMember) 
-        public
-        view
-        onlyActiveMemberAddress(_currentMember)
-        returns(uint)
-    {
-        return members[_currentMember].balance;
-    }
+    receive() external payable {}
 
-    function getMemberDetails(Member memory member)
-        public
-        pure
-        returns (
-            address, 
-            bool,
-            uint,
-            Ranks
-        ) 
-    {
-        require(member.isActive, "Member not registered");
+    function deposit() public payable {}
 
-        return (
-            member.memberWallet,
-            member.isActive,
-            member.balance,
-            member.rank
-        );
-    }
+    function depositMemeberFunds(uint _amount) public {
+        require(_amount <= token.balanceOf(msg.sender), "No cuentas con USDT en tu wallet");
+        require(_amount >= _MIN_AMOUNT_TO_TRANSFER, "Deposito minimo es de 2000 USDT");
+        require(_amount % _DEPOSIT_MULTIPLE == 0, "Solo puede depositar de mil en mil");
 
-    function getMemberDetails(address _memberAddress)
-        public
-        view
-        returns (
-            address, 
-            bool,
-            uint,
-            Ranks
-        ) 
-    {
-        Member memory member = members[_memberAddress];
-        require(member.isActive, "Member not registered");
-
-        return (
-            member.memberWallet,
-            member.isActive,
-            member.balance,
-            member.rank
-        );
-    }
-
-    function addReferralToUpline(address _to, address _from)
-        public
-        onlyActiveMemberAddress(_to)
-        checkValidAddress(_to)
-    {
-        enrolled[_to].push(_from);
-        Member storage member = members[_to];
-        updateReferralRank(member, _to);
-    }
-
-    function memberEntrance(address _uplineAddress) 
-        public
-        payable
-        checkMinimumAmount
-    {
-
-        if (!members[msg.sender].isActive) createMember(payable(msg.sender));
-
-        if (_uplineAddress != address(0)) addReferralToUpline(_uplineAddress, msg.sender);
-
-        depositMemeberFunds();
-    }
-
-    // NOTE: This is a provisional function for active members
-    function depositMemeberFunds()
-        public
-        payable
-        checkMinimumAmount
-    {
         Member storage member = members[msg.sender];
-        member.balance += msg.value;
-        emit Deposit(msg.sender, msg.value);
+        uint newTotalBalance = member.balance + _amount;
+        require(newTotalBalance <= _MAX_MEMBER_BALANCE, "Has alcanzado el limite maxiomo de 50,000 USDT");
 
-        uint8 refundPercentToMember = _getRefundPerRank(member);
+        require(token.transferFrom(msg.sender, address(this), _amount), "Transferencia fallida");
 
-        uint refundToMember = _getRefundAmount(msg.value, refundPercentToMember);
-        uint refundToBusiness = msg.value - refundToMember;
-        require(refundToBusiness >= refundToMember, "Failed transaction");
+        member.balance += _amount;
+        emit Deposit(msg.sender, _amount);
 
-        _payment(_businessWallet, refundToBusiness);
-        _payment(payable(msg.sender), refundToMember);
+        uint refundToMember = _calculateRefund(_amount, member.rank);
+        uint refundToBusiness = _amount - refundToMember;
+
+        _processPayment(_businessWallet, refundToBusiness);
+        _processPayment(payable(msg.sender), refundToMember);
         emit Refund(msg.sender, refundToMember);
     }
 
-    // NOTE: this feature remains to be seen
-    function withdrawalRequest(uint128 _requestedAmount)
-        public
-        preventZeroAmount(_requestedAmount)
-    {
-        Member memory currentMember = members[msg.sender];
-        require(currentMember.isActive, "Member not active");
-        require(currentMember.balance >= _requestedAmount, "Insufficient balance");
-        require(withdrawals[msg.sender].length <= _MAX_TICKETS, "Error can't request more than 5 withdrawals");
+    function memberEntrance(address _uplineAddress, uint _amount) public {
+        if (!members[msg.sender].isActive) {
+            createMember(payable(msg.sender));
+        }
+        if (_uplineAddress != address(0)) {
+            enrolled[_uplineAddress].push(msg.sender);
+            _updateMemberRank(_uplineAddress);
+        }
 
-        WithdrawTicket memory currentTicket = WithdrawTicket({
-            to: payable(msg.sender),
-            requestedAmount: _requestedAmount,
-            requestDate: uint32(block.timestamp),
-            isPaid: false
-        });
-        withdrawals[msg.sender].push(currentTicket);
-        emit WithdrawalRequest(msg.sender, _requestedAmount);
+        depositMemeberFunds(_amount);
     }
 
-    function payToMember(address _memberAddress, uint _amount)
-        public
-        onlyBusiness
-        preventZeroAmount(_amount)
-    {
-
+    function getMemberBalance(address _currentMember) public view returns(uint) {
+        return members[_currentMember].balance;
     }
 
-    function isCurrentlyActiveUser(address _currentMember)
-        public
-        view
-        returns(bool)
-    {
-        return members[_currentMember].isActive;
-    }
-
-    function createMember(address payable _newMember)
-        internal
-        checkValidAddress(_newMember)
-    {
-        
-        Member storage newMember = members[_newMember];
-        newMember.memberWallet = _newMember;
-        newMember.isActive = true;
-        newMember.balance = 0;
-        newMember.rank = Ranks.Sapphire;
-
-        _totalMembers++;
-        _totalActiveMembers++;
-
-        emit NewMember(_newMember);
-    }
-
-    function getTotalAffiliatesPerMember(address _currentMember)
-        public
-        view
-        onlyActiveMemberAddress(_currentMember)
-        returns(uint)
-    {
+    function getTotalAffiliatesPerMember(address _currentMember) public view returns(uint) {
         return enrolled[_currentMember].length;
     }
 
-    function _payment(address payable _to, uint _amount)
-        private
-        preventZeroAmount(_amount)
-    {
-        (bool sent, ) = _to.call{ value: _amount }("");
-        require(sent, "Failed transaction");
+    function _processPayment(address payable _to, uint _amount) private {
+        require(_amount > 0, "La cantidad a tranferir debe ser mayor a cero");
+        require(token.transfer(_to, _amount), "Ha fallado la tranferencia");
     }
 
-    function _getRefundAmount(uint _totalAmount, uint _refundPercent) private pure returns (uint) {
-        return (_totalAmount * _refundPercent) / 100;
+    function _calculateRefund(uint _amount, Ranks _rank) private pure returns (uint) {
+        uint refundPercent;
+        if (_rank == Ranks.Diamond) refundPercent = _REFUND_TIER_FIVE;
+        else if (_rank == Ranks.Emerald) refundPercent = _REFUND_TIER_FOUR;
+        else if (_rank == Ranks.Ruby) refundPercent = _REFUND_TIER_THREE;
+        else if (_rank == Ranks.Pearl) refundPercent = _REFUND_TIER_TWO;
+        else refundPercent = _REFUND_TIER_ONE;
+
+        return (_amount * refundPercent) / 100;
     }
 
-    function _getRefundPerRank(Member storage member)
-        private
-        view
-        returns (uint8) 
-    {
-        if (member.rank == Ranks.Diamond) {
-            return _refundTierFive;
-        } 
-        if (member.rank == Ranks.Emerald) {
-            return _refundTierFour;
-        } 
-        if (member.rank == Ranks.Ruby) {
-            return _refundTierThree;
-        } 
-        if (member.rank == Ranks.Pearl) {
-            return _refundTierTwo;
-        }
+    function _updateMemberRank(address _uplineAddress) private {
+        Member storage member = members[_uplineAddress];
+        uint referralCount = enrolled[_uplineAddress].length;
 
-        return _refundTierOne;
-    }
-
-    function _setNewRank(
-        Member storage currentMember,
-        Ranks newRank,
-        string memory nameRank
-        ) private
-    {
-        currentMember.rank = newRank;
-        emit NewRankReached(currentMember.memberWallet, nameRank);
-    }
-
-    function updateReferralRank(
-        Member storage currentMember,
-        address _currentMemberAddress
-        ) private 
-    {
-        uint qualificationRank = enrolled[_currentMemberAddress].length / _qualifyToImproveRank;
-
-        if (qualificationRank == 5 && currentMember.rank != Ranks.Diamond) {
-            _setNewRank(
-                currentMember,
-                Ranks.Diamond,
-                "Diamond"
-            );
-        } else if (qualificationRank == 4 && currentMember.rank != Ranks.Emerald) {
-            _setNewRank(
-                currentMember,
-                Ranks.Emerald,
-                "Emerald"
-            );
-        } else if (qualificationRank == 3 && currentMember.rank != Ranks.Ruby) {
-            _setNewRank(
-                currentMember,
-                Ranks.Ruby,
-                "Ruby"
-            );
-        } else if (qualificationRank == 2 && currentMember.rank != Ranks.Pearl) {
-            _setNewRank(
-                currentMember,
-                Ranks.Pearl,
-                "Pearl"
-            );
+        if (referralCount / _QUALIFY_TO_IMPROVE_RANK >= 5 && member.rank != Ranks.Diamond) {
+            member.rank = Ranks.Diamond;
+            emit NewRankReached(_uplineAddress, "Diamond");
+        } else if (referralCount / _QUALIFY_TO_IMPROVE_RANK >= 4 && member.rank != Ranks.Emerald) {
+            member.rank = Ranks.Emerald;
+            emit NewRankReached(_uplineAddress, "Emerald");
+        } else if (referralCount / _QUALIFY_TO_IMPROVE_RANK >= 3 && member.rank != Ranks.Ruby) {
+            member.rank = Ranks.Ruby;
+            emit NewRankReached(_uplineAddress, "Ruby");
+        } else if (referralCount / _QUALIFY_TO_IMPROVE_RANK >= 2 && member.rank != Ranks.Pearl) {
+            member.rank = Ranks.Pearl;
+            emit NewRankReached(_uplineAddress, "Pearl");
         }
     }
 
+    function createMember(address payable _newMember) internal checkValidAddress(_newMember) {
+        members[_newMember] = Member({
+            memberWallet: _newMember,
+            isActive: true,
+            balance: 0,
+            rank: Ranks.Sapphire
+        });
+
+        _totalMembers++;
+        emit NewMember(_newMember);
+    }
 }

@@ -2131,6 +2131,7 @@ __metadata:
     react: ~18.2.0
     react-copy-to-clipboard: ~5.1.0
     react-dom: ~18.2.0
+    react-flagpack: ^2.0.6
     react-hot-toast: ~2.4.0
     tailwindcss: ~3.4.3
     type-fest: ~4.6.0
@@ -5044,6 +5045,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chalk@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "chalk@npm:5.3.0"
+  checksum: 623922e077b7d1e9dedaea6f8b9e9352921f8ae3afe739132e0e00c275971bdd331268183b2628cf4ab1727c45ea1f28d7e24ac23ce1db1eb653c414ca8a5a80
+  languageName: node
+  linkType: hard
+
 "charenc@npm:>= 0.0.1":
   version: 0.0.2
   resolution: "charenc@npm:0.0.2"
@@ -7664,6 +7672,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fs-extra@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "fs-extra@npm:11.2.0"
+  dependencies:
+    graceful-fs: ^4.2.0
+    jsonfile: ^6.0.1
+    universalify: ^2.0.0
+  checksum: b12e42fa40ba47104202f57b8480dd098aa931c2724565e5e70779ab87605665594e76ee5fb00545f772ab9ace167fe06d2ab009c416dc8c842c5ae6df7aa7e8
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^7.0.0, fs-extra@npm:^7.0.1":
   version: 7.0.1
   resolution: "fs-extra@npm:7.0.1"
@@ -9801,6 +9820,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"meow@npm:^13.2.0":
+  version: 13.2.0
+  resolution: "meow@npm:13.2.0"
+  checksum: 79c61dc02ad448ff5c29bbaf1ef42181f1eae9947112c0e23db93e84cbc2708ecda53e54bfc6689f1e55255b2cea26840ec76e57a5773a16ca45f4fe2163ec1c
+  languageName: node
+  linkType: hard
+
 "merge-stream@npm:^2.0.0":
   version: 2.0.0
   resolution: "merge-stream@npm:2.0.0"
@@ -11569,6 +11595,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-flagpack@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "react-flagpack@npm:2.0.6"
+  dependencies:
+    chalk: ^5.3.0
+    fs-extra: ^11.2.0
+    meow: ^13.2.0
+  peerDependencies:
+    react: ^16.8.* || ^17.* || ^18.*
+  bin:
+    react-flagpack: cli/flagpack.js
+  checksum: a4db23fc9ff2ac60e8ee693ff2629b871e81458870168c785093409b4849ebf602cd0beb60bdd803ccb0290918ac208890be321d87e06511f0b2841e835977ab
+  languageName: node
+  linkType: hard
+
 "react-hot-toast@npm:~2.4.0":
   version: 2.4.1
   resolution: "react-hot-toast@npm:2.4.1"
@@ -12144,6 +12185,7 @@ __metadata:
     axios: ^1.7.7
     husky: ~8.0.3
     lint-staged: ~13.2.2
+    react-flagpack: ^2.0.6
   languageName: unknown
   linkType: soft
 
