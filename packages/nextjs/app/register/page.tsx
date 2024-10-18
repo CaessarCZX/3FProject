@@ -31,6 +31,7 @@ const Register: NextPage = () => {
       if (address == null) setAddress("");
       if (!contract?.address) {
         console.error("Direccion del contrato no encontrada");
+        return;
       }
 
       const contractAddress = contract?.address ?? "0x";

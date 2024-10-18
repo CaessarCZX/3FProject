@@ -3,16 +3,19 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import BlockExplorer from "./_components/BlockExplorer";
+import { writeContract } from "@wagmi/core";
 import type { NextPage } from "next";
-import { formatUnits } from "viem";
+import { erc20Abi, formatUnits } from "viem";
 import { useAccount } from "wagmi";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { UsdtInput } from "~~/components/3F/UsdtInput";
 import { useDateEs } from "~~/hooks/3FProject/useDateEs";
 import { useExchangeRatios } from "~~/hooks/3FProject/useExchangeRatios";
-import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo, useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { formatCurrency, parseCurrency, parseThreeDecimals } from "~~/utils/3FContract/currencyConvertion";
 
+const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 // import ProtectedRoute from "~~/services/Auth/ProtectedRoute";
 
 const Dashboard: NextPage = () => {
@@ -23,6 +26,7 @@ const Dashboard: NextPage = () => {
   const { exchangeRatio: exchangeUSD, loadingData: loadingUSD } = useExchangeRatios("USD");
   const [dollarBalance, setDollarBalance] = useState(0);
   const currentDate = useDateEs();
+  const { data: contract } = useDeployedContractInfo("FFFBusiness");
 
   const { data: memberBalance } = useScaffoldReadContract({
     contractName: "FFFBusiness",
@@ -40,11 +44,27 @@ const Dashboard: NextPage = () => {
 
   const handleDeposit = async () => {
     try {
-      const convertDepositToWei = Math.round(Number(deposit) * 10 ** 6);
-      await depositMemberFunds({
-        functionName: "depositMemeberFunds",
-        args: [BigInt(convertDepositToWei)],
+      if (!contract?.address) {
+        console.error("Direccion del contrato no encontrada");
+        return;
+      }
+      const contractAddress = contract?.address ?? "0x";
+      const convertDeposit = Math.round(Number(deposit) * 10 ** 6);
+      const allowanceAmount = BigInt(convertDeposit);
+
+      // Allowance for transaction
+      const approveTx = await writeContract(wagmiConfig, {
+        abi: erc20Abi,
+        address: tokenUsdt,
+        functionName: "approve",
+        args: [contractAddress, allowanceAmount],
       });
+      if (approveTx) {
+        await depositMemberFunds({
+          functionName: "depositMemeberFunds",
+          args: [allowanceAmount],
+        });
+      }
     } catch (e) {
       console.error("Error Deposit:", e);
     }
