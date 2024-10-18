@@ -5,10 +5,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 // import Link from "next/link";
 import userIcon from "../../public/userIcon.svg";
+import { writeContract } from "@wagmi/core";
 import type { NextPage } from "next";
+import { erc20Abi } from "viem";
 import { UsdtInput } from "~~/components/3F/UsdtInput";
 import { AddressInput } from "~~/components/scaffold-eth";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
+import { wagmiConfig } from "~~/services/web3/wagmiConfig";
+
+const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 
 const Register: NextPage = () => {
   // const { address: connectedAddress } = useAccount();
@@ -16,18 +22,35 @@ const Register: NextPage = () => {
   const [deposit, setDeposit] = useState("");
   const router = useRouter();
 
+  const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const { writeContractAsync: memberEntrance } = useScaffoldWriteContract("FFFBusiness");
 
   const handleMemberEntrance = async () => {
     try {
       // IMPORTANT: THIS ADDRES IS JUST PROVISIONAL DEVELOPMENT
       if (address == null) setAddress("");
+      if (!contract?.address) {
+        console.error("Direccion del contrato no encontrada");
+      }
 
-      const convertDepositToWei = Math.round(Number(deposit) * 10 ** 6);
-      await memberEntrance({
-        functionName: "memberEntrance",
-        args: [address, BigInt(convertDepositToWei)],
+      const contractAddress = contract?.address ?? "0x";
+      const convertDeposit = Math.round(Number(deposit) * 10 ** 6);
+      const allowanceAmount = BigInt(convertDeposit);
+
+      // Allowance for transaction
+      const approveTx = await writeContract(wagmiConfig, {
+        abi: erc20Abi,
+        address: tokenUsdt,
+        functionName: "approve",
+        args: [contractAddress, allowanceAmount],
       });
+
+      if (approveTx) {
+        await memberEntrance({
+          functionName: "memberEntrance",
+          args: [address, allowanceAmount],
+        });
+      }
 
       router.push("/dashboard");
     } catch (e) {

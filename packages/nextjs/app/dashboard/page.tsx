@@ -4,7 +4,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import BlockExplorer from "./_components/BlockExplorer";
 import type { NextPage } from "next";
-import { formatEther } from "viem";
+import { formatUnits } from "viem";
 import { useAccount } from "wagmi";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { UsdtInput } from "~~/components/3F/UsdtInput";
@@ -21,7 +21,7 @@ const Dashboard: NextPage = () => {
   const [currencyType, setCurrencyType] = useState<string>("USDT");
   const { exchangeRatio, loadingData } = useExchangeRatios("ETH");
   const { exchangeRatio: exchangeUSD, loadingData: loadingUSD } = useExchangeRatios("USD");
-  const [dollarValue, setDollarValue] = useState(0);
+  const [dollarBalance, setDollarBalance] = useState(0);
   const currentDate = useDateEs();
 
   const { data: memberBalance } = useScaffoldReadContract({
@@ -52,10 +52,8 @@ const Dashboard: NextPage = () => {
 
   useEffect(() => {
     if (!loadingData && exchangeRatio?.USDT) {
-      const dollarPrice = parseThreeDecimals(
-        parseCurrency(Number(formatEther(memberBalance || BigInt(0))), Number(exchangeRatio.USDT)),
-      );
-      setDollarValue(dollarPrice);
+      const currentDollarBalance = Number(formatUnits(BigInt(memberBalance || 0), 6));
+      setDollarBalance(currentDollarBalance);
     }
   }, [loadingData, exchangeRatio, memberBalance]);
 
@@ -72,7 +70,7 @@ const Dashboard: NextPage = () => {
                     {loadingData ? (
                       <span className="loading loading-dots loading-lg"></span>
                     ) : exchangeRatio && exchangeRatio.USDT ? (
-                      <p className="text-4xl font-bold m-0">{formatCurrency(dollarValue)}</p>
+                      <p className="text-4xl font-bold m-0">{formatCurrency(dollarBalance)}</p>
                     ) : (
                       <p className="text-xl font-semibold m-0">No disponible</p>
                     )}
@@ -81,10 +79,10 @@ const Dashboard: NextPage = () => {
                   <span>
                     {loadingUSD ? (
                       <span className="loading loading-spinner text-accent"></span>
-                    ) : exchangeUSD && exchangeUSD.MXN && dollarValue ? (
+                    ) : exchangeUSD && exchangeUSD.MXN && dollarBalance ? (
                       <span className="text-cyan-600 font-light">
                         {`${formatCurrency(
-                          parseThreeDecimals(parseCurrency(dollarValue, Number(exchangeUSD.MXN))),
+                          parseThreeDecimals(parseCurrency(dollarBalance, Number(exchangeUSD.MXN))),
                         )} MXN`}
                       </span>
                     ) : (
