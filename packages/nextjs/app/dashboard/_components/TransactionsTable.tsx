@@ -1,12 +1,12 @@
 import { TransactionHash } from "./TransactionHash";
-import { formatEther } from "viem";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { TransactionsTableProps } from "~~/utils/3FContract/block";
 
 // import { TransactionWithFunction } from "~~/utils/scaffold-eth";
 
-export const TransactionsTable = ({ transactions, transactionReceipts }: TransactionsTableProps) => {
+export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
   const { targetNetwork } = useTargetNetwork();
+  console.log(transactions);
 
   return (
     <div className="flex justify-center max-h-56 overflow-y-auto">
@@ -18,24 +18,27 @@ export const TransactionsTable = ({ transactions, transactionReceipts }: Transac
               <th className="bg-primary">Fecha</th>
               <th className="bg-primary">Ahorro</th>
               <th className="bg-primary">Estatus</th>
-              <th className="bg-primary text-end">Valor ({targetNetwork.nativeCurrency.symbol})</th>
+              <th className="bg-primary text-end">
+                Valor
+                <span className="font-light text-md ml-2">USDT</span>
+              </th>
             </tr>
           </thead>
           <tbody>
             {transactions.map(tx => {
               const hash = tx.hash;
-              const status = transactionReceipts[hash].status;
+              // const status = transactionReceipts[hash].status;
               const value = tx.value;
               return (
                 <tr key={hash} className="hover text-sm">
                   <td className="w-1/12 md:py-4">
                     <TransactionHash hash={hash} />
                   </td>
-                  <td className="w-2/1 md:py-4">Date to be confirmed...</td>
+                  <td className="w-2/1 md:py-4">date</td>
                   <td className="w-2/12 md:py-4">Save tipe to be confirmed...</td>
-                  <td className="w-2/12 md:py-4">{status}</td>
+                  {/* <td className="w-2/12 md:py-4">{status}</td> */}
                   <td className="text-right md:py-4">
-                    {formatEther(value)} {targetNetwork.nativeCurrency.symbol}
+                    {value} {targetNetwork.nativeCurrency.symbol}
                   </td>
                 </tr>
               );

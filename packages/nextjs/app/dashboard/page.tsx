@@ -3,9 +3,11 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import BlockExplorer from "./_components/BlockExplorer";
-import { writeContract } from "@wagmi/core";
+import { estimateGas, writeContract } from "@wagmi/core";
+import { waitForTransactionReceipt } from "@wagmi/core";
+import { getGasPrice } from "@wagmi/core";
 import type { NextPage } from "next";
-import { erc20Abi, formatUnits } from "viem";
+import { encodeFunctionData, erc20Abi, formatUnits, parseUnits } from "viem";
 import { useAccount } from "wagmi";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { UsdtInput } from "~~/components/3F/UsdtInput";
@@ -27,6 +29,11 @@ const Dashboard: NextPage = () => {
   const [dollarBalance, setDollarBalance] = useState(0);
   const currentDate = useDateEs();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
+  // For transaction
+  const contractAddress = contract?.address ?? "0x";
+  const { writeContractAsync: depositMemberFunds } = useScaffoldWriteContract("FFFBusiness");
+  const [isApproved, setIsApproved] = useState(false);
+  const [depositToContract, setDepositToContract] = useState(0n);
 
   const { data: memberBalance } = useScaffoldReadContract({
     contractName: "FFFBusiness",
@@ -40,35 +47,70 @@ const Dashboard: NextPage = () => {
     args: [currentMember?.address],
   });
 
-  const { writeContractAsync: depositMemberFunds } = useScaffoldWriteContract("FFFBusiness");
-
   const handleDeposit = async () => {
     try {
-      if (!contract?.address) {
+      if (!contractAddress) {
         console.error("Direccion del contrato no encontrada");
         return;
       }
-      const contractAddress = contract?.address ?? "0x";
-      const convertDeposit = Math.round(Number(deposit) * 10 ** 6);
-      const allowanceAmount = BigInt(convertDeposit);
+      const allowanceAmount = parseUnits(deposit, 6);
+
+      const allowData = encodeFunctionData({
+        abi: erc20Abi,
+        functionName: "approve",
+        args: [contractAddress, allowanceAmount],
+      });
+
+      const gas = await estimateGas(wagmiConfig, {
+        to: tokenUsdt,
+        data: allowData,
+      });
+      console.log(gas);
+
+      const gasPrice = await getGasPrice(wagmiConfig);
+      console.log(gasPrice);
 
       // Allowance for transaction
-      const approveTx = await writeContract(wagmiConfig, {
+      const allowanceHash = await writeContract(wagmiConfig, {
         abi: erc20Abi,
         address: tokenUsdt,
         functionName: "approve",
         args: [contractAddress, allowanceAmount],
+        gas,
+        gasPrice,
       });
-      if (approveTx) {
-        await depositMemberFunds({
-          functionName: "depositMemeberFunds",
-          args: [allowanceAmount],
-        });
-      }
+
+      const interval = setInterval(async () => {
+        try {
+          const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
+            hash: allowanceHash,
+          });
+          if (transactionReceipt.status === "success") {
+            clearInterval(interval);
+            setIsApproved(true);
+            setDepositToContract(allowanceAmount);
+          }
+        } catch (error) {
+          console.error("Failed deposit", error);
+        }
+      }, 500);
     } catch (e) {
       console.error("Error Deposit:", e);
     }
   };
+
+  useEffect(() => {
+    const depositAction = async () => {
+      await depositMemberFunds({
+        functionName: "depositMemberFunds",
+        args: [depositToContract],
+      });
+    };
+    if (isApproved) {
+      depositAction();
+      setIsApproved(false);
+    }
+  }, [isApproved, depositMemberFunds, depositToContract]);
 
   useEffect(() => {
     if (!loadingData && exchangeRatio?.USDT) {
@@ -145,7 +187,7 @@ const Dashboard: NextPage = () => {
                 <div className="card-actions">
                   <div className="flex-grow mx-2">
                     <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
-                    <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo 1000 USDT</p>
+                    <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo 2000 USDT</p>
                   </div>
                   <div className="w-full space-x-4 flex justify-end  md:w-auto lg:self-auto">
                     <select

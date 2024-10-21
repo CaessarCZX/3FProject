@@ -33,12 +33,12 @@ contract FFFBusiness {
     mapping(address => Member) private members;
     mapping(address => address[]) private enrolled;
 
-    event Deposit(address indexed from, uint amount);
-    event Transfer(address indexed from, address indexed to, uint amount);
-    event WithdrawalRequest(address indexed to, uint amount);
-    event Refund(address indexed to, uint amount);
-    event NewMember(address indexed member);
-    event NewRankReached(address indexed member, string rank);
+    event Deposit(address indexed from, uint amount, uint timestamp);
+    event Transfer(address indexed from, address indexed to, uint amount, uint timestamp);
+    event WithdrawalRequest(address indexed to, uint amount, uint timestamp);
+    event Refund(address indexed to, uint amount, uint timestamp);
+    event NewMember(address indexed member, uint timestamp);
+    event NewRankReached(address indexed member, string rank, uint timestamp);
 
     constructor(address tokenAddress) {
         _businessWallet = payable(msg.sender);
@@ -70,7 +70,7 @@ contract FFFBusiness {
 
     function deposit() public payable {}
 
-    function depositMemeberFunds(uint _amount) public {
+    function depositMemberFunds(uint _amount) public {
         require(_amount <= token.balanceOf(msg.sender), "No cuentas con USDT en tu wallet");
         require(_amount >= _MIN_AMOUNT_TO_TRANSFER, "Deposito minimo es de 2000 USDT");
         require(_amount % _DEPOSIT_MULTIPLE == 0, "Solo puede depositar de mil en mil");
@@ -82,14 +82,14 @@ contract FFFBusiness {
         require(token.transferFrom(msg.sender, address(this), _amount), "Transferencia fallida");
 
         member.balance += _amount;
-        emit Deposit(msg.sender, _amount);
+        emit Deposit(msg.sender, _amount, block.timestamp);
 
         uint refundToMember = _calculateRefund(_amount, member.rank);
         uint refundToBusiness = _amount - refundToMember;
 
         _processPayment(_businessWallet, refundToBusiness);
         _processPayment(payable(msg.sender), refundToMember);
-        emit Refund(msg.sender, refundToMember);
+        emit Refund(msg.sender, refundToMember, block.timestamp);
     }
 
     function memberEntrance(address _uplineAddress, uint _amount) public {
@@ -101,7 +101,7 @@ contract FFFBusiness {
             _updateMemberRank(_uplineAddress);
         }
 
-        depositMemeberFunds(_amount);
+        depositMemberFunds(_amount);
     }
 
     function getMemberBalance(address _currentMember) public view returns(uint) {
@@ -134,16 +134,16 @@ contract FFFBusiness {
 
         if (referralCount / _QUALIFY_TO_IMPROVE_RANK >= 5 && member.rank != Ranks.Diamond) {
             member.rank = Ranks.Diamond;
-            emit NewRankReached(_uplineAddress, "Diamond");
+            emit NewRankReached(_uplineAddress, "Diamond", block.timestamp);
         } else if (referralCount / _QUALIFY_TO_IMPROVE_RANK >= 4 && member.rank != Ranks.Emerald) {
             member.rank = Ranks.Emerald;
-            emit NewRankReached(_uplineAddress, "Emerald");
+            emit NewRankReached(_uplineAddress, "Emerald", block.timestamp);
         } else if (referralCount / _QUALIFY_TO_IMPROVE_RANK >= 3 && member.rank != Ranks.Ruby) {
             member.rank = Ranks.Ruby;
-            emit NewRankReached(_uplineAddress, "Ruby");
+            emit NewRankReached(_uplineAddress, "Ruby", block.timestamp);
         } else if (referralCount / _QUALIFY_TO_IMPROVE_RANK >= 2 && member.rank != Ranks.Pearl) {
             member.rank = Ranks.Pearl;
-            emit NewRankReached(_uplineAddress, "Pearl");
+            emit NewRankReached(_uplineAddress, "Pearl", block.timestamp);
         }
     }
 
@@ -156,6 +156,6 @@ contract FFFBusiness {
         });
 
         _totalMembers++;
-        emit NewMember(_newMember);
+        emit NewMember(_newMember, block.timestamp);
     }
 }

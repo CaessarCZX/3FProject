@@ -1,10 +1,10 @@
-import { Transaction, TransactionReceipt } from "viem";
+import { Transaction } from "viem";
 
-type TransactionReceipts = {
-  [key: string]: TransactionReceipt;
-};
+// type TransactionReceipts = {
+//   [key: string]: TransactionReceipt;
+// };
 
 export type TransactionsTableProps = {
   transactions: Transaction[];
-  transactionReceipts: TransactionReceipts;
+  // transactionReceipts: TransactionReceipts;
 };
