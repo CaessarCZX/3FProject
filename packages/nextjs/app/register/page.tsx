@@ -15,11 +15,13 @@ import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+const contractMember = process.env.NEXT_PUBLIC_FIRST_CONTRACT_MEMBER || "0x";
 
 const Register: NextPage = () => {
   // const { address: connectedAddress } = useAccount();
   const [address, setAddress] = useState("");
   const [deposit, setDeposit] = useState("");
+  const [hasUpline, setHasUpline] = useState(false);
   const router = useRouter();
 
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
@@ -27,8 +29,9 @@ const Register: NextPage = () => {
 
   const handleMemberEntrance = async () => {
     try {
-      // IMPORTANT: THIS ADDRES IS JUST PROVISIONAL DEVELOPMENT
-      if (address == null) setAddress("");
+      console.log(contractMember);
+      if (address === "") setAddress(contractMember);
+
       if (!contract?.address) {
         console.error("Direccion del contrato no encontrada");
         return;
@@ -71,9 +74,31 @@ const Register: NextPage = () => {
               <h2 className="card-title m-0">Bienvenido!!</h2>
               <p className="mt-2 mb-1 leading-none font-light">Bienvenido a la comunidad descentralizada</p>
               <div className="card-actions flex-col w-full">
-                <p className="text-xs font-thin text-slate-400 m-0 ml-3">Eres referido de alguien?</p>
                 <div className="w-full">
-                  <AddressInput onChange={setAddress} value={address} placeholder="Pon la dirección de tu Upline" />
+                  {!hasUpline && (
+                    <span>
+                      <p className="text-xs font-thin text-slate-400 flex self-start ml-3 mb-2">
+                        Eres referido de alguien?
+                      </p>
+                      <AddressInput
+                        onChange={setAddress}
+                        value={address}
+                        placeholder="Pon la dirección de tu Upline"
+                        disabled={hasUpline}
+                      />
+                    </span>
+                  )}
+                  <div className="form-control">
+                    <label className="label cursor-pointer">
+                      <span className="text-xs font-thin text-slate-400 m-0 ml-3">No tengo un upline</span>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-primary checkbox-xs"
+                        onChange={() => setHasUpline(!hasUpline)}
+                      />
+                    </label>
+                  </div>
+
                   <div className="flex-grow pt-4">
                     <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
                     <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo de 2000 USDT</p>
