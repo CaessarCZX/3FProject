@@ -112,6 +112,10 @@ contract FFFBusiness {
         return enrolled[_currentMember].length;
     }
 
+    function checkActiveMember(address _member) public view returns(bool) {
+        return members[_member].isActive;
+    }
+
     function _processPayment(address payable _to, uint _amount) private {
         require(_amount > 0, "La cantidad a tranferir debe ser mayor a cero");
         require(token.transfer(_to, _amount), "Ha fallado la tranferencia");

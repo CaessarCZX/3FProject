@@ -9,7 +9,7 @@ export const TransactionHash = ({ hash }: { hash: string }) => {
   const [addressCopied, setAddressCopied] = useState(false);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center text-blue-600">
       <Link href={`/dashboard/transaction/${hash}`}>
         {hash?.substring(0, 6)}...{hash?.substring(hash.length - 4)}
       </Link>

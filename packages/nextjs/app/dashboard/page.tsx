@@ -3,21 +3,17 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import BlockExplorer from "./_components/BlockExplorer";
-import { estimateGas, writeContract } from "@wagmi/core";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { getGasPrice } from "@wagmi/core";
 import type { NextPage } from "next";
-import { encodeFunctionData, erc20Abi, formatUnits, parseUnits } from "viem";
+import { formatUnits } from "viem";
 import { useAccount } from "wagmi";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
+import DepositButton from "~~/components/3F/DepositButton";
 import { UsdtInput } from "~~/components/3F/UsdtInput";
 import { useDateEs } from "~~/hooks/3FProject/useDateEs";
 import { useExchangeRatios } from "~~/hooks/3FProject/useExchangeRatios";
-import { useDeployedContractInfo, useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { wagmiConfig } from "~~/services/web3/wagmiConfig";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { formatCurrency, parseCurrency, parseThreeDecimals } from "~~/utils/3FContract/currencyConvertion";
 
-const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 // import ProtectedRoute from "~~/services/Auth/ProtectedRoute";
 
 const Dashboard: NextPage = () => {
@@ -28,12 +24,6 @@ const Dashboard: NextPage = () => {
   const { exchangeRatio: exchangeUSD, loadingData: loadingUSD } = useExchangeRatios("USD");
   const [dollarBalance, setDollarBalance] = useState(0);
   const currentDate = useDateEs();
-  const { data: contract } = useDeployedContractInfo("FFFBusiness");
-  // For transaction
-  const contractAddress = contract?.address ?? "0x";
-  const { writeContractAsync: depositMemberFunds } = useScaffoldWriteContract("FFFBusiness");
-  const [isApproved, setIsApproved] = useState(false);
-  const [depositToContract, setDepositToContract] = useState(0n);
 
   const { data: memberBalance } = useScaffoldReadContract({
     contractName: "FFFBusiness",
@@ -46,71 +36,6 @@ const Dashboard: NextPage = () => {
     functionName: "getTotalAffiliatesPerMember",
     args: [currentMember?.address],
   });
-
-  const handleDeposit = async () => {
-    try {
-      if (!contractAddress) {
-        console.error("Direccion del contrato no encontrada");
-        return;
-      }
-      const allowanceAmount = parseUnits(deposit, 6);
-
-      const allowData = encodeFunctionData({
-        abi: erc20Abi,
-        functionName: "approve",
-        args: [contractAddress, allowanceAmount],
-      });
-
-      const gas = await estimateGas(wagmiConfig, {
-        to: tokenUsdt,
-        data: allowData,
-      });
-      console.log(gas);
-
-      const gasPrice = await getGasPrice(wagmiConfig);
-      console.log(gasPrice);
-
-      // Allowance for transaction
-      const allowanceHash = await writeContract(wagmiConfig, {
-        abi: erc20Abi,
-        address: tokenUsdt,
-        functionName: "approve",
-        args: [contractAddress, allowanceAmount],
-        gas,
-        gasPrice,
-      });
-
-      const interval = setInterval(async () => {
-        try {
-          const transactionReceipt = await waitForTransactionReceipt(wagmiConfig, {
-            hash: allowanceHash,
-          });
-          if (transactionReceipt.status === "success") {
-            clearInterval(interval);
-            setIsApproved(true);
-            setDepositToContract(allowanceAmount);
-          }
-        } catch (error) {
-          console.error("Failed deposit", error);
-        }
-      }, 500);
-    } catch (e) {
-      console.error("Error Deposit:", e);
-    }
-  };
-
-  useEffect(() => {
-    const depositAction = async () => {
-      await depositMemberFunds({
-        functionName: "depositMemberFunds",
-        args: [depositToContract],
-      });
-    };
-    if (isApproved) {
-      depositAction();
-      setIsApproved(false);
-    }
-  }, [isApproved, depositMemberFunds, depositToContract]);
 
   useEffect(() => {
     if (!loadingData && exchangeRatio?.USDT) {
@@ -200,9 +125,7 @@ const Dashboard: NextPage = () => {
                         ETH
                       </option>
                     </select>
-                    <button className="btn btn-primary px-8" onClick={() => handleDeposit()}>
-                      Enviar
-                    </button>
+                    <DepositButton depositAmount={deposit} />
                   </div>
                 </div>
               </div>
