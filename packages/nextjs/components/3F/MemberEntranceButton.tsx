@@ -38,10 +38,10 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
     setDepositConfirmationHash("");
   };
 
-  const HandleDeposit = async () => {
+  const HandleEntrance = async () => {
     try {
       setIsStarted(true);
-      if (!depositAmount || isStarted === true || !tokenUsdt || !currentContract) {
+      if (!depositAmount && isStarted === true && !tokenUsdt && !currentContract && !uplineAddress) {
         setError("Se ha producido un error en el proceso de deposito");
         resetFlags();
         return;
@@ -96,8 +96,9 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
       {!isStarted && (
         <button
           type="button"
-          className=" w-full text-white bg-blue-700 disabled:bg-slate-500 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
-          onClick={() => HandleDeposit()}
+          disabled={depositAmount ? Number(depositAmount) < 2000 : !depositAmount}
+          className=" w-full text-white bg-blue-700 disabled:bg-slate-500 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 inline-flex items-center justify-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          onClick={() => HandleEntrance()}
         >
           {isStarted ? "Pendiente" : btnText}
         </button>

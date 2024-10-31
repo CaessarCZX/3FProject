@@ -23,6 +23,10 @@ type GlobalState = {
   };
   targetNetwork: ChainWithAttributes;
   memberTransactions: MemberTransaction[];
+  memberStatus: {
+    active: boolean;
+    isFetching: boolean;
+  };
 };
 
 type GlobalActions = {
@@ -32,6 +36,8 @@ type GlobalActions = {
   setIsMexicanPesoFetching: (newIsMexicanPesoFetching: boolean) => void;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
   setMemberTransactions: (newMemberTransactions: MemberTransaction[]) => void;
+  setIsActiveMemberStatus: (newCurrentMemberStatus: boolean) => void;
+  setIsMemberStatusFetching: (newIsMemeberStatusFetching: boolean) => void;
 };
 
 type GlobalStorage = GlobalState & GlobalActions;
@@ -58,4 +64,12 @@ export const useGlobalState = create<GlobalStorage>(set => ({
   memberTransactions: [],
   setMemberTransactions: (newMemberTransactions: MemberTransaction[]) =>
     set(() => ({ memberTransactions: newMemberTransactions })),
+  memberStatus: {
+    active: false,
+    isFetching: true,
+  },
+  setIsActiveMemberStatus: (newValue: boolean): void =>
+    set(state => ({ memberStatus: { ...state.memberStatus, active: newValue } })),
+  setIsMemberStatusFetching: (newValue: boolean): void =>
+    set(state => ({ memberStatus: { ...state.memberStatus, isFetching: newValue } })),
 }));

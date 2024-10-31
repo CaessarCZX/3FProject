@@ -1,72 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-// import { useRouter } from "next/navigation";
-// import Link from "next/link";
 import userIcon from "../../public/userIcon.svg";
-// import { writeContract } from "@wagmi/core";
 import type { NextPage } from "next";
-// import { erc20Abi } from "viem";
 import MemberEntranceButton from "~~/components/3F/MemberEntranceButton";
 import { UsdtInput } from "~~/components/3F/UsdtInput";
 import { AddressInput } from "~~/components/scaffold-eth";
 
-// import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-// import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
-// import { wagmiConfig } from "~~/services/web3/wagmiConfig";
-
-// const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
-const contractMember = process.env.NEXT_PUBLIC_FIRST_CONTRACT_MEMBER || "0x";
+const defaultAddress = process.env.NEXT_PUBLIC_FIRST_CONTRACT_MEMBER || "0x";
 
 const Register: NextPage = () => {
   // const { address: connectedAddress } = useAccount();
   const [address, setAddress] = useState("");
   const [deposit, setDeposit] = useState("");
-  const [hasUpline, setHasUpline] = useState(false);
+  const [hasUpline, setHasUpline] = useState(true);
   // const router = useRouter();
-
-  // const { data: contract } = useDeployedContractInfo("FFFBusiness");
-  // const { writeContractAsync: memberEntrance } = useScaffoldWriteContract("FFFBusiness");
-
-  // const handleMemberEntrance = async () => {
-  //   try {
-  //     console.log(contractMember);
-  //     if (address === "") setAddress(contractMember);
-
-  //     if (!contract?.address) {
-  //       console.error("Direccion del contrato no encontrada");
-  //       return;
-  //     }
-
-  //     const contractAddress = contract?.address ?? "0x";
-  //     const convertDeposit = Math.round(Number(deposit) * 10 ** 6);
-  //     const allowanceAmount = BigInt(convertDeposit);
-
-  //     // Allowance for transaction
-  //     const approveTx = await writeContract(wagmiConfig, {
-  //       abi: erc20Abi,
-  //       address: tokenUsdt,
-  //       functionName: "approve",
-  //       args: [contractAddress, allowanceAmount],
-  //     });
-
-  //     if (approveTx) {
-  //       await memberEntrance({
-  //         functionName: "memberEntrance",
-  //         args: [address, allowanceAmount],
-  //       });
-  //     }
-
-  //     router.push("/dashboard");
-  //   } catch (e) {
-  //     console.error("Error", e);
-  //   }
-  // };
-
-  useEffect(() => {
-    if (!hasUpline) setAddress(contractMember);
-  }, [hasUpline]);
 
   return (
     <>
@@ -81,7 +30,7 @@ const Register: NextPage = () => {
               <p className="mt-2 mb-1 leading-none font-light">Bienvenido a la comunidad descentralizada</p>
               <div className="card-actions flex-col w-full">
                 <div className="w-full">
-                  {!hasUpline && (
+                  {hasUpline && (
                     <span>
                       <p className="text-xs font-thin text-slate-400 flex self-start ml-3 mb-2">
                         Eres referido de alguien?
@@ -110,7 +59,11 @@ const Register: NextPage = () => {
                     <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo de 2000 USDT</p>
                   </div>
                 </div>
-                <MemberEntranceButton uplineAddress={address} depositAmount={deposit} btnText="Entrar" />
+                <MemberEntranceButton
+                  uplineAddress={!hasUpline ? defaultAddress : address}
+                  depositAmount={deposit}
+                  btnText="Entrar"
+                />
               </div>
             </div>
           </div>
