@@ -3,45 +3,11 @@ import { useDeployedContractInfo } from "../scaffold-eth/useDeployedContractInfo
 import axios from "axios";
 import { Hex, hexToBigInt } from "viem";
 import { useChainId } from "wagmi";
+import { AlchemyTransaction, MemberTransaction, UseFetchTransactionsResult } from "~~/utils/3FContract/block";
 import { getAlchemyHttpUrl } from "~~/utils/scaffold-eth";
 
-interface Transaction {
-  hash: string;
-  value: string;
-  timestamp: string;
-  status: string;
-}
-
-interface UseFetchTransactionsResult {
-  transactions: Transaction[] | null;
-  isLoading: boolean;
-  error: boolean;
-}
-
-interface AlchemyTransaction {
-  asset: string | null;
-  blockNum: string;
-  category: string;
-  erc721TokenId: string | null;
-  erc1155Metadata: any | null;
-  from: string;
-  hash: string;
-  metadata: {
-    blockTimestamp: string;
-  };
-  rawContract: {
-    value: string;
-    address: string;
-    decimal: number | null;
-  };
-  to: string;
-  tokenId: string | null;
-  uniqueId: string;
-  value: string | null;
-}
-
 export const useFetchTransactions = (address: string | undefined): UseFetchTransactionsResult => {
-  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+  const [transactions, setTransactions] = useState<MemberTransaction[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
@@ -83,7 +49,7 @@ export const useFetchTransactions = (address: string | undefined): UseFetchTrans
         );
 
         // Extraer la información relevante de cada transferencia
-        const formattedTransactions: Transaction[] = relevantTransfers.map((transfer: AlchemyTransaction) => ({
+        const formattedTransactions: MemberTransaction[] = relevantTransfers.map((transfer: AlchemyTransaction) => ({
           hash: transfer.hash,
           value: hexToBigInt(transfer.rawContract.value as Hex),
           timestamp: transfer.metadata.blockTimestamp,

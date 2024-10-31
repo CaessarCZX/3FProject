@@ -9,13 +9,14 @@ import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContra
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 type DepositBtnProps = {
+  uplineAddress: string;
   depositAmount: string | null;
   btnText: string;
 };
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 
-const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
+const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: DepositBtnProps) => {
   const [isStarted, setIsStarted] = useState(false);
   const [error, setError] = useState("");
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
@@ -66,8 +67,8 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         const txHash = await writeContractAsync({
           abi: contractAbi as Abi,
           address: currentContract,
-          functionName: "depositMemberFunds",
-          args: [allowanceAmount],
+          functionName: "memberEntrance",
+          args: [uplineAddress, allowanceAmount],
         });
 
         console.log("Transaccion realizada con exito: ", txHash);
@@ -95,7 +96,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
       {!isStarted && (
         <button
           type="button"
-          className="text-white bg-blue-700 disabled:bg-slate-500 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          className=" w-full text-white bg-blue-700 disabled:bg-slate-500 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
           onClick={() => HandleDeposit()}
         >
           {isStarted ? "Pendiente" : btnText}
@@ -108,11 +109,11 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
           transactionReceiptHash={transactionReceiptHash}
           finalTransactionReceiptHash={depositConfirmationHash}
           error={error}
-          transactionDescription="Deposito Exitoso"
+          transactionDescription="Registro exitoso"
         />
       )}
     </>
   );
 };
 
-export default DepositButton;
+export default MemberEntranceButton;

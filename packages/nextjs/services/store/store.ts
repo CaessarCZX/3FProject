@@ -1,5 +1,6 @@
 import create from "zustand";
 import scaffoldConfig from "~~/scaffold.config";
+import { MemberTransaction } from "~~/utils/3FContract/block";
 import { ChainWithAttributes } from "~~/utils/scaffold-eth";
 
 /**
@@ -21,6 +22,7 @@ type GlobalState = {
     isFetching: boolean;
   };
   targetNetwork: ChainWithAttributes;
+  memberTransactions: MemberTransaction[];
 };
 
 type GlobalActions = {
@@ -29,6 +31,7 @@ type GlobalActions = {
   setMexicanPesoPrice: (newMexicanPesoPriceState: number) => void;
   setIsMexicanPesoFetching: (newIsMexicanPesoFetching: boolean) => void;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
+  setMemberTransactions: (newMemberTransactions: MemberTransaction[]) => void;
 };
 
 type GlobalStorage = GlobalState & GlobalActions;
@@ -52,4 +55,7 @@ export const useGlobalState = create<GlobalStorage>(set => ({
     set(state => ({ mexicanPeso: { ...state.mexicanPeso, isFetching: newValue } })),
   targetNetwork: scaffoldConfig.targetNetworks[0],
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
+  memberTransactions: [],
+  setMemberTransactions: (newMemberTransactions: MemberTransaction[]) =>
+    set(() => ({ memberTransactions: newMemberTransactions })),
 }));

@@ -125,7 +125,7 @@ const Dashboard: NextPage = () => {
                         ETH
                       </option>
                     </select>
-                    <DepositButton depositAmount={deposit} />
+                    <DepositButton depositAmount={deposit} btnText="Preparar deposito" />
                   </div>
                 </div>
               </div>

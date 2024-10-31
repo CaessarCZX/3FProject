@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   11155111: {
     FFFBusiness: {
-      address: "0x51518e534f890eE2B28723448ddF16b1a4EF709f",
+      address: "0x4a49Af04f76c603a46B23c3f3a3e648db816f56c",
       abi: [
         {
           inputs: [
@@ -169,6 +169,25 @@ const deployedContracts = {
           ],
           name: "WithdrawalRequest",
           type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_member",
+              type: "address",
+            },
+          ],
+          name: "checkActiveMember",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
         },
         {
           inputs: [],

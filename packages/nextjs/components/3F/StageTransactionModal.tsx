@@ -8,6 +8,7 @@ type HandleModalProps = {
   transactionReceiptHash: string | undefined;
   finalTransactionReceiptHash: string | undefined;
   error: string | undefined;
+  transactionDescription: string | null;
 };
 
 export const StageTransactionModal = ({
@@ -16,6 +17,7 @@ export const StageTransactionModal = ({
   transactionReceiptHash,
   finalTransactionReceiptHash,
   error,
+  transactionDescription,
 }: HandleModalProps) => {
   const [openFirst, setIsOpenFirst] = useState(true);
   const modalRef = useRef<HTMLDialogElement>(null);
@@ -81,6 +83,7 @@ export const StageTransactionModal = ({
               {!finalTransactionReceiptHash && !error && <p>Procesando solicitud</p>}
               {finalTransactionReceiptHash && !error && <p>Transaccion completada</p>}
               {!finalTransactionReceiptHash && error && <p>Ha ocurrido un error</p>}
+              {finalTransactionReceiptHash && <p className="font-bold text-3xl">{transactionDescription}</p>}
             </div>
           )}
           <div className="modal-action">

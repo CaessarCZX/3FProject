@@ -1,20 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 // import Link from "next/link";
 import userIcon from "../../public/userIcon.svg";
-import { writeContract } from "@wagmi/core";
+// import { writeContract } from "@wagmi/core";
 import type { NextPage } from "next";
-import { erc20Abi } from "viem";
+// import { erc20Abi } from "viem";
+import MemberEntranceButton from "~~/components/3F/MemberEntranceButton";
 import { UsdtInput } from "~~/components/3F/UsdtInput";
 import { AddressInput } from "~~/components/scaffold-eth";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
-import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
-const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+// import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+// import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
+// import { wagmiConfig } from "~~/services/web3/wagmiConfig";
+
+// const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 const contractMember = process.env.NEXT_PUBLIC_FIRST_CONTRACT_MEMBER || "0x";
 
 const Register: NextPage = () => {
@@ -22,45 +24,49 @@ const Register: NextPage = () => {
   const [address, setAddress] = useState("");
   const [deposit, setDeposit] = useState("");
   const [hasUpline, setHasUpline] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
 
-  const { data: contract } = useDeployedContractInfo("FFFBusiness");
-  const { writeContractAsync: memberEntrance } = useScaffoldWriteContract("FFFBusiness");
+  // const { data: contract } = useDeployedContractInfo("FFFBusiness");
+  // const { writeContractAsync: memberEntrance } = useScaffoldWriteContract("FFFBusiness");
 
-  const handleMemberEntrance = async () => {
-    try {
-      console.log(contractMember);
-      if (address === "") setAddress(contractMember);
+  // const handleMemberEntrance = async () => {
+  //   try {
+  //     console.log(contractMember);
+  //     if (address === "") setAddress(contractMember);
 
-      if (!contract?.address) {
-        console.error("Direccion del contrato no encontrada");
-        return;
-      }
+  //     if (!contract?.address) {
+  //       console.error("Direccion del contrato no encontrada");
+  //       return;
+  //     }
 
-      const contractAddress = contract?.address ?? "0x";
-      const convertDeposit = Math.round(Number(deposit) * 10 ** 6);
-      const allowanceAmount = BigInt(convertDeposit);
+  //     const contractAddress = contract?.address ?? "0x";
+  //     const convertDeposit = Math.round(Number(deposit) * 10 ** 6);
+  //     const allowanceAmount = BigInt(convertDeposit);
 
-      // Allowance for transaction
-      const approveTx = await writeContract(wagmiConfig, {
-        abi: erc20Abi,
-        address: tokenUsdt,
-        functionName: "approve",
-        args: [contractAddress, allowanceAmount],
-      });
+  //     // Allowance for transaction
+  //     const approveTx = await writeContract(wagmiConfig, {
+  //       abi: erc20Abi,
+  //       address: tokenUsdt,
+  //       functionName: "approve",
+  //       args: [contractAddress, allowanceAmount],
+  //     });
 
-      if (approveTx) {
-        await memberEntrance({
-          functionName: "memberEntrance",
-          args: [address, allowanceAmount],
-        });
-      }
+  //     if (approveTx) {
+  //       await memberEntrance({
+  //         functionName: "memberEntrance",
+  //         args: [address, allowanceAmount],
+  //       });
+  //     }
 
-      router.push("/dashboard");
-    } catch (e) {
-      console.error("Error", e);
-    }
-  };
+  //     router.push("/dashboard");
+  //   } catch (e) {
+  //     console.error("Error", e);
+  //   }
+  // };
+
+  useEffect(() => {
+    if (!hasUpline) setAddress(contractMember);
+  }, [hasUpline]);
 
   return (
     <>
@@ -104,13 +110,7 @@ const Register: NextPage = () => {
                     <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo de 2000 USDT</p>
                   </div>
                 </div>
-                <button
-                  disabled={!deposit ? true : false}
-                  className="btn btn-primary self-end w-full"
-                  onClick={() => handleMemberEntrance()}
-                >
-                  Acceder
-                </button>
+                <MemberEntranceButton uplineAddress={address} depositAmount={deposit} btnText="Entrar" />
               </div>
             </div>
           </div>
