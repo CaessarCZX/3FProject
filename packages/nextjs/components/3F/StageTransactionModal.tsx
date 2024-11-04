@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckBadgeIcon, CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { TransactionHash } from "~~/app/dashboard/_components/TransactionHash";
+import { useModal } from "~~/hooks/3FProject/useModal";
 
 type HandleModalProps = {
   activate: boolean;
@@ -20,22 +21,26 @@ export const StageTransactionModal = ({
   transactionDescription,
 }: HandleModalProps) => {
   const [openFirst, setIsOpenFirst] = useState(true);
-  const modalRef = useRef<HTMLDialogElement>(null);
-
-  const handleModal = () => {
-    modalRef.current?.showModal;
-  };
+  const { modalRef, openModal } = useModal();
+  console.log(
+    activate,
+    transactionHash,
+    transactionReceiptHash,
+    finalTransactionReceiptHash,
+    error,
+    transactionDescription,
+  );
 
   useEffect(() => {
     if (activate && openFirst) {
       setIsOpenFirst(false);
-      handleModal();
+      openModal();
     }
-  }, [activate, openFirst]);
+  }, [activate, openFirst, openModal]);
 
   return (
     <>
-      <button className="btn" onClick={handleModal}>
+      <button className="btn" onClick={openModal}>
         Transaccion en proceso
       </button>
       <dialog ref={modalRef} id="my_modal_5" className="modal">

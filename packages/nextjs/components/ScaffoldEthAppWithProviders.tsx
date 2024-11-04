@@ -10,6 +10,7 @@ import { Footer } from "~~/components/Footer";
 import { Header } from "~~/components/Header";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { ProgressBar } from "~~/components/scaffold-eth/ProgressBar";
+import { useInitializeMemberTransactions } from "~~/hooks/3FProject/useInitializeMemberTransactions";
 import { useInitializeMexicanPesoPrice } from "~~/hooks/3FProject/useInitializeMexicanPesoPrice";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
@@ -17,6 +18,7 @@ import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   useInitializeNativeCurrencyPrice();
   useInitializeMexicanPesoPrice();
+  useInitializeMemberTransactions();
 
   return (
     <>

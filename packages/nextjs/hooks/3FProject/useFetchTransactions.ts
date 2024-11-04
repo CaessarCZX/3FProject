@@ -3,10 +3,10 @@ import { useDeployedContractInfo } from "../scaffold-eth/useDeployedContractInfo
 import axios from "axios";
 import { Hex, hexToBigInt } from "viem";
 import { useChainId } from "wagmi";
-import { AlchemyTransaction, MemberTransaction, UseFetchTransactionsResult } from "~~/utils/3FContract/block";
+import { AlchemyTransaction, MemberTransaction } from "~~/utils/3FContract/block";
 import { getAlchemyHttpUrl } from "~~/utils/scaffold-eth";
 
-export const useFetchTransactions = (address: string | undefined): UseFetchTransactionsResult => {
+export const useFetchTransactions = (address: string | undefined) => {
   const [transactions, setTransactions] = useState<MemberTransaction[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
@@ -31,11 +31,10 @@ export const useFetchTransactions = (address: string | undefined): UseFetchTrans
             fromBlock: "0x0",
             toBlock: "latest",
             fromAddress: address,
-            // toAddress: contractAddress,
             category: ["erc20"],
             withMetadata: true,
             excludeZeroValue: true,
-            maxCount: "0x64", // Ajusta el número máximo de transacciones a recuperar
+            maxCount: "0x64",
           },
         ],
       };

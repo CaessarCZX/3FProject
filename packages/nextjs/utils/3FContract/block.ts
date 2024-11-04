@@ -11,10 +11,8 @@ export interface MemberTransaction {
   status: string;
 }
 
-export interface UseFetchTransactionsResult {
+export interface FetchTransactionsResult {
   transactions: MemberTransaction[] | null;
-  isLoading: boolean;
-  error: boolean;
 }
 
 export interface AlchemyTransaction {

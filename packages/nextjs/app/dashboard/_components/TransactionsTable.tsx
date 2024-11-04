@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { TransactionHash } from "./TransactionHash";
 import { formatUnits } from "viem";
+import { WithdrawalCounter } from "~~/components/3F/WithdrawalCounter";
 import { formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 import { getDateAndTimeFromTimestamp } from "~~/utils/3FContract/timestampFormatter";
 
@@ -16,7 +17,7 @@ type TransactionTableProps = {
 };
 
 export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
-  console.log(transactions);
+  // console.log(transactions);
   const [totalSavings, setTotalSavings] = useState<string[]>();
 
   useEffect(() => {
@@ -64,7 +65,9 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                     <span className="font-bold">{date}</span>
                     <span className="font-light ml-4">{time}</span>
                   </td>
-                  <td className="w-2/1 md:py-4">Tiempo para retiro</td>
+                  <td className="w-2/1 text-center font-bold md:py-4">
+                    <WithdrawalCounter date={date} time={time} />
+                  </td>
                   <td className="w-2/12 md:py-4">{totalSavings ? totalSavings[i] : "No disponible"}</td>
                 </tr>
               );

@@ -39,7 +39,7 @@ const Register: NextPage = () => {
                         onChange={setAddress}
                         value={address}
                         placeholder="Pon la dirección de tu Upline"
-                        disabled={hasUpline}
+                        disabled={!hasUpline}
                       />
                     </span>
                   )}

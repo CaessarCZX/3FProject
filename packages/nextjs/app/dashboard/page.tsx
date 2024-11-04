@@ -136,7 +136,7 @@ const Dashboard: NextPage = () => {
               <div className="card-body flex-none">
                 <h2 className="card-title">Mis ahorros</h2>
                 <div className="card-actions">
-                  <BlockExplorer address={currentMember?.address} />
+                  <BlockExplorer />
                 </div>
               </div>
             </div>

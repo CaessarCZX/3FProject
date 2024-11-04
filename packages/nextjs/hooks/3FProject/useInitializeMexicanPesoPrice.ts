@@ -6,9 +6,6 @@ import { useGlobalState } from "~~/services/store/store";
 
 const enablePolling = false;
 
-/**
- * Get the price of Native Currency based on Native Token/DAI trading pair from Uniswap SDK
- */
 export const useInitializeMexicanPesoPrice = () => {
   const setMexicanPesoPrice = useGlobalState(state => state.setMexicanPesoPrice);
   const setIsMexicanPesoFetching = useGlobalState(state => state.setIsMexicanPesoFetching);

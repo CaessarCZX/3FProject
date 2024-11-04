@@ -28,6 +28,7 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
   const [transactionReceiptHash, setTransactionReceiptHash] = useState("");
   const [depositConfirmationHash, setDepositConfirmationHash] = useState("");
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
+  console.log("Im activate", uplineAddress, depositAmount, btnText);
 
   const resetFlags = () => {
     setError("");
@@ -41,7 +42,7 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
   const HandleEntrance = async () => {
     try {
       setIsStarted(true);
-      if (!depositAmount && isStarted === true && !tokenUsdt && !currentContract && !uplineAddress) {
+      if (!depositAmount || isStarted === true || !tokenUsdt || !currentContract || !uplineAddress) {
         setError("Se ha producido un error en el proceso de deposito");
         resetFlags();
         return;
@@ -90,6 +91,15 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
       resetFlags();
     }
   };
+
+  // const HandleTest = () => {
+  //   setIsStarted(true);
+  //   setIsHandleModalActivate(true);
+
+  //   setTimeout(() => {
+  //     setIsStarted(false);
+  //   }, 5000);
+  // };
 
   return (
     <>

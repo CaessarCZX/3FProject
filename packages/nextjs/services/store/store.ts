@@ -22,7 +22,10 @@ type GlobalState = {
     isFetching: boolean;
   };
   targetNetwork: ChainWithAttributes;
-  memberTransactions: MemberTransaction[];
+  memberTransactions: {
+    transactions: MemberTransaction[];
+    isFetching: boolean;
+  };
   memberStatus: {
     active: boolean;
     isFetching: boolean;
@@ -36,6 +39,7 @@ type GlobalActions = {
   setIsMexicanPesoFetching: (newIsMexicanPesoFetching: boolean) => void;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
   setMemberTransactions: (newMemberTransactions: MemberTransaction[]) => void;
+  setIsMemberTransactionsFetching: (newIsMemberTransactionsFetching: boolean) => void;
   setIsActiveMemberStatus: (newCurrentMemberStatus: boolean) => void;
   setIsMemberStatusFetching: (newIsMemeberStatusFetching: boolean) => void;
 };
@@ -61,9 +65,14 @@ export const useGlobalState = create<GlobalStorage>(set => ({
     set(state => ({ mexicanPeso: { ...state.mexicanPeso, isFetching: newValue } })),
   targetNetwork: scaffoldConfig.targetNetworks[0],
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
-  memberTransactions: [],
-  setMemberTransactions: (newMemberTransactions: MemberTransaction[]) =>
-    set(() => ({ memberTransactions: newMemberTransactions })),
+  memberTransactions: {
+    transactions: [],
+    isFetching: true,
+  },
+  setMemberTransactions: (newValue: MemberTransaction[]): void =>
+    set(state => ({ memberTransactions: { ...state.memberTransactions, transactions: newValue } })),
+  setIsMemberTransactionsFetching: (newValue: boolean): void =>
+    set(state => ({ memberTransactions: { ...state.memberTransactions, isFetching: newValue } })),
   memberStatus: {
     active: false,
     isFetching: true,

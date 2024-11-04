@@ -13,6 +13,13 @@ type DepositBtnProps = {
   btnText: string;
 };
 
+// const TestData = {
+//   transactionHash: "kdjf;ladfjlasfjklsfjslfjlsfjsklfjl",
+//   transactionReceiptHash: "sdfklshdfjkhfkfhkfhalflfhsldkfhskdfh",
+//   depositConfirmationHash: "kdsjfklasjflsjflihgfdqwuyiwehfdhfkjahf",
+//   error: "",
+// };
+
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 
 const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
@@ -23,7 +30,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   const contractAbi = contract?.abi;
   const { writeContractAsync } = useWriteContract();
   const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
-  const [transacciónHash, setTransactionHash] = useState("");
+  const [transactionHash, setTransactionHash] = useState("");
   const [transactionReceiptHash, setTransactionReceiptHash] = useState("");
   const [depositConfirmationHash, setDepositConfirmationHash] = useState("");
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
@@ -90,6 +97,15 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
     }
   };
 
+  // const HandleTest = () => {
+  //   setIsStarted(true);
+  //   setIsHandleModalActivate(true);
+
+  //   setTimeout(() => {
+  //     setIsStarted(false);
+  //   }, 5000);
+  // };
+
   return (
     <>
       {!isStarted && (
@@ -104,7 +120,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
       {isStarted && (
         <StageTransactionModal
           activate={isHandleModalActivate}
-          transactionHash={transacciónHash}
+          transactionHash={transactionHash}
           transactionReceiptHash={transactionReceiptHash}
           finalTransactionReceiptHash={depositConfirmationHash}
           error={error}
