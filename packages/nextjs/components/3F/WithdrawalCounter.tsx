@@ -36,11 +36,11 @@ export const WithdrawalCounter = ({ date, time }: { date: string; time: string }
     return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), hours, minutes, seconds);
   };
 
-  const getNextFinalizationDate = (startDate: Date): Date => {
+  const getNextQuarterDate = (startDate: Date): Date => {
     const month = startDate.getMonth();
-    const nextFinalizationMonth = month + (3 - (month % 3));
-    const nextFinalizationYear = startDate.getFullYear() + Math.floor(nextFinalizationMonth / 12);
-    return new Date(nextFinalizationYear, nextFinalizationMonth % 12, 5, 0, 0, 0); // El día 5 del siguiente trimestre
+    const nextQuarterMonth = month + (3 - (month % 3));
+    const nextQuarterYear = startDate.getFullYear() + Math.floor(nextQuarterMonth / 12);
+    return new Date(nextQuarterYear, nextQuarterMonth % 12, 5, 0, 0, 0); // El día 5 del siguiente trimestre
   };
 
   const calculateTimeLeft = useCallback((): TimeLeft => {
@@ -51,7 +51,7 @@ export const WithdrawalCounter = ({ date, time }: { date: string; time: string }
         throw new Error("Invalid start date format.");
       }
 
-      const endDate = getNextFinalizationDate(startDate);
+      const endDate = getNextQuarterDate(startDate);
       const now = new Date();
       const difference = endDate.getTime() - now.getTime();
 

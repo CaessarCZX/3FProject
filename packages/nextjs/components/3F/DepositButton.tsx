@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { StageTransactionModal } from "./StageTransactionModal";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { Abi } from "abitype";
 import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
-import { useWriteContract } from "wagmi";
+import { useAccount, useChainId, useWriteContract } from "wagmi";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
+import { useGlobalState } from "~~/services/store/store";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
+import { fetchMemberTransactions } from "~~/utils/3FContract/fetchMemberTransactions";
+import { getAlchemyHttpUrl } from "~~/utils/scaffold-eth";
 
 type DepositBtnProps = {
   depositAmount: string | null;
@@ -21,8 +24,18 @@ type DepositBtnProps = {
 // };
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+// type DepositTransaction = {
+//   allowanceHash: string | undefined;
+//   allovanceReceiptHash: string | undefined;
+//   depositContractHash: string | undefined;
+//   depositContractReceiptHash: string | undefined;
+//   error: string | undefined;
+// };
 
 const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
+  const currentMember = useAccount();
+  const setIsMemberTransactionsFetching = useGlobalState(state => state.setIsMemberTransactionsFetching);
+  const setMemberTransactions = useGlobalState(state => state.setMemberTransactions);
   const [isStarted, setIsStarted] = useState(false);
   const [error, setError] = useState("");
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
@@ -34,6 +47,16 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   const [transactionReceiptHash, setTransactionReceiptHash] = useState("");
   const [depositConfirmationHash, setDepositConfirmationHash] = useState("");
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
+  const chainId = useChainId();
+  const url = getAlchemyHttpUrl(chainId) ?? "";
+  const memberAddress = currentMember?.address ?? "0x0";
+  // const [transaction, setTransaction] = useState<DepositTransaction>({
+  //   allowanceHash: "",
+  //   allovanceReceiptHash: "",
+  //   depositContractHash: "",
+  //   depositContractReceiptHash: "",
+  //   error: "",
+  // });
 
   const resetFlags = () => {
     setError("");
@@ -43,6 +66,13 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
     setTransactionReceiptHash("");
     setDepositConfirmationHash("");
   };
+
+  const fetchTransactions = useCallback(async () => {
+    setIsMemberTransactionsFetching(true);
+    const { transactions } = await fetchMemberTransactions(url, memberAddress, currentContract);
+    if (transactions) setMemberTransactions(transactions);
+    setIsMemberTransactionsFetching(false);
+  }, [setIsMemberTransactionsFetching, setMemberTransactions, url, memberAddress, currentContract]);
 
   const HandleDeposit = async () => {
     try {
@@ -85,7 +115,13 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
 
         console.log("Transaccion confirmada con: ", receiptTx.status);
 
-        if (receiptTx.status === "success") setDepositConfirmationHash(receiptTx.transactionHash);
+        if (receiptTx.status === "success") {
+          setDepositConfirmationHash(receiptTx.transactionHash);
+
+          setTimeout(() => {
+            fetchTransactions();
+          }, 3000);
+        }
       } else {
         setError("La transacción de depósito falló");
       }
