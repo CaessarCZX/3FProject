@@ -37,10 +37,23 @@ export const WithdrawalCounter = ({ date, time }: { date: string; time: string }
   };
 
   const getNextQuarterDate = (startDate: Date): Date => {
-    const month = startDate.getMonth();
-    const nextQuarterMonth = month + (3 - (month % 3));
-    const nextQuarterYear = startDate.getFullYear() + Math.floor(nextQuarterMonth / 12);
-    return new Date(nextQuarterYear, nextQuarterMonth % 12, 5, 0, 0, 0); // El día 5 del siguiente trimestre
+    let month = startDate.getMonth();
+    let year = startDate.getFullYear();
+    const currentDay = startDate.getDate();
+
+    if (month === 11) {
+      year++;
+      month = 0;
+    }
+
+    if (currentDay > 5) month++;
+
+    month += 3;
+
+    const day = 5;
+
+    console.log(new Date(year, month, day, 0, 0, 0));
+    return new Date(year, month, day, 0, 0, 0);
   };
 
   const calculateTimeLeft = useCallback((): TimeLeft => {
@@ -85,7 +98,7 @@ export const WithdrawalCounter = ({ date, time }: { date: string; time: string }
       {isExpired ? (
         <p>Retiro disponible</p>
       ) : (
-        <p>{`${timeLeft.days} : ${timeLeft.hours} : ${timeLeft.minutes} : ${timeLeft.seconds}`}</p>
+        <p>{`${timeLeft.days}d ${timeLeft.hours} : ${timeLeft.minutes} : ${timeLeft.seconds}`}</p>
       )}
     </>
   );

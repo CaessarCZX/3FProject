@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { StageTransactionModal } from "./StageTransactionModal";
+import { DepositErrors as err } from "./errors";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { Abi } from "abitype";
 import { parseUnits } from "viem";
@@ -7,6 +8,7 @@ import { erc20Abi } from "viem";
 import { useWriteContract } from "wagmi";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
+import { TransactionInfo } from "~~/utils/3FContract/deposit";
 
 type DepositBtnProps = {
   uplineAddress: string;
@@ -18,32 +20,41 @@ const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 
 const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: DepositBtnProps) => {
   const [isStarted, setIsStarted] = useState(false);
-  const [error, setError] = useState("");
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const currentContract = contract?.address ?? "0x";
   const contractAbi = contract?.abi;
   const { writeContractAsync } = useWriteContract();
   const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
-  const [transacciónHash, setTransactionHash] = useState("");
-  const [transactionReceiptHash, setTransactionReceiptHash] = useState("");
-  const [depositConfirmationHash, setDepositConfirmationHash] = useState("");
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
-  console.log("Im activate", uplineAddress, depositAmount, btnText);
+  const [transaction, setTransaction] = useState<TransactionInfo>({
+    allowanceHash: "",
+    allowanceReceiptHash: "",
+    depositContractHash: "",
+    depositContractReceiptHash: "",
+    error: "",
+  });
 
   const resetFlags = () => {
-    setError("");
     setIsStarted(false);
     setIsHandleModalActivate(false);
-    setTransactionHash("");
-    setTransactionReceiptHash("");
-    setDepositConfirmationHash("");
+    setTransaction(prev => ({
+      ...prev,
+      allowanceHash: "",
+      allowanceReceiptHash: "",
+      depositContractHash: "",
+      depositContractReceiptHash: "",
+      error: "",
+    }));
   };
 
   const HandleEntrance = async () => {
     try {
       setIsStarted(true);
       if (!depositAmount || isStarted === true || !tokenUsdt || !currentContract || !uplineAddress) {
-        setError("Se ha producido un error en el proceso de deposito");
+        setTransaction(prev => ({
+          ...prev,
+          error: err.general,
+        }));
         resetFlags();
         return;
       }
@@ -55,15 +66,20 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
         args: [currentContract, allowanceAmount],
       });
 
-      setTransactionHash(txHash);
-      console.log("Generated transaction" + txHash);
+      setTransaction(prev => ({
+        ...prev,
+        allowanceHash: txHash,
+      }));
 
       const receipt = await waitForTransactionReceipt(wagmiConfig, {
         hash: txHash,
       });
 
       if (receipt.status === "success") {
-        setTransactionReceiptHash(receipt.transactionHash);
+        setTransaction(prev => ({
+          ...prev,
+          allowanceReceiptHash: receipt.transactionHash,
+        }));
 
         const txHash = await writeContractAsync({
           abi: contractAbi as Abi,
@@ -72,21 +88,29 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
           args: [uplineAddress, allowanceAmount],
         });
 
-        console.log("Transaccion realizada con exito: ", txHash);
+        // This is provisional while MmembersEntrance Types doesn't exist
+        setTransaction(prev => ({
+          ...prev,
+          depositContractHash: txHash,
+        }));
 
         const receiptTx = await waitForTransactionReceipt(wagmiConfig, {
           hash: txHash,
         });
 
-        console.log("Transaccion confirmada con: ", receiptTx.status);
-
-        if (receiptTx.status === "success") setDepositConfirmationHash(receiptTx.transactionHash);
+        if (receiptTx.status === "success") {
+          // This is provisional while MmembersEntrance Types doesn't exist
+          setTransaction(prev => ({
+            ...prev,
+            depositContractReceiptHash: receiptTx.transactionHash,
+          }));
+        }
       } else {
-        setError("La transacción de depósito falló");
+        // setError("La transacción de depósito falló");
       }
     } catch (e) {
-      setError("Se ha producido un error en el proceso de deposito");
-      console.error(error, e);
+      // setError("Se ha producido un error en el proceso de deposito");
+      console.error(err.general, e);
     } finally {
       resetFlags();
     }
@@ -116,10 +140,7 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
       {isStarted && (
         <StageTransactionModal
           activate={isHandleModalActivate}
-          transactionHash={transacciónHash}
-          transactionReceiptHash={transactionReceiptHash}
-          finalTransactionReceiptHash={depositConfirmationHash}
-          error={error}
+          transaction={transaction}
           transactionDescription="Registro exitoso"
         />
       )}
