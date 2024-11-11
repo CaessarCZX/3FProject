@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { CheckBadgeIcon, DocumentCheckIcon, DocumentTextIcon, HandThumbUpIcon } from "@heroicons/react/24/outline";
-import { TransactionHash } from "~~/app/dashboard/_components/TransactionHash";
+import { TransactionHash } from "~~/components/3F/TransactionHash";
 import { TransactionInfo } from "~~/utils/3FContract/deposit";
 
 type HeroIcon = React.FC<React.ComponentProps<"svg">>;
@@ -73,18 +73,6 @@ const ContentItem = ({ item, index, hashes }: ContentItemProps) => (
     </div>
   </div>
 );
-
-// export const SpecialContentItem = () => (
-//   <div className="bg-blue-600 shadow-xl rounded-xl flex flex-col justify-center items-center text-center pb-10 px-6 h-full">
-//     <div className="w-20 h-20 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center -translate-y-10">
-//       <h1 className="font-medium text-[40px] dark:text-slate-900">4</h1>
-//     </div>
-//     <h2 className="text-white text-2xl font-medium grow">Delivery</h2>
-//     <p className="text-white leading-relaxed grow opacity-75">
-//       Your PSD will become a website that works great on all devices like smartphone, laptop, tablet, desktop etc.
-//     </p>
-//   </div>
-// );
 
 export const TransactionSteps = (props: TransactionStepsProps) => {
   const [progress, setProgress] = useState(0);

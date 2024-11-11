@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { TransactionHash } from "./TransactionHash";
+import { TransactionsTableRow } from "./TransactionsTableRow";
 import { formatUnits } from "viem";
-import { WithdrawalCounter } from "~~/components/3F/WithdrawalCounter";
-import { formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 import { getDateAndTimeFromTimestamp } from "~~/utils/3FContract/timestampFormatter";
 
 interface Transaction {
@@ -17,7 +15,6 @@ type TransactionTableProps = {
 };
 
 export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
-  // console.log(transactions);
   const [totalSavings, setTotalSavings] = useState<string[]>();
 
   useEffect(() => {
@@ -29,7 +26,7 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
   if (!transactions) {
     return (
       <>
-        <p>No desponible</p>
+        <p className="font-black text-2xl">No desponible</p>
       </>
     );
   }
@@ -50,26 +47,17 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
           <tbody>
             {transactions.map((tx, i) => {
               const hash = tx.hash;
-              // const status = transactionReceipts[hash].status;
               const { date, time } = getDateAndTimeFromTimestamp(tx.timestamp);
               const value = formatUnits(BigInt(tx.value), 6);
               return (
-                <tr key={hash} className="hover text-sm">
-                  <td className="text-center text-xs md:py-4">
-                    {formatCurrency(Number(value))} <span className="font-semibold text-xs">USDT</span>
-                  </td>
-                  <td className="w-1/12 md:py-4">
-                    <TransactionHash hash={hash} />
-                  </td>
-                  <td className="w-2/1 md:py-4 text-xs">
-                    <span className="font-bold">{date}</span>
-                    <span className="font-light ml-4">{time}</span>
-                  </td>
-                  <td className="w-2/1 text-center font-bold md:py-4">
-                    <WithdrawalCounter date={date} time={time} />
-                  </td>
-                  <td className="w-2/12 md:py-4">{totalSavings ? totalSavings[i] : "No disponible"}</td>
-                </tr>
+                <TransactionsTableRow
+                  key={+hash * i}
+                  hash={hash}
+                  value={value}
+                  date={date}
+                  time={time}
+                  savigName={totalSavings ? totalSavings[i] : "No disponible"}
+                />
               );
             })}
           </tbody>
