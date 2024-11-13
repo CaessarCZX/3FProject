@@ -4,8 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import userIcon from "../../public/userIcon.svg";
 import type { NextPage } from "next";
-import { UsdtInput } from "~~/components/3F/UsdtInput";
 import MemberEntranceButton from "~~/components/Actions/Entrance_member/MemberEntranceButton";
+import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 import { AddressInput } from "~~/components/scaffold-eth";
 
 const defaultAddress = process.env.NEXT_PUBLIC_FIRST_CONTRACT_MEMBER || "0x";

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { CheckBadgeIcon, DocumentCheckIcon, DocumentTextIcon, HandThumbUpIcon } from "@heroicons/react/24/outline";
-import { TransactionHash } from "~~/components/3F/TransactionHash";
+import { TransactionHash } from "~~/components/Display/TransactionHash";
 import { TransactionInfo } from "~~/utils/3FContract/deposit";
 
 type HeroIcon = React.FC<React.ComponentProps<"svg">>;

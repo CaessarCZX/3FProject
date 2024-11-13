@@ -1,6 +1,6 @@
 import React from "react";
-import { TransactionHash } from "~~/components/3F/TransactionHash";
-import { WithdrawalCounter } from "~~/components/3F/WithdrawalCounter";
+import { TransactionHash } from "~~/components/Display/TransactionHash";
+import { WithdrawalCounter } from "~~/components/Display/WithdrawalCounter";
 import { formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 
 type TransactionTableRowProps = {

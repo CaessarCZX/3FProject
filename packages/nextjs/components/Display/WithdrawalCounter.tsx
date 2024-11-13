@@ -52,7 +52,6 @@ export const WithdrawalCounter = ({ date, time }: { date: string; time: string }
 
     const day = 5;
 
-    console.log(new Date(year, month, day, 0, 0, 0));
     return new Date(year, month, day, 0, 0, 0);
   };
 
