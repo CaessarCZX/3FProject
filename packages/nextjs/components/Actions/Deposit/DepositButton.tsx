@@ -1,31 +1,34 @@
-import { useState } from "react";
-import { StageTransactionModal } from "./StageTransactionModal";
-import { DepositErrors as err } from "./errors";
+import { useCallback, useState } from "react";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { Abi } from "abitype";
 import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
-import { useWriteContract } from "wagmi";
+import { useAccount, useChainId, useWriteContract } from "wagmi";
+import { StageTransactionModal } from "~~/components/Actions/Transaction/StageTransactionModal";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
+import { useGlobalState } from "~~/services/store/store";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
-import { TransactionInfo } from "~~/utils/3FContract/deposit";
-
-type DepositBtnProps = {
-  uplineAddress: string;
-  depositAmount: string | null;
-  btnText: string;
-};
+import { DepositBtnProps, TransactionInfo } from "~~/utils/3FContract/deposit";
+import { fetchMemberTransactions } from "~~/utils/3FContract/fetchMemberTransactions";
+import { DepositErrors as err } from "~~/utils/errors/errors";
+import { getAlchemyHttpUrl } from "~~/utils/scaffold-eth";
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 
-const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: DepositBtnProps) => {
-  const [isStarted, setIsStarted] = useState(false);
-  const { data: contract } = useDeployedContractInfo("FFFBusiness");
-  const currentContract = contract?.address ?? "0x";
-  const contractAbi = contract?.abi;
+const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
+  const currentMember = useAccount();
   const { writeContractAsync } = useWriteContract();
+  const { data: contract } = useDeployedContractInfo("FFFBusiness");
+  const setIsMemberTransactionsFetching = useGlobalState(state => state.setIsMemberTransactionsFetching);
+  const setMemberTransactions = useGlobalState(state => state.setMemberTransactions);
+  const [isStarted, setIsStarted] = useState(false);
   const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
+  const chainId = useChainId();
+  const contractAbi = contract?.abi;
+  const url = getAlchemyHttpUrl(chainId) ?? "";
+  const currentContract = contract?.address ?? "0x";
+  const memberAddress = currentMember?.address ?? "0x0";
   const [transaction, setTransaction] = useState<TransactionInfo>({
     allowanceHash: "",
     allowanceReceiptHash: "",
@@ -47,10 +50,17 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
     }));
   };
 
-  const HandleEntrance = async () => {
+  const fetchTransactions = useCallback(async () => {
+    setIsMemberTransactionsFetching(true);
+    const { transactions } = await fetchMemberTransactions(url, memberAddress, currentContract);
+    if (transactions) setMemberTransactions(transactions);
+    setIsMemberTransactionsFetching(false);
+  }, [setIsMemberTransactionsFetching, setMemberTransactions, url, memberAddress, currentContract]);
+
+  const HandleDeposit = async () => {
     try {
       setIsStarted(true);
-      if (!depositAmount || isStarted === true || !tokenUsdt || !currentContract || !uplineAddress) {
+      if (!depositAmount || isStarted === true || !tokenUsdt || !currentContract) {
         setTransaction(prev => ({
           ...prev,
           error: err.general,
@@ -59,6 +69,7 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
         return;
       }
       setIsHandleModalActivate(true);
+
       const txHash = await writeContractAsync({
         abi: erc20Abi,
         address: tokenUsdt,
@@ -84,11 +95,10 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
         const txHash = await writeContractAsync({
           abi: contractAbi as Abi,
           address: currentContract,
-          functionName: "memberEntrance",
-          args: [uplineAddress, allowanceAmount],
+          functionName: "depositMemberFunds",
+          args: [allowanceAmount],
         });
 
-        // This is provisional while MmembersEntrance Types doesn't exist
         setTransaction(prev => ({
           ...prev,
           depositContractHash: txHash,
@@ -99,40 +109,39 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
         });
 
         if (receiptTx.status === "success") {
-          // This is provisional while MmembersEntrance Types doesn't exist
           setTransaction(prev => ({
             ...prev,
             depositContractReceiptHash: receiptTx.transactionHash,
           }));
+
+          setTimeout(() => {
+            fetchTransactions();
+          }, 3000);
         }
       } else {
-        // setError("La transacción de depósito falló");
+        setTransaction(prev => ({
+          ...prev,
+          error: err.onTransaction,
+        }));
       }
     } catch (e) {
-      // setError("Se ha producido un error en el proceso de deposito");
-      console.error(err.general, e);
+      setTransaction(prev => ({
+        ...prev,
+        error: err.general,
+      }));
+      console.error(e);
     } finally {
       resetFlags();
     }
   };
-
-  // const HandleTest = () => {
-  //   setIsStarted(true);
-  //   setIsHandleModalActivate(true);
-
-  //   setTimeout(() => {
-  //     setIsStarted(false);
-  //   }, 5000);
-  // };
 
   return (
     <>
       {!isStarted && (
         <button
           type="button"
-          disabled={depositAmount ? Number(depositAmount) < 2000 : !depositAmount}
-          className=" w-full text-white bg-blue-700 disabled:bg-slate-500 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 inline-flex items-center justify-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
-          onClick={() => HandleEntrance()}
+          className="text-white bg-blue-700 disabled:bg-slate-500 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          onClick={() => HandleDeposit()}
         >
           {isStarted ? "Pendiente" : btnText}
         </button>
@@ -141,11 +150,11 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
         <StageTransactionModal
           activate={isHandleModalActivate}
           transaction={transaction}
-          transactionDescription="Registro exitoso"
+          transactionDescription="Deposito Exitoso"
         />
       )}
     </>
   );
 };
 
-export default MemberEntranceButton;
+export default DepositButton;

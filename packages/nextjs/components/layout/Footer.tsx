@@ -1,7 +1,7 @@
 import React from "react";
 import { hardhat } from "viem/chains";
 import { CurrencyDollarIcon } from "@heroicons/react/24/outline";
-import { SwitchTheme } from "~~/components/SwitchTheme";
+import { SwitchTheme } from "~~/components/Actions/Theme/SwitchTheme";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useGlobalState } from "~~/services/store/store";
 
