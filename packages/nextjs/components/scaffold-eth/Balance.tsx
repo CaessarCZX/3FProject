@@ -37,7 +37,6 @@ export const Balance = ({ address, className = "", currenciesMode }: BalanceProp
   useEffect(() => {
     if (!isLoading && !isError) {
       const dolarBalance = balance ? Number(formatUnits(balance?.value, 6)) : 0;
-      console.log(balance?.value);
       setCurrentUsdtBalance(dolarBalance);
     }
   }, [isLoading, isError, balance]);
