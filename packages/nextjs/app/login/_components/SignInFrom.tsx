@@ -46,7 +46,7 @@ export const SignInForm = () => {
       </div>
 
       <div className="text-center mt-6 text-lg duration-300 hover:text-blue-600">
-        <a href="#!">Forget Username / Password ?</a>
+        <a href="#!">Forget Username / Contrasenia ?</a>
       </div>
     </form>
   );

@@ -23,7 +23,7 @@ const Login: NextPage = () => {
               alt=""
               className="w-24 h-auto mb-6 mx-auto"
             />
-            <h2 className="text-3xl font-light leading-none mb-12">Unknown</h2>
+            <h2 className="text-3xl font-light leading-none mb-12">Bienvenido Username</h2>
             <SignInForm />
           </div>
         </div>
