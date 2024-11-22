@@ -5,8 +5,8 @@ import "~~/styles/globals.css";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
 export const metadata = getMetadata({
-  title: "Friends & Family Funds",
-  description: "Wellcome to colective fund",
+  title: "Bienvenido a FREE!",
+  description: "Wellcome to the family",
 });
 
 const MainApp = ({ children }: { children: React.ReactNode }) => {
