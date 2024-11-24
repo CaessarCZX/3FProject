@@ -1,6 +1,6 @@
 import { Toaster } from "react-hot-toast";
-import { Footer } from "~~/components/layout/Footer";
-import { Header } from "~~/components/layout/Header";
+import { Footer } from "~~/components/Layouts/Footer";
+import { Header } from "~~/components/Layouts/Header";
 import { useInitializeMemberTransactions } from "~~/hooks/3FProject/useInitializeMemberTransactions";
 import { useInitializeMexicanPesoPrice } from "~~/hooks/3FProject/useInitializeMexicanPesoPrice";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
