@@ -11,7 +11,7 @@ export const metadata = getMetadata({
 
 const MainApp = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html suppressHydrationWarning>
+    <html lang="Es" suppressHydrationWarning>
       <body>
         <ThemeProvider enableSystem>
           <BlockchainAppWithProviders>{children}</BlockchainAppWithProviders>

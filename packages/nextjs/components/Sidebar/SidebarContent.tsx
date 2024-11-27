@@ -15,27 +15,27 @@ const defaultSizeIcon = "w-5 h-5";
 
 export const developMenuGoups: SidebarMenuGroup[] = [
   {
-    name: "MENU",
+    name: "MENÚ",
     menuItems: [
       {
         icon: <Squares2X2Icon className={defaultSizeIcon} />,
-        label: "Dashboard",
+        label: "Panel de control",
         route: "#",
-        children: [{ label: "Cuenta", route: "/" }],
+        children: [{ label: "Mi cuenta", route: "/" }],
       },
       {
         icon: <CalendarDaysIcon className={defaultSizeIcon} />,
-        label: "Calendar",
+        label: "Calendario",
         route: "/calendar",
       },
       {
         icon: <UserIcon className={defaultSizeIcon} />,
-        label: "Profile",
+        label: "Tu perfil",
         route: "/profile",
       },
       {
         icon: <CogIcon className={defaultSizeIcon} />,
-        label: "Settings",
+        label: "Configuraciones",
         route: "/settings",
       },
     ],
