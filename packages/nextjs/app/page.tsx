@@ -9,7 +9,7 @@ const Home: NextPage = () => {
   return (
     <>
       <header
-        className="min-h-screen py-20 md:py-36 text-white bg-cover bg-center bg-no-repeat relative"
+        className="min-h-screen text-white bg-cover bg-center bg-no-repeat relative"
         style={{
           backgroundImage: "url(https://cdn.easyfrontend.com/pictures/contact/contact13.jpg)",
         }}
@@ -23,17 +23,22 @@ const Home: NextPage = () => {
           }}
         ></div>
         {/* For background */}
-        <div className="container px-4 relative m-auto">
+        <div className="relative w-full text-right mt-8 px-4 md:px-8">
+          <button className="btn bg-primary font-medium text-white border-none hover:bg-blue-500">
+            Panel de control
+          </button>
+        </div>
+        <div className="container px-4 pt-16 md:pt-8 relative m-auto">
           <div className="grid grid-cols-12">
             <div className="col-span-12 text-center">
               <picture className="w-full mb-8 block">
-                <Image className="m-auto" width={150} height={150} src={logo_white} alt="FREE Friends and Family" />
-                <h3 className="font-regular leading-none text-7xl tracking-widest mt-2 mb-0">FREE</h3>
-                <p className="m-0 p-0 font-light tracking-widest text-lg">FRIENDS & FAMILY</p>
+                <Image className="m-auto w-[120px] md:w-[150px]" src={logo_white} alt="FREE Friends and Family" />
+                <h3 className="font-regular leading-none text-5xl md:text-7xl tracking-widest mt-2 mb-0">FREE</h3>
+                <p className="m-0 p-0 font-light tracking-widest text-xs md:text-lg">FRIENDS & FAMILY</p>
               </picture>
 
               <h2 className="text-3xl leading-none md:text-[70px] font-bold mb-6">Bienvenido a la familia!</h2>
-              <p className="font-light text-[22px] leading-normal opacity-80 px-12 md:font-normal md:px-44 lg:px-64">
+              <p className="font-light text-xl leading-normal opacity-80 px-12 md:font-normal md:px-44 lg:px-64">
                 FREE Friends & Family es fundada con el propósito de brindar a amigos y familiares un espacio seguro y
                 confiable para alcanzar la libertad financiera.
               </p>
