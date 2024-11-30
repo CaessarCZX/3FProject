@@ -20,12 +20,12 @@ export default function ProtectedRoute(Outlet: ComponentType): ComponentType {
     // Se activa una sola vez para por cada renderizacion de los componentes protegidos
     // Solo funciona con un solo componente (Dashboard por el momento)
     useEffect(() => {
-      if (isActiveMember == false || isActiveMember == undefined) {
-        setTimeout(() => {
+      setTimeout(() => {
+        if (isActiveMember == false || isActiveMember == undefined) {
           router.push("/");
           console.log(isActiveMember);
-        }, 500);
-      }
+        }
+      }, 500);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
