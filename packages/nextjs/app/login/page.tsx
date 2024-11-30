@@ -1,9 +1,11 @@
 "use client";
 
+import { SignInForm } from "./_components/SignInFrom";
 import type { NextPage } from "next";
-import { SignUpForm } from "~~/app/newregister/_components/SignInFrom";
 
-const Register: NextPage = () => {
+// import { SignInForm } from "~~/app/login/_components/SignInFrom";
+
+const Login: NextPage = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Section */}
@@ -17,12 +19,12 @@ const Register: NextPage = () => {
       {/* Right Section */}
       <div className="w-1/2 flex items-center justify-center bg-white">
         <div className="max-w-md w-full space-y-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center">Regístrate</h2>
-          <SignUpForm />
+          <h2 className="text-3xl font-bold text-gray-900 text-center">Inicia Sesión</h2>
+          <SignInForm />
         </div>
       </div>
     </div>
   );
 };
 
-export default Register;
+export default Login;
