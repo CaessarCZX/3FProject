@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FiMail, FiLock } from "react-icons/fi";
+import { FiLock, FiMail } from "react-icons/fi";
 
 export const SignInForm = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -64,7 +64,7 @@ export const SignInForm = () => {
             required
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiMail className="text-gray-400" />
+            <FiMail />
           </div>
         </div>
       </div>
@@ -85,7 +85,7 @@ export const SignInForm = () => {
             required
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiLock className="text-gray-400" />
+            <FiLock />
           </div>
         </div>
       </div>

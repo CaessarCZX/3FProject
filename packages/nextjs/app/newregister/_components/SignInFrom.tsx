@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FiUser, FiMail, FiLock } from "react-icons/fi";
+import { FiLock, FiMail, FiUser } from "react-icons/fi";
 
 export const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -80,7 +80,7 @@ export const SignUpForm = () => {
             required
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiUser className="text-gray-400" />
+            <FiUser />
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@ export const SignUpForm = () => {
             required
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiMail className="text-gray-400" />
+            <FiMail />
           </div>
         </div>
       </div>
@@ -124,7 +124,7 @@ export const SignUpForm = () => {
             required
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiLock className="text-gray-400" />
+            <FiLock />
           </div>
         </div>
       </div>
