@@ -1,17 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import ClickOutside from "~~/components/Actions/ClickOutside";
 
+// Definimos el tipo para el payload del JWT
+interface CustomJwtPayload {
+  name: string;
+  email: string;
+  // Puedes agregar más propiedades si es necesario
+}
+
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userData, setUserData] = useState<{ name: string; email: string }>({ name: "", email: "" });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        // Aquí le decimos a TypeScript que el token tiene un payload con el tipo CustomJwtPayload
+        const decoded = jwtDecode<CustomJwtPayload>(token);
+        setUserData({ name: decoded.name, email: decoded.email });
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+      }
+    }
+  }, []);
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <Link onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-4" href="#">
         <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black dark:text-white">Username</span>
-          <span className="block text-xs">@member_name</span>
+          <span className="block text-sm font-medium text-black dark:text-white">{userData.name || "Invitado"}</span>
+          <span className="block text-xs">{userData.email || "No autenticado"}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
@@ -122,7 +144,13 @@ const DropdownUser = () => {
               </Link>
             </li>
           </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          <button
+            onClick={() => {
+              localStorage.removeItem("token"); // Cerrar sesión
+              setUserData({ name: "", email: "" });
+            }}
+            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+          >
             <svg
               className="fill-current"
               width="22"
