@@ -1,4 +1,4 @@
-import { ArrowDownIcon, BanknotesIcon, EyeIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { BanknotesIcon, EyeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { ContentStatsType } from "~~/types/cardstats";
 
 const ContentStats: ContentStatsType[] = [
@@ -12,14 +12,6 @@ const ContentStats: ContentStatsType[] = [
   },
   {
     icon: BanknotesIcon,
-    title: "Total ingresado",
-    total: "$3.456K",
-    rate: "0.43%",
-    levelUp: true,
-    levelDown: false,
-  },
-  {
-    icon: ArrowDownIcon,
     title: "Total Retirado",
     total: "$3.456K",
     rate: "0.43%",
