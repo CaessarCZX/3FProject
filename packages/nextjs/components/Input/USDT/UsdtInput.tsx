@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
+import { InputBase } from "../Base";
 import { ArrowsRightLeftIcon } from "@heroicons/react/24/outline";
-import { CommonInputProps, InputBase, SIGNED_NUMBER_REGEX } from "~~/components/scaffold-eth";
+import { CommonInputProps, SIGNED_NUMBER_REGEX } from "~~/components/scaffold-eth";
 import { useDisplayPreferredCurrencies } from "~~/hooks/3FProject/useDisplayPreferredCurrencies";
 import { useGlobalState } from "~~/services/store/store";
 
@@ -97,10 +98,15 @@ export const UsdtInput = ({ value, name, onChange, disabled, mxnMode }: CommonIn
     <InputBase
       name={name}
       value={displayValue}
-      placeholder={displayCurrenciesMode ? "Ingresa la cantidad en MXN" : "Ingresa la cantidad en USDT"}
+      placeholder={displayCurrenciesMode ? "Ingresa en Pesos" : "Ingresa en USDT"}
       onChange={handleChangeNumber}
       disabled={disabled}
-      prefix={<span className="pl-4 -mr-2 text-accent self-center text-lg">{displayCurrenciesMode ? "🇲🇽" : "🇺🇸"}</span>}
+      reFocus
+      prefix={
+        <span className="pl-4 -mr-2 absolute text-accent self-center text-lg">
+          {displayCurrenciesMode ? "🇲🇽" : "🇺🇸"}
+        </span>
+      }
       suffix={
         <div
           className={`${
@@ -108,14 +114,18 @@ export const UsdtInput = ({ value, name, onChange, disabled, mxnMode }: CommonIn
               ? ""
               : "tooltip tooltip-secondary before:content-[attr(data-tip)] before:right-[-10px] before:left-auto before:transform-none"
           }`}
-          data-tip={isMexicanPesoPriceFetching ? "Fetching price" : "Unable to fetch price"}
+          data-tip={isMexicanPesoPriceFetching ? "Recuperando precio" : "No se ha podido fijar el precio"}
         >
           <button
-            className="btn btn-primary h-[2.2rem] min-h-[2.2rem]"
+            // className="btn btn-primary h-[2.2rem] min-h-[2.2rem]"
+            className="flex items-center h-full w-full p-2"
             onClick={toggleDisplayCurrenciesMode}
             disabled={!displayCurrenciesMode && !mexicanPesoPrice}
           >
-            <ArrowsRightLeftIcon className="h-3 w-3 cursor-pointer" aria-hidden="true" />
+            <ArrowsRightLeftIcon
+              className="h-6 w-6 cursor-pointer hover:drop-shadow-icon-1 dark:hover:drop-shadow-icon-2"
+              aria-hidden="true"
+            />
           </button>
         </div>
       }

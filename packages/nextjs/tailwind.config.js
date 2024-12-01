@@ -326,6 +326,8 @@ export const theme = {
       3: "0px 0px 4px rgba(0, 0, 0, 0.15)",
       4: "0px 0px 2px rgba(0, 0, 0, 0.2)",
       5: "0px 1px 5px rgba(0, 0, 0, 0.2)",
+      "icon-1": "0px 0px 4px rgba(43, 202, 199, 0.8)",
+      "icon-2": "0px 0px 4px rgba(43, 202, 199, 0.4)",
     },
     keyframes: {
       linspin: {

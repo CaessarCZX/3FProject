@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { TbPigMoney } from "react-icons/tb";
+import DepositButton from "~~/components/Actions/Deposit/DepositButton";
 import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 import CardBox from "~~/components/UI/CardBox";
 
@@ -17,10 +18,16 @@ const DepositContract: React.FC = () => {
         {/* For Icon */}
 
         {/* For title */}
-        <h3 className="font-bold text-xl">Nuevo Ahorro</h3>
+        <h3 className="font-light text-3xl text-gray-500 dark:text-slate-100">Nuevo Ahorro</h3>
         {/* For title */}
       </div>
-      <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
+
+      {/* Input for savings */}
+      <article className="flex space-x-4 w-full">
+        <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
+        <DepositButton depositAmount={deposit} btnText="Depositar" />
+      </article>
+      {/* Input for savings */}
     </CardBox>
   );
 };
