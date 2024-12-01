@@ -4,16 +4,21 @@ import { CardDataStatsProps } from "~~/types/cardstats";
 const CardDataStats: React.FC<CardDataStatsProps> = ({ title, total, rate, levelUp, levelDown, children }) => {
   return (
     <div className="rounded-sm border border-stroke bg-white px-7.5 py-6 shadow-default dark:border-strokedark dark:bg-boxdark">
+      {/* For Icon */}
       <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
         {children}
       </div>
+      {/* For Icon */}
 
       <div className="mt-4 flex items-end justify-between">
+        {/* For title */}
         <div>
           <h4 className="text-title-md font-bold text-black dark:text-white">{total}</h4>
           <span className="text-sm font-light">{title}</span>
         </div>
+        {/* For title */}
 
+        {/* For rate */}
         <span
           className={`flex items-center gap-1 text-sm font-medium ${levelUp && "text-meta-3"} ${
             levelDown && "text-meta-5"
@@ -52,6 +57,7 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({ title, total, rate, level
             </svg>
           )}
         </span>
+        {/* For rate */}
       </div>
     </div>
   );

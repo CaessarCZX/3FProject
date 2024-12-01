@@ -1,3 +1,4 @@
+import DepositContract from "./_components/DepositContract";
 import ContentStats from "./_content/ContentStats";
 import { NextPage } from "next";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
@@ -7,7 +8,8 @@ const Dashboard: NextPage = () => {
   return (
     <>
       <InternalLayout>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4 xl:grid-cols-5 2xl:gap-7.5">
+          <DepositContract />
           {ContentStats.map((statInfo, statIndex) => {
             return (
               <CardDataStats key={statIndex} title={statInfo.title} total={statInfo.total} rate={statInfo.rate}>
