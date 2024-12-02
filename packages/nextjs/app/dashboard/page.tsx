@@ -4,7 +4,7 @@
 import BlockExplorer from "./_components/BlockExplorer";
 import DepositContract from "./_components/DepositContract";
 import ContentStats from "./_content/ContentStats";
-import withAuth from "~~/app/hoc/withAuth";
+// import withAuth from "~~/app/hoc/withAuth";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
 import CardDataStats from "~~/components/UI/CardDataStats";
 
@@ -27,5 +27,7 @@ const Dashboard = () => {
     </InternalLayout>
   );
 };
+// Aplica el HOC al export
+// export default withAuth(Dashboard);
 
-export default withAuth(Dashboard); // Aplica el HOC al export
+export default Dashboard;

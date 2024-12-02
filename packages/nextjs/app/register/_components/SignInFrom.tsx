@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { WalletButton } from "@rainbow-me/rainbowkit";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
+import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 export const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -43,7 +45,7 @@ export const SignUpForm = () => {
 
         // Redirige al usuario a "newlogin" después de 2 segundos
         setTimeout(() => {
-          router.push("/newlogin"); // Cambia "/newlogin" por la ruta deseada
+          router.push("/dashboard"); // Cambia "/newlogin" por la ruta deseada
         }, 2000);
       } else {
         const errorData = await response.json();
@@ -75,7 +77,7 @@ export const SignUpForm = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="block w-full pr-10 pl-4 font-light text-gray-700 dark:text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="Enter your full name"
             required
           />
@@ -97,7 +99,7 @@ export const SignUpForm = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="block w-full pr-10 pl-4 font-light text-gray-700 dark:text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="Enter your email"
             required
           />
@@ -119,7 +121,7 @@ export const SignUpForm = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="block w-full pr-10 pl-4 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="Enter your password"
             required
           />
@@ -131,6 +133,8 @@ export const SignUpForm = () => {
 
       {/* Wallet */}
       <div>
+        <RainbowKitCustomConnectButton />
+        <WalletButton wallet="metamask" />
         <label htmlFor="wallet" className="block text-sm font-medium text-gray-700">
           Wallet
         </label>
@@ -141,9 +145,9 @@ export const SignUpForm = () => {
             name="wallet"
             value={formData.wallet}
             onChange={handleChange}
-            className="block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="block w-full pl-4 pr-20 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="0xABC123"
-            readOnly
+            // readOnly
           />
           <button
             type="button"
