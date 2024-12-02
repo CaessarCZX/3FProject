@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { WalletButton } from "@rainbow-me/rainbowkit";
+// import { WalletButton } from "@rainbow-me/rainbowkit";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
-import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import { useAccount } from "wagmi";
+import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
+import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
 
 export const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -15,19 +17,38 @@ export const SignUpForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [singleErrorMessage, setSingleErrorMessage] = useState("");
+  // const [errors, setErrors] = useState<Record<string, string>>({});
+
+  //For blockchain
+  const currentUser = useAccount();
 
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Validacion en tiempo real para los campos
+    // const error = validateField(name, value);
+    // if (error)
+    //   notification.warning(error);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSuccessMessage("");
-    setErrorMessage("");
+    setSingleErrorMessage("");
+
+    // For validations
+    const validation = validateFormData(formData);
+    if (Object.values(validation).length > 0) {
+      RenderWarningMessages(validation);
+    }
 
     try {
       const response = await fetch("http://localhost:3001/f3api/users", {
@@ -43,25 +64,31 @@ export const SignUpForm = () => {
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
         setFormData({ name: "", email: "", password: "", wallet: "" });
 
-        // Redirige al usuario a "newlogin" después de 2 segundos
+        // Redirige al usuario a "dashboard" después de 2 segundos
         setTimeout(() => {
-          router.push("/dashboard"); // Cambia "/newlogin" por la ruta deseada
+          router.push("/dashboard");
         }, 2000);
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || "Error en el registro.");
+        setSingleErrorMessage(errorData.message || "Error en el registro.");
       }
     } catch (error) {
-      setErrorMessage("No se pudo conectar con el servidor.");
+      setSingleErrorMessage("No se pudo conectar con el servidor.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleConnectWallet = () => {
-    // Simula la conexión a una wallet (puedes integrar Web3.js o ethers.js aquí)
-    setFormData({ ...formData, wallet: "0xABC123" });
-  };
+  // For wallet address detection
+  useEffect(() => {
+    if (currentUser.status === "connected") {
+      setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
+    }
+
+    if (currentUser.status === "disconnected") {
+      setFormData(prevData => ({ ...prevData, wallet: "" }));
+    }
+  }, [currentUser.address, currentUser.status]);
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -133,13 +160,12 @@ export const SignUpForm = () => {
 
       {/* Wallet */}
       <div>
-        <RainbowKitCustomConnectButton />
-        <WalletButton wallet="metamask" />
         <label htmlFor="wallet" className="block text-sm font-medium text-gray-700">
           Wallet
         </label>
         <div className="mt-1 relative flex">
-          <input
+          <WalletConnectionBtn classBtn="w-full rounded-md" />
+          {/* <input
             type="text"
             id="wallet"
             name="wallet"
@@ -155,7 +181,7 @@ export const SignUpForm = () => {
             className="px-4 py-2 border border-gray-300 bg-gray-100 rounded-r-md text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
           >
             Conectar
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -172,7 +198,7 @@ export const SignUpForm = () => {
 
       {/* Mensajes de éxito o error */}
       {successMessage && <p className="text-green-600 text-sm mt-2">{successMessage}</p>}
-      {errorMessage && <p className="text-red-600 text-sm mt-2">{errorMessage}</p>}
+      {singleErrorMessage && <p className="text-red-600 text-sm mt-2">{singleErrorMessage}</p>}
     </form>
   );
 };

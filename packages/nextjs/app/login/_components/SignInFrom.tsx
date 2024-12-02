@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiLock, FiMail } from "react-icons/fi";
+import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 
 export const SignInForm = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -89,6 +90,17 @@ export const SignInForm = () => {
           </div>
         </div>
       </div>
+
+      {/* Wallet connection */}
+      <div>
+        <label htmlFor="wallet" className="block text-sm font-medium text-gray-700">
+          Wallet
+        </label>
+        <div className="mt-1 relative flex">
+          <WalletConnectionBtn classBtn="w-full rounded-md" />
+        </div>
+      </div>
+      {/* Wallet connection */}
 
       {/* Submit */}
       <div>
