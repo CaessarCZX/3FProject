@@ -37,40 +37,45 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
       <h4 className="mb-6 text-3xl font-light text-black dark:text-white">Ahorros</h4>
 
       <table className="flex flex-col">
-        <tr className="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
-          <td className="p-2.5 xl:p-5">
-            <h5 className="text-xs font-bold xsm:text-base">Ahorro</h5>
-          </td>
-          <td className="p-2.5 text-center xl:p-5">
-            <h5 className="text-xs font-bold xsm:text-base">Hash</h5>
-          </td>
-          <td className="p-2.5 text-center xl:p-5">
-            <h5 className="text-xs font-bold xsm:text-base">Fecha</h5>
-          </td>
-          <td className="hidden p-2.5 text-center sm:block xl:p-5">
-            <h5 className="text-xs font-bold xsm:text-base">Proximo pago</h5>
-          </td>
-          <td className="hidden p-2.5 text-center sm:block xl:p-5">
-            <h5 className="text-sm font-bold xsm:text-base">Estatus</h5>
-          </td>
-        </tr>
+        <thead>
+          <tr className="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
+            <td className="p-2.5 xl:p-5">
+              <h5 className="text-xs font-bold xsm:text-base">Ahorro</h5>
+            </td>
+            <td className="p-2.5 text-center xl:p-5">
+              <h5 className="text-xs font-bold xsm:text-base">Hash</h5>
+            </td>
+            <td className="p-2.5 text-center xl:p-5">
+              <h5 className="text-xs font-bold xsm:text-base">Fecha</h5>
+            </td>
+            <td className="hidden p-2.5 text-center sm:block xl:p-5">
+              <h5 className="text-xs font-bold xsm:text-base">Proximo pago</h5>
+            </td>
+            <td className="hidden p-2.5 text-center sm:block xl:p-5">
+              <h5 className="text-sm font-bold xsm:text-base">Estatus</h5>
+            </td>
+          </tr>
+        </thead>
 
-        {transactions.map((tx, key) => {
-          const hash = tx.hash;
-          const { date, time } = getDateAndTimeFromTimestamp(tx.timestamp);
-          const value = formatUnits(BigInt(tx.value), 6);
-          return (
-            <TransactionsTableRow
-              key={+hash * key}
-              hash={hash}
-              value={value}
-              date={date}
-              time={time}
-              status=""
-              lengthData={transactions.length}
-            />
-          );
-        })}
+        <tbody>
+          {transactions.map((tx, key) => {
+            const hash = tx.hash;
+            const { date, time } = getDateAndTimeFromTimestamp(tx.timestamp);
+            const value = formatUnits(BigInt(tx.value), 6);
+            return (
+              <TransactionsTableRow
+                key={+hash * key}
+                index={key}
+                hash={hash}
+                value={value}
+                date={date}
+                time={time}
+                status=""
+                lengthData={transactions.length}
+              />
+            );
+          })}
+        </tbody>
       </table>
     </div>
   );

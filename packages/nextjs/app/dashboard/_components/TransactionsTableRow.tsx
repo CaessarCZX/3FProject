@@ -4,7 +4,7 @@ import { WithdrawalCounter } from "~~/components/Display/WithdrawalCounter";
 import { formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 
 type TransactionTableRowProps = {
-  key: number;
+  index: number;
   hash: string;
   value: string;
   date: string;
@@ -20,38 +20,37 @@ export const TransactionsTableRow = ({
   time,
   status,
   lengthData,
-  key,
+  index,
 }: TransactionTableRowProps) => {
   return (
-    <div
+    <tr
       className={`grid grid-cols-3 sm:grid-cols-5 ${
-        key === lengthData - 1 ? "" : "border-b border-stroke dark:border-strokedark"
+        index === lengthData - 1 ? "" : "border-b border-stroke dark:border-strokedark"
       }`}
-      key={key}
     >
-      <div className="flex items-center gap-3 p-2.5 xl:p-5">
+      <td className="flex items-center gap-3 p-2.5 xl:p-5">
         <p className="hidden font-light text-black dark:text-white sm:block">
           {formatCurrency(Number(value))} <span className="font-black text-xs">USDT</span>
         </p>
-      </div>
+      </td>
 
-      <div className="flex items-center justify-center p-2.5 xl:p-5">
+      <td className="flex items-center justify-center p-2.5 xl:p-5">
         <TransactionHash hash={hash} />
-      </div>
+      </td>
 
-      <div className="flex items-center justify-center p-2.5 xl:p-5">
+      <td className="flex items-center justify-center p-2.5 xl:p-5">
         <p className="text-meta-3 dark:text-white">{date}</p>
-      </div>
+      </td>
 
-      <div className="hidden items-center font-bold justify-center p-2.5 sm:flex xl:p-5">
+      <td className="hidden items-center font-bold justify-center p-2.5 sm:flex xl:p-5">
         {/* <p className="text-black dark:text-white">{brand.sales}</p> */}
         <WithdrawalCounter date={date} time={time} />
-      </div>
+      </td>
 
-      <div className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
+      <td className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
         {/* <p className="text-meta-5">{brand.conversion}%</p> */}
         <p className="text-meta-5">{status}</p>
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 };
