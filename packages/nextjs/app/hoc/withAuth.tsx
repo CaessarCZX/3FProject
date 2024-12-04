@@ -10,9 +10,9 @@ const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): Compone
     useEffect(() => {
       const token = localStorage.getItem("token");
       if (!token) {
-        router.replace("/login");
+        router.push("/login");
       }
-    }, [router]); // Incluido router como dependencia
+    }, [router]);
 
     const token = typeof window !== "undefined" && localStorage.getItem("token");
     if (!token) return null;

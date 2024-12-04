@@ -12,6 +12,7 @@ export const SignUpForm = () => {
     wallet: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(false); // Validacion de wallet
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -40,10 +41,11 @@ export const SignUpForm = () => {
       if (response.ok) {
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
         setFormData({ name: "", email: "", password: "", wallet: "" });
+        setIsWalletConnected(false); // Resetear la bandera después del registro
 
-        // Redirige al usuario a "newlogin" después de 2 segundos
+        // Redirige al usuario a "login" después de 2 segundos
         setTimeout(() => {
-          router.push("/newlogin"); // Cambia "/newlogin" por la ruta deseada
+          router.replace("/login");
         }, 2000);
       } else {
         const errorData = await response.json();
@@ -56,9 +58,44 @@ export const SignUpForm = () => {
     }
   };
 
-  const handleConnectWallet = () => {
-    // Simula la conexión a una wallet (puedes integrar Web3.js o ethers.js aquí)
-    setFormData({ ...formData, wallet: "0xABC123" });
+  const handleConnectWallet = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (!formData.wallet) {
+      setErrorMessage("Por favor, introduce una dirección de wallet.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3001/f3api/users/check-wallet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ wallet: formData.wallet }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (data.exists) {
+          setErrorMessage("Esta wallet ya está registrada.");
+          setIsWalletConnected(false); // Deshabilitar el registro si la wallet está registrada
+        } else {
+          setSuccessMessage("Wallet conectada con éxito.");
+          setIsWalletConnected(true); // Habilitar el registro
+        }
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Error al verificar la wallet.");
+        setIsWalletConnected(false); // Deshabilitar registro si ocurre un error con la wallet
+      }
+    } catch (error) {
+      setErrorMessage("No se pudo conectar con el servidor.");
+      setIsWalletConnected(false);
+    }
   };
 
   return (
@@ -143,7 +180,7 @@ export const SignUpForm = () => {
             onChange={handleChange}
             className="block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="0xABC123"
-            readOnly
+            required
           />
           <button
             type="button"
@@ -158,9 +195,9 @@ export const SignUpForm = () => {
       {/* Submit */}
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || !isWalletConnected} // Deshabilitado si no se conectó la wallet
         className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-          isSubmitting ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
+          isSubmitting || !isWalletConnected ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
         }`}
       >
         {isSubmitting ? "Registrando..." : "Registrar"}

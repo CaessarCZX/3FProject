@@ -1,17 +1,40 @@
 "use client";
 
 // import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { TransactionsTable } from "./TransactionsTable";
+import { jwtDecode } from "jwt-decode";
 // import { PaginationButton } from "./PaginationButton";
 import { useGlobalState } from "~~/services/store/store";
 
 // import { notification } from "~~/utils/scaffold-eth";
 
+interface DecodedToken {
+  wallet: string;
+}
+
 const BlockExplorer = () => {
   // const { filteredTransactions, transactionReceipts, currentPage, totalBlocks, setCurrentPage, error } =
   //   useFetchFilteredBlocks(address);
+
+  const [wallet, setWallet] = useState<string | null>(null);
+
   const memberTransactions = useGlobalState(state => state.memberTransactions.transactions);
   const isLoading = useGlobalState(state => state.memberTransactions.isFetching);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+
+    if (storedToken) {
+      try {
+        // Decodifica el JWT para obtener el contenido del payload
+        const decoded: DecodedToken = jwtDecode(storedToken);
+        setWallet(decoded.wallet || null); // Extrae la propiedad wallet
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+      }
+    }
+  }, []);
 
   // const { targetNetwork } = useTargetNetwork();
   // const [hasError, setHasError] = useState(false);
@@ -41,6 +64,11 @@ const BlockExplorer = () => {
       ) : (
         <TransactionsTable transactions={memberTransactions} />
       )}
+
+      <div>
+        <p>{wallet ? `Wallet: ${wallet}` : "Wallet no asignado."}</p>
+      </div>
+
       {/* <PaginationButton currentPage={currentPage} totalItems={Number(totalBlocks)} setCurrentPage={setCurrentPage} /> */}
     </div>
   );

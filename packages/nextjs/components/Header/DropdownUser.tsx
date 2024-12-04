@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
+import { jwtDecode } from "jwt-decode";
 import ClickOutside from "~~/components/Actions/ClickOutside";
 
-// Definimos el tipo para el payload del JWT
 interface CustomJwtPayload {
   name: string;
   email: string;
-  // Puedes agregar más propiedades si es necesario
 }
 
 const DropdownUser = () => {
@@ -19,7 +17,6 @@ const DropdownUser = () => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        // Aquí le decimos a TypeScript que el token tiene un payload con el tipo CustomJwtPayload
         const decoded = jwtDecode<CustomJwtPayload>(token);
         setUserData({ name: decoded.name, email: decoded.email });
       } catch (error) {
