@@ -7,6 +7,7 @@ import {
   KeyIcon,
   Squares2X2Icon,
   TableCellsIcon,
+  UserCircleIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
 import { SidebarMenuGroup } from "~~/types/sidebar";
@@ -29,7 +30,7 @@ export const developMenuGoups: SidebarMenuGroup[] = [
         route: "/calendar",
       },
       {
-        icon: <UserIcon className={defaultSizeIcon} />,
+        icon: <UserCircleIcon className={defaultSizeIcon} />,
         label: "Tu perfil",
         route: "/profile",
       },
@@ -37,6 +38,11 @@ export const developMenuGoups: SidebarMenuGroup[] = [
         icon: <CogIcon className={defaultSizeIcon} />,
         label: "Configuraciones",
         route: "/settings",
+      },
+      {
+        icon: <UserIcon className={defaultSizeIcon} />,
+        label: "Admin",
+        route: "/admin",
       },
     ],
   },

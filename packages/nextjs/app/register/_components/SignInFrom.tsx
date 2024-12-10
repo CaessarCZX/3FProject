@@ -29,12 +29,18 @@ export const SignUpForm = () => {
     setErrorMessage("");
 
     try {
+      const dataToSend = {
+        ...formData, // Incluye los campos existentes
+        isAdmin: false, // Agrega isAdmin con valor por defecto
+        isActive: true, // Agrega isActive con valor por defecto
+      };
+
       const response = await fetch("http://localhost:3001/f3api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
         credentials: "include",
       });
 
@@ -96,6 +102,11 @@ export const SignUpForm = () => {
       setErrorMessage("No se pudo conectar con el servidor.");
       setIsWalletConnected(false);
     }
+  };
+
+  // Función para manejar el clic en el enlace de registro
+  const handleLoginClick = () => {
+    sessionStorage.setItem("allowAccess", "true");
   };
 
   return (
@@ -190,6 +201,16 @@ export const SignUpForm = () => {
             Conectar
           </button>
         </div>
+      </div>
+
+      {/* Login link */}
+      <div className="text-sm text-center">
+        <p>
+          ¿Ya tienes una cuenta?{" "}
+          <a href="/login" className="text-blue-600 hover:text-blue-800" onClick={handleLoginClick}>
+            Inicia sesión aquí
+          </a>
+        </p>
       </div>
 
       {/* Submit */}

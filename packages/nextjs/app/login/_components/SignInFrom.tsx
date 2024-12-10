@@ -30,10 +30,8 @@ export const SignInForm = () => {
         const data = await response.json();
         console.log("Token JWT:", data.token);
 
-        // Guarda el token en localStorage o sessionStorage
         localStorage.setItem("token", data.token);
 
-        // Redirige al usuario (por ejemplo, a un dashboard)
         router.push("/dashboard");
       } else {
         const errorData = await response.json();
@@ -44,6 +42,11 @@ export const SignInForm = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Función para manejar el clic en el enlace de registro
+  const handleSignUpClick = () => {
+    sessionStorage.setItem("allowAccess", "true");
   };
 
   return (
@@ -88,6 +91,16 @@ export const SignInForm = () => {
             <FiLock />
           </div>
         </div>
+      </div>
+
+      {/* Sign up link */}
+      <div className="text-sm text-center">
+        <p>
+          ¿No tienes cuenta?{" "}
+          <a href="/register" className="text-blue-600 hover:text-blue-800" onClick={handleSignUpClick}>
+            Regístrate aquí
+          </a>
+        </p>
       </div>
 
       {/* Submit */}

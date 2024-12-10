@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import ClickOutside from "~~/components/Actions/ClickOutside";
 
@@ -12,6 +13,8 @@ interface CustomJwtPayload {
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userData, setUserData] = useState<{ name: string; email: string }>({ name: "", email: "" });
+
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -145,6 +148,7 @@ const DropdownUser = () => {
             onClick={() => {
               localStorage.removeItem("token"); // Cerrar sesión
               setUserData({ name: "", email: "" });
+              router.replace("/login");
             }}
             className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
           >
