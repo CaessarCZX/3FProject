@@ -18,7 +18,7 @@ const WhiteListTableForm = () => {
     const fetchUsers = async () => {
       try {
         console.log("Fetching users from API...");
-        const response = await fetch("http://localhost:3001/f3api/whiteList/");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/`);
         if (!response.ok) {
           throw new Error("Error al obtener los usuarios");
         }
@@ -48,7 +48,7 @@ const WhiteListTableForm = () => {
     console.log(`Actualizando ${field} para el usuario ${userId}:`, updatedValue);
 
     try {
-      const response = await fetch(`http://localhost:3001/f3api/whiteList/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +78,7 @@ const WhiteListTableForm = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/f3api/whiteList/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/${userId}`, {
         method: "DELETE",
       });
 

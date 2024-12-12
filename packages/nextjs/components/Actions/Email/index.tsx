@@ -14,7 +14,7 @@ export const SubscribeForm = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch("http://localhost:3001/f3api/whiteList/create-white-list", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/create-white-list`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,8 +32,10 @@ export const SubscribeForm = () => {
           // Permiti acceso a login y register
           sessionStorage.setItem("allowAccess", "true");
 
-          // Redirige al login
-          window.location.href = data.redirect;
+          // Redirige al login con el email
+          const url = new URL(data.redirect, window.location.origin);
+          url.searchParams.append("email", email);
+          window.location.href = url.toString();
           return;
         }
 

@@ -24,7 +24,7 @@ const TableForm = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:3001/f3api/users");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users`);
         if (!response.ok) {
           throw new Error("Error al obtener los usuarios");
         }
@@ -68,7 +68,7 @@ const TableForm = () => {
       setUsers(prevUsers => prevUsers.map(user => (user._id === userId ? { ...user, [field]: !user[field] } : user)));
 
       // Realizar la actualización en el backend
-      const response = await fetch(`http://localhost:3001/f3api/users/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [field]: !users.find(user => user._id === userId)?.[field] }),
