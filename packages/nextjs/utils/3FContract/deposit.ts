@@ -8,5 +8,4 @@ export type TransactionInfo = {
   allowanceReceiptHash: string | undefined;
   depositContractHash: string | undefined;
   depositContractReceiptHash: string | undefined;
-  error: string | undefined;
 };

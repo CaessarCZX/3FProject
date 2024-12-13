@@ -7,7 +7,6 @@ export const fetchMemberTransactions = async (
   address: string | null,
   contractAddress: string | null,
 ): Promise<FetchTransactionsResult> => {
-  console.log("Fetching");
   const data = {
     jsonrpc: "2.0",
     id: 1,
@@ -43,7 +42,7 @@ export const fetchMemberTransactions = async (
       transactions: formattedTransactions,
     };
   } catch (error) {
-    console.error("Error fetching transactions:", error);
+    console.warn("Error fetching transactions:");
     return {
       transactions: [],
     };
