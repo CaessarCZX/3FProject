@@ -7,7 +7,7 @@ export const SubscribeForm = () => {
         name="email"
         className="bg-transparent py-4 px-5 placeholder:text-lg placeholder:text-white placeholder:text-opacity-80 focus:outline-none grow"
         type="email"
-        placeholder="Enter email"
+        placeholder="Ingresa tu Email"
         required
       />
       <button className="text-xl font-semibold duration-500 hover:text-blue-600 mr-7">

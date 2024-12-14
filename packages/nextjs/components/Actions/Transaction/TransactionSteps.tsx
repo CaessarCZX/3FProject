@@ -73,26 +73,6 @@ const contents: StepItem[] = [
 //   </div>
 // );
 
-// const StepProcess = ({ item, index, hashes }: ContentItemProps) => (
-//   <div className="flex items-center gap-4">
-//     <div
-//       className={`w-16 h-16 rounded-full transition-colors ${
-//         !hashes[index] ? "bg-slate-300" : "bg-green-500"
-//       } bg-opacity-90 flex items-center justify-center`}
-//     >
-//       <h1 className="m-0 font-normal text-xl text-white">{index + 1}</h1>
-//     </div>
-//     <div>
-//       <p className="m-0 font-normal">{item.title}</p>
-//       <div className="space-x-4">
-//         <span>{item.text}</span>
-//         <span></span>
-//       </div>
-//     </div>
-//     <div>step</div>
-//   </div>
-// );
-
 const FeaturedItem = ({ item, index, hashes }: ContentItemProps) => {
   return (
     <div className="flex justify-between">

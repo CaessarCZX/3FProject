@@ -35,15 +35,10 @@ const Home: NextPage = () => {
               </picture>
 
               <h2 className="text-3xl leading-none md:text-[70px] font-bold mb-6">Bienvenido a la familia!</h2>
-              {/* <p className="font-light text-xl leading-normal opacity-80 px-12 md:font-normal md:px-44 lg:px-64">
-                FREE Friends & Family es fundada con el propósito de brindar a amigos y familiares un espacio seguro y
-                confiable para alcanzar la libertad financiera.
-              </p> */}
-
               <div className="flex w-full items-center justify-center mt-12">
                 <SubscribeForm />
               </div>
-              <p className="mt-6 font-light text-xs">* Suscribete para recibir notificaciones</p>
+              <p className="mt-6 font-light text-xs">* Solo miembros aprobados</p>
             </div>
           </div>
         </div>
