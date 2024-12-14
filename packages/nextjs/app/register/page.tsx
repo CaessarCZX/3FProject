@@ -18,7 +18,7 @@ const Register: NextPage = () => {
       ></div>
 
       {/* Right Section */}
-      <div className="w-1/2 flex items-center justify-center bg-white">
+      <div className="w-1/2 flex items-center justify-center bg-white dark:bg-transparent">
         <div className="max-w-md w-full space-y-8">
           <h2 className="text-3xl font-bold text-gray-900 text-center">Regístrate</h2>
           <SignUpForm />

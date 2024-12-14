@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { TransactionsTableRow } from "./TransactionsTableRow";
 import { formatUnits } from "viem";
 import { getDateAndTimeFromTimestamp } from "~~/utils/3FContract/timestampFormatter";
@@ -15,13 +15,14 @@ type TransactionTableProps = {
 };
 
 export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
-  const [totalSavings, setTotalSavings] = useState<string[]>();
+  // Function disabled for req
+  // const [totalSavings, setTotalSavings] = useState<string[]>();
 
-  useEffect(() => {
-    if (!transactions) return;
-    const createSavings = Array.from({ length: transactions.length }, (_, i) => `Ahorro-${i + 1}`);
-    setTotalSavings(createSavings);
-  }, [transactions]);
+  // useEffect(() => {
+  //   if (!transactions) return;
+  //   const createSavings = Array.from({ length: transactions.length }, (_, i) => `Ahorro-${i + 1}`);
+  //   setTotalSavings(createSavings);
+  // }, [transactions]);
 
   if (!transactions) {
     return (
@@ -32,37 +33,50 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
   }
 
   return (
-    <div className="flex justify-center max-h-56 overflow-y-auto">
-      <div className="overflow-x-auto w-full shadow-2xl rounded-xl">
-        <table className="table text-xl bg-base-100 table-zebra w-full md:table-md table-sm">
-          <thead>
-            <tr className="rounded-xl text-sm text-base-content">
-              <th className="bg-primary">Valor</th>
-              <th className="bg-primary">Hash</th>
-              <th className="bg-primary">Fecha y hora</th>
-              <th className="bg-primary">Tiempo para retiro</th>
-              <th className="bg-primary">Ahorro</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((tx, i) => {
-              const hash = tx.hash;
-              const { date, time } = getDateAndTimeFromTimestamp(tx.timestamp);
-              const value = formatUnits(BigInt(tx.value), 6);
-              return (
-                <TransactionsTableRow
-                  key={+hash * i}
-                  hash={hash}
-                  value={value}
-                  date={date}
-                  time={time}
-                  savigName={totalSavings ? totalSavings[i] : "No disponible"}
-                />
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+    <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+      <h4 className="mb-6 text-3xl font-light text-black dark:text-white">Ahorros</h4>
+
+      <table className="flex flex-col">
+        <thead>
+          <tr className="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
+            <td className="p-2.5 xl:p-5">
+              <h5 className="text-xs font-bold xsm:text-base">Ahorro</h5>
+            </td>
+            <td className="p-2.5 text-center xl:p-5">
+              <h5 className="text-xs font-bold xsm:text-base">Hash</h5>
+            </td>
+            <td className="p-2.5 text-center xl:p-5">
+              <h5 className="text-xs font-bold xsm:text-base">Fecha</h5>
+            </td>
+            <td className="hidden p-2.5 text-center sm:block xl:p-5">
+              <h5 className="text-xs font-bold xsm:text-base">Proximo pago</h5>
+            </td>
+            <td className="hidden p-2.5 text-center sm:block xl:p-5">
+              <h5 className="text-sm font-bold xsm:text-base">Estatus</h5>
+            </td>
+          </tr>
+        </thead>
+
+        <tbody>
+          {transactions.map((tx, key) => {
+            const hash = tx.hash;
+            const { date, time } = getDateAndTimeFromTimestamp(tx.timestamp);
+            const value = formatUnits(BigInt(tx.value), 6);
+            return (
+              <TransactionsTableRow
+                key={+hash * key}
+                index={key}
+                hash={hash}
+                value={value}
+                date={date}
+                time={time}
+                status=""
+                lengthData={transactions.length}
+              />
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 };

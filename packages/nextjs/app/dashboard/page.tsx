@@ -3,12 +3,14 @@
 // Marca este archivo como un Client Component
 import BlockExplorer from "./_components/BlockExplorer";
 import DepositContract from "./_components/DepositContract";
-import ContentStats from "./_content/ContentStats";
-import withAuth from "~~/app/hoc/withAuth";
+import useGetContentStats from "./_content/ContentStats";
+// import withAuth from "~~/app/hoc/withAuth";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
 import CardDataStats from "~~/components/UI/CardDataStats";
 
 const Dashboard = () => {
+  const ContentStats = useGetContentStats();
+
   return (
     <InternalLayout>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4 xl:grid-cols-5 2xl:gap-7.5">
@@ -27,5 +29,7 @@ const Dashboard = () => {
     </InternalLayout>
   );
 };
+// Aplica el HOC al export
+// export default withAuth(Dashboard);
 
-export default withAuth(Dashboard); // Aplica el HOC al export
+export default Dashboard;
