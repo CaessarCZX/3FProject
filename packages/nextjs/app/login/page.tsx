@@ -1,5 +1,6 @@
 "use client";
 
+import withAccessControl from "../hoc/withAccessControl";
 import { SignInForm } from "./_components/SignInFrom";
 import type { NextPage } from "next";
 
@@ -27,4 +28,4 @@ const Login: NextPage = () => {
   );
 };
 
-export default Login;
+export default withAccessControl(Login);

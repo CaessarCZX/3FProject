@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiLock, FiMail } from "react-icons/fi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
@@ -15,13 +15,21 @@ export const SignInForm = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const email = searchParams.get("email");
+    if (email) {
+      setFormData(prev => ({ ...prev, email }));
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage("");
 
     try {
-      const response = await fetch("http://localhost:3001/f3api/users/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -31,10 +39,8 @@ export const SignInForm = () => {
         const data = await response.json();
         console.log("Token JWT:", data.token);
 
-        // Guarda el token en localStorage o sessionStorage
         localStorage.setItem("token", data.token);
 
-        // Redirige al usuario (por ejemplo, a un dashboard)
         router.push("/dashboard");
       } else {
         const errorData = await response.json();
@@ -45,6 +51,14 @@ export const SignInForm = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Función para manejar el clic en el enlace de registro
+  const handleSignUpClick = () => {
+    const email = formData.email;
+    const registerUrl = email ? `/register?email=${encodeURIComponent(email)}` : "/register";
+    sessionStorage.setItem("allowAccess", "true");
+    router.push(registerUrl);
   };
 
   return (
@@ -59,9 +73,8 @@ export const SignInForm = () => {
             type="email"
             id="email"
             value={formData.email}
-            onChange={handleChange}
-            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter your email"
+            readOnly
+            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
             required
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -91,6 +104,17 @@ export const SignInForm = () => {
         </div>
       </div>
 
+<<<<<<< develop
+      {/* Sign up link */}
+      <div className="text-sm text-center">
+        <p>
+          ¿No tienes cuenta?{" "}
+          <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleSignUpClick}>
+            Regístrate aquí
+          </a>
+        </p>
+      </div>
+=======
       {/* Wallet connection */}
       <div>
         <label htmlFor="wallet" className="block text-sm font-medium text-gray-700">
@@ -101,6 +125,7 @@ export const SignInForm = () => {
         </div>
       </div>
       {/* Wallet connection */}
+>>>>>>> develop
 
       {/* Submit */}
       <div>

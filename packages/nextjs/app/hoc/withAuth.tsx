@@ -2,6 +2,11 @@
 
 import { ComponentType, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  isActive: boolean;
+}
 
 const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): ComponentType<P> => {
   const AuthComponent = (props: P) => {
@@ -9,13 +14,37 @@ const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): Compone
 
     useEffect(() => {
       const token = localStorage.getItem("token");
+
       if (!token) {
-        router.replace("/login");
+        // Si no hay token, redirige al login
+        router.push("/login");
+        return;
       }
-    }, [router]); // Incluido router como dependencia
+
+      try {
+        // Decodificar el token para validar isActive
+        const decoded: DecodedToken = jwtDecode(token);
+
+        if (!decoded.isActive) {
+          // Si isActive es false, redirige a la pagina login
+          router.push("/login");
+        }
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+        router.push("/login"); // Redirige al login si el token es inválido
+      }
+    }, [router]);
 
     const token = typeof window !== "undefined" && localStorage.getItem("token");
-    if (!token) return null;
+
+    if (!token) return null; // Renderizar algo mientras redirige
+
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      if (!decoded.isActive) return null; // No renderiza el componente si el usuario no está activo
+    } catch {
+      return null; // En caso de error al decodificar, evita renderizar
+    }
 
     return <WrappedComponent {...props} />;
   };
