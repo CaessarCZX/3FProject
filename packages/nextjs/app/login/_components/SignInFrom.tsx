@@ -1,19 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiLock, FiMail } from "react-icons/fi";
+import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
+import { notification } from "~~/utils/scaffold-eth/notification";
 
 export const SignInForm = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ email: "", password: "", wallet: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const currentUser = useAccount();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
+  // Mensajes a ui
+  useEffect(() => {
+    if (errorMessage) {
+      notification.error(errorMessage, { position: "bottom-right", duration: 5000 }); // Muestra la notificicacion con el error encontrado
+      setErrorMessage(""); // Borra el mensaje de error registrado
+    }
+
+    if (successMessage) {
+      notification.success(successMessage, { position: "bottom-right", duration: 5000 });
+      setSuccessMessage("");
+    }
+  }, [errorMessage, successMessage]);
+
+  const handleConnectWallet = useCallback(async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    // if (!formData.wallet) {
+    //   setSingleErrorMessage("Por favor, introduce una dirección de wallet.");
+    //   return;
+    // }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ wallet: formData.wallet }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (data.exists) {
+          setErrorMessage("Esta wallet ya está registrada.");
+          setIsWalletConnected(false); // Deshabilitar el registro si la wallet está registrada
+        } else {
+          setSuccessMessage("Wallet conectada con éxito.");
+          setIsWalletConnected(true); // Habilitar el registro
+        }
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Error al verificar la wallet.");
+        setIsWalletConnected(false); // Deshabilitar registro si ocurre un error con la wallet
+      }
+    } catch (error) {
+      setErrorMessage("No se pudo conectar con el servidor.");
+      setIsWalletConnected(false);
+    }
+  }, [formData.wallet]);
+
+  // Para obtener direccion automatica de wallet conectada
+  useEffect(() => {
+    if (currentUser.status === "connected") {
+      setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
+      setTimeout(() => handleConnectWallet(), 2000);
+    }
+
+    if (currentUser.status === "disconnected") setFormData(prevData => ({ ...prevData, wallet: "" }));
+  }, [currentUser.status, currentUser.address, handleConnectWallet]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +166,7 @@ export const SignInForm = () => {
           Wallet
         </label>
         <div className="mt-1 relative flex">
-          <WalletConnectionBtn classBtn="w-full rounded-md" />
+          <WalletConnectionBtn enableWallet={isWalletConnected} classBtn="w-full rounded-md" />
         </div>
       </div>
       {/* Wallet connection */}

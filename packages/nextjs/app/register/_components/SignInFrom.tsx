@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// import { WalletButton } from "@rainbow-me/rainbowkit";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
 import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
+import { notification } from "~~/utils/scaffold-eth/notification";
 
 export const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -14,8 +14,11 @@ export const SignUpForm = () => {
     email: "",
     password: "",
     wallet: "",
+    referredBy: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(false); // Validacion de wallet
+  const [isReferrerValid, setIsReferrerValid] = useState(false); // Validador de referido
   const [successMessage, setSuccessMessage] = useState("");
   const [singleErrorMessage, setSingleErrorMessage] = useState("");
   // const [errors, setErrors] = useState<Record<string, string>>({});
@@ -25,17 +28,83 @@ export const SignUpForm = () => {
 
   const router = useRouter();
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const email = searchParams.get("email");
+    if (email) {
+      setFormData(prev => ({ ...prev, email }));
+    }
+  }, []);
+
+  // Mensajes a ui
+  useEffect(() => {
+    if (singleErrorMessage) {
+      notification.error(singleErrorMessage, { position: "bottom-right", duration: 5000 }); // Muestra la notificicacion con el error encontrado
+      setSingleErrorMessage(""); // Borra el mensaje de error registrado
+    }
+
+    if (successMessage) {
+      notification.success(successMessage, { position: "bottom-right", duration: 5000 });
+      setSuccessMessage("");
+    }
+  }, [singleErrorMessage, successMessage]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
 
-    // Validacion en tiempo real para los campos
-    // const error = validateField(name, value);
-    // if (error)
-    //   notification.warning(error);
+    // Reset validation when "wallet" changes
+    if (name === "wallet") {
+      setIsWalletConnected(false);
+      setSingleErrorMessage("");
+      setSuccessMessage("");
+    }
+
+    // Reset validation when "referredBy" changes
+    if (name === "referredBy") {
+      setIsReferrerValid(false);
+      setSingleErrorMessage("");
+      setSuccessMessage("");
+    }
+  };
+
+  const handleValidateReferrer = async () => {
+    setSingleErrorMessage("");
+    setSuccessMessage("");
+
+    if (!formData.referredBy) {
+      setSingleErrorMessage("Por favor, introduce una wallet de referido.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ wallet: formData.referredBy }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.exists) {
+          setSuccessMessage("Wallet de referido válida.");
+          setIsReferrerValid(true);
+        } else {
+          setSingleErrorMessage("La wallet de referido no está registrada.");
+          setIsReferrerValid(false);
+        }
+      } else {
+        const errorData = await response.json();
+        setSingleErrorMessage(errorData.message || "Error al validar la wallet de referido.");
+        setIsReferrerValid(false);
+      }
+    } catch (error) {
+      setSingleErrorMessage("No se pudo conectar con el servidor.");
+      setIsReferrerValid(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,23 +120,29 @@ export const SignUpForm = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3001/f3api/users", {
+      const dataToSend = {
+        ...formData,
+        isAdmin: false,
+        isActive: true,
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
         credentials: "include",
       });
 
       if (response.ok) {
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
-        setFormData({ name: "", email: "", password: "", wallet: "" });
+        setFormData({ name: "", email: "", password: "", wallet: "", referredBy: "" });
+        setIsWalletConnected(false);
+        setIsReferrerValid(false);
 
-        // Redirige al usuario a "dashboard" después de 2 segundos
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 2000);
+        sessionStorage.setItem("allowAccess", "true");
+        router.push("/login");
       } else {
         const errorData = await response.json();
         setSingleErrorMessage(errorData.message || "Error en el registro.");
@@ -79,16 +154,63 @@ export const SignUpForm = () => {
     }
   };
 
-  // For wallet address detection
+  const handleConnectWallet = useCallback(async () => {
+    setSingleErrorMessage("");
+    setSuccessMessage("");
+
+    // if (!formData.wallet) {
+    //   setSingleErrorMessage("Por favor, introduce una dirección de wallet.");
+    //   return;
+    // }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ wallet: formData.wallet }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (data.exists) {
+          setSingleErrorMessage("Esta wallet ya está registrada.");
+          setIsWalletConnected(false); // Deshabilitar el registro si la wallet está registrada
+        } else {
+          setSuccessMessage("Wallet conectada con éxito.");
+          setIsWalletConnected(true); // Habilitar el registro
+        }
+      } else {
+        const errorData = await response.json();
+        setSingleErrorMessage(errorData.message || "Error al verificar la wallet.");
+        setIsWalletConnected(false); // Deshabilitar registro si ocurre un error con la wallet
+      }
+    } catch (error) {
+      setSingleErrorMessage("No se pudo conectar con el servidor.");
+      setIsWalletConnected(false);
+    }
+  }, [formData.wallet]);
+
+  // Para obtener direccion automatica de wallet conectada
   useEffect(() => {
     if (currentUser.status === "connected") {
       setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
+      setTimeout(() => handleConnectWallet(), 1000);
     }
 
-    if (currentUser.status === "disconnected") {
-      setFormData(prevData => ({ ...prevData, wallet: "" }));
-    }
-  }, [currentUser.address, currentUser.status]);
+    if (currentUser.status === "disconnected") setFormData(prevData => ({ ...prevData, wallet: "" }));
+  }, [currentUser.status, currentUser.address, handleConnectWallet]);
+
+  // Función para manejar el clic en el enlace de registro
+  const handleLoginClick = () => {
+    const email = formData.email;
+    const loginUrl = email ? `/login?email=${encodeURIComponent(email)}` : "/login";
+    sessionStorage.setItem("allowAccess", "true");
+    router.push(loginUrl);
+  };
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -125,10 +247,8 @@ export const SignUpForm = () => {
             id="email"
             name="email"
             value={formData.email}
-            onChange={handleChange}
-            className="block w-full pr-10 pl-4 font-light text-gray-700 dark:text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter your email"
-            required
+            readOnly
+            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
             <FiMail />
@@ -164,33 +284,52 @@ export const SignUpForm = () => {
           Wallet
         </label>
         <div className="mt-1 relative flex">
-          <WalletConnectionBtn classBtn="w-full rounded-md" />
-          {/* <input
+          <WalletConnectionBtn enableWallet={isWalletConnected} classBtn="w-full rounded-md" />
+        </div>
+      </div>
+
+      {/* Referred Wallet */}
+      <div>
+        <label htmlFor="referredBy" className="block text-sm font-medium text-gray-700">
+          Wallet de Referido
+        </label>
+        <div className="mt-1 relative flex">
+          <input
             type="text"
-            id="wallet"
-            name="wallet"
-            value={formData.wallet}
+            id="referredBy"
+            name="referredBy"
+            value={formData.referredBy}
             onChange={handleChange}
-            className="block w-full pl-4 pr-20 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="0xABC123"
-            // readOnly
+            required
           />
           <button
             type="button"
-            onClick={handleConnectWallet}
+            onClick={handleValidateReferrer}
             className="px-4 py-2 border border-gray-300 bg-gray-100 rounded-r-md text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
           >
-            Conectar
-          </button> */}
+            Validar
+          </button>
         </div>
+      </div>
+
+      {/* Login link */}
+      <div className="text-sm text-center">
+        <p>
+          ¿Ya tienes una cuenta?{" "}
+          <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleLoginClick}>
+            Inicia sesión aquí
+          </a>
+        </p>
       </div>
 
       {/* Submit */}
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || !isWalletConnected || !isReferrerValid}
         className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-          isSubmitting ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
+          isSubmitting || !isWalletConnected || !isReferrerValid ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
         }`}
       >
         {isSubmitting ? "Registrando..." : "Registrar"}

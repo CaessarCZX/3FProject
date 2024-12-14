@@ -5,7 +5,7 @@
 import React from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useDisconnect } from "wagmi";
-import { ArrowLeftOnRectangleIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftOnRectangleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { WrongNetworkDropdown } from "~~/components/scaffold-eth/RainbowKitCustomConnectButton/WrongNetworkDropdown";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 
@@ -15,9 +15,10 @@ import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 
 type RainbowKitCustomConnectButtonProps = {
   classBtn?: string;
+  enableWallet: boolean;
 };
 
-export const WalletConnectionBtn: React.FC<RainbowKitCustomConnectButtonProps> = ({ classBtn }) => {
+export const WalletConnectionBtn: React.FC<RainbowKitCustomConnectButtonProps> = ({ classBtn, enableWallet }) => {
   const { targetNetwork } = useTargetNetwork();
   const { disconnect } = useDisconnect();
 
@@ -43,13 +44,23 @@ export const WalletConnectionBtn: React.FC<RainbowKitCustomConnectButtonProps> =
 
               return (
                 <button
-                  className={`btn bg-red-500 dark:bg-red-700 focus-visible:outline-none focus:outline-none focus-within:outline-none ${
-                    classBtn ?? ""
-                  }`}
+                  className={`btn ${
+                    !enableWallet ? "bg-red-500 dark:bg-red-700" : "bg-green-500 dark:bg-green-700"
+                  }  focus-visible:outline-none focus:outline-none focus-within:outline-none ${classBtn ?? ""}`}
                   type="button"
                   onClick={() => disconnect()}
                 >
-                  <ArrowLeftOnRectangleIcon className="h-8 w-6 ml-2 sm:ml-0" /> <span>Desconectar Wallet</span>
+                  {!enableWallet ? (
+                    <>
+                      <ExclamationCircleIcon className="h-8 w-6 ml-2 sm:ml-0" />
+                      <span>Wallet no aceptada</span>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowLeftOnRectangleIcon className="h-8 w-6 ml-2 sm:ml-0" />
+                      <span>Wallet aceptada</span>
+                    </>
+                  )}
                 </button>
               );
             })()}
