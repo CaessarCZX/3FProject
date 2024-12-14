@@ -1,5 +1,6 @@
 "use client";
 
+import withAccessControl from "../hoc/withAccessControl";
 import { SignUpForm } from "./_components/SignInFrom";
 import type { NextPage } from "next";
 
@@ -27,4 +28,4 @@ const Register: NextPage = () => {
   );
 };
 
-export default Register;
+export default withAccessControl(Register);
