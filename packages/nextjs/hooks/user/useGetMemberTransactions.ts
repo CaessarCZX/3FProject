@@ -12,8 +12,7 @@ export const useGetMemberTransactions = () => {
   const setMemberTransactions = useGlobalState(state => state.setMemberTransactions);
   // const chainId = useChainId();
   // const url = getAlchemyHttpUrl(chainId) ?? "0x";
-  const url =
-    "https://blockchain.googleapis.com/v1/projects/western-trilogy-444802-h4/locations/us-central1/endpoints/ethereum-sepolia/rpc?key=AIzaSyCKHpHu0qF-a5goTnUxNsVuwCiejJVgDAk";
+  const url = process.env.NEXT_PUBLIC_GOOGLE_API_ENDPOINT ?? "";
   const memberAddress = currentMember?.address ?? "0x";
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const contractAddress = contract?.address ?? "0x";
