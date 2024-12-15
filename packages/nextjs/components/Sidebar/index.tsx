@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { developMenuGoups } from "./SidebarContent";
+import { projectMenuGoups } from "./SidebarContent";
 import { jwtDecode } from "jwt-decode";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import ClickOutside from "~~/components/Actions/ClickOutside";
@@ -30,7 +30,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const isAdmin = getIsAdminFromToken();
 
   // Filtra el menú según el valor de isAdmin
-  const filteredMenuGroups = developMenuGoups.map(group => ({
+  const filteredMenuGroups = projectMenuGoups.map(group => ({
     ...group,
     menuItems: group.menuItems.filter(
       menuItem =>
