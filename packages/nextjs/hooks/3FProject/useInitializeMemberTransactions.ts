@@ -5,6 +5,6 @@ export const useInitializeMemberTransactions = () => {
   const { fetchTransactions } = useGetMemberTransactions();
 
   useEffect(() => {
-    fetchTransactions();
+    // fetchTransactions();
   }, [fetchTransactions]);
 };
