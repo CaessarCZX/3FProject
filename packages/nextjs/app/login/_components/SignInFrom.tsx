@@ -176,10 +176,19 @@ export const SignInForm = () => {
       </div>
       {/* Wallet connection */}
 
+      {/* Register link */}
+      <div className="text-sm text-center">
+        <p>
+          ¿No tienes una cuenta?{" "}
+          <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleSignUpClick}>
+            Registrate aquí
+          </a>
+        </p>
+      </div>
+
       {/* Submit */}
       <div>
         <button
-          onClick={handleSignUpClick}
           type="submit"
           disabled={isSubmitting}
           className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${

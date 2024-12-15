@@ -90,7 +90,7 @@ export const SubscribeForm = () => {
           onChange={e => setEmail(e.target.value)}
           className="bg-transparent py-4 px-5 placeholder:text-lg placeholder:text-white placeholder:text-opacity-80 focus:outline-none w-full"
           type="email"
-          placeholder="Enter email"
+          placeholder="Ingresa tu email"
           required
         />
         <button

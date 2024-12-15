@@ -7,26 +7,37 @@ export const fetchMemberTransactions = async (
   address: string | null,
   contractAddress: string | null,
 ): Promise<FetchTransactionsResult> => {
+  if (!address) {
+    console.error("Address parameter is null or undefined.");
+    return { transactions: [] };
+  }
+
+  if (!contractAddress) {
+    console.error("Contract address is null or undefined.");
+    return { transactions: [] };
+  }
+
   const data = {
-    jsonrpc: "2.0",
     id: 1,
+    jsonrpc: "2.0",
     method: "alchemy_getAssetTransfers",
     params: [
       {
         fromBlock: "0x0",
         toBlock: "latest",
         fromAddress: address,
-        category: ["erc20"],
+        category: ["erc20", "external"],
         withMetadata: true,
         excludeZeroValue: true,
-        maxCount: "0x64",
+        maxCount: "0x3e8",
       },
     ],
   };
 
   try {
     const response = await axios.post(url, data);
-    const transfers = response.data?.result?.transfers;
+    const transfers = await response.data?.result?.transfers;
+    console.log(await response.data);
 
     const relevantTransfers = transfers.filter((tx: AlchemyTransaction) => tx.to === contractAddress?.toLowerCase());
 
@@ -42,7 +53,13 @@ export const fetchMemberTransactions = async (
       transactions: formattedTransactions,
     };
   } catch (error) {
-    console.warn("Error fetching transactions:");
+    // console.warn("Error fetching transactions:");
+    if (axios.isAxiosError(error)) {
+      console.warn("Alchemy API call failed:", error.response?.data || error.message);
+    } else {
+      console.warn("Unexpected error:", error);
+    }
+
     return {
       transactions: [],
     };
