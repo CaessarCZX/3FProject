@@ -104,17 +104,6 @@ export const SignInForm = () => {
         </div>
       </div>
 
-<<<<<<< develop
-      {/* Sign up link */}
-      <div className="text-sm text-center">
-        <p>
-          ¿No tienes cuenta?{" "}
-          <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleSignUpClick}>
-            Regístrate aquí
-          </a>
-        </p>
-      </div>
-=======
       {/* Wallet connection */}
       <div>
         <label htmlFor="wallet" className="block text-sm font-medium text-gray-700">
@@ -125,11 +114,11 @@ export const SignInForm = () => {
         </div>
       </div>
       {/* Wallet connection */}
->>>>>>> develop
 
       {/* Submit */}
       <div>
         <button
+          onClick={handleSignUpClick}
           type="submit"
           disabled={isSubmitting}
           className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
