@@ -109,7 +109,6 @@ export const SignUpForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleConnectWallet();
     setIsSubmitting(true);
     setSuccessMessage("");
     setSingleErrorMessage("");
