@@ -28,7 +28,3 @@ dist
 .env.development.local
 .env.test.local
 .env.production.local
-
-packages/nextjs/.env
-packages/nextjs/.env.development
-packages/nextjs/.env.production
