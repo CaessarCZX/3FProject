@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// import { WalletButton } from "@rainbow-me/rainbowkit";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
-// import { useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
+import { notification } from "~~/utils/scaffold-eth/notification";
 
 export const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -20,11 +20,11 @@ export const SignUpForm = () => {
   const [isWalletConnected, setIsWalletConnected] = useState(false); // Validacion de wallet
   const [isReferrerValid, setIsReferrerValid] = useState(false); // Validador de referido
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [singleErrorMessage, setSingleErrorMessage] = useState("");
   // const [errors, setErrors] = useState<Record<string, string>>({});
 
   //For blockchain
-  // const currentUser = useAccount();
+  const currentUser = useAccount();
 
   const router = useRouter();
 
@@ -33,9 +33,21 @@ export const SignUpForm = () => {
     const email = searchParams.get("email");
     if (email) {
       setFormData(prev => ({ ...prev, email }));
-      console.log(errorMessage);
     }
-  }, [errorMessage]);
+  }, []);
+
+  // Mensajes a ui
+  useEffect(() => {
+    if (singleErrorMessage) {
+      notification.error(singleErrorMessage, { position: "bottom-right", duration: 5000 }); // Muestra la notificicacion con el error encontrado
+      setSingleErrorMessage(""); // Borra el mensaje de error registrado
+    }
+
+    if (successMessage) {
+      notification.success(successMessage, { position: "bottom-right", duration: 5000 });
+      setSuccessMessage("");
+    }
+  }, [singleErrorMessage, successMessage]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,24 +56,24 @@ export const SignUpForm = () => {
     // Reset validation when "wallet" changes
     if (name === "wallet") {
       setIsWalletConnected(false);
-      setErrorMessage("");
+      setSingleErrorMessage("");
       setSuccessMessage("");
     }
 
     // Reset validation when "referredBy" changes
     if (name === "referredBy") {
       setIsReferrerValid(false);
-      setErrorMessage("");
+      setSingleErrorMessage("");
       setSuccessMessage("");
     }
   };
 
   const handleValidateReferrer = async () => {
-    setErrorMessage("");
+    setSingleErrorMessage("");
     setSuccessMessage("");
 
     if (!formData.referredBy) {
-      setErrorMessage("Por favor, introduce una wallet de referido.");
+      setSingleErrorMessage("Por favor, introduce una wallet de referido.");
       return;
     }
 
@@ -81,16 +93,16 @@ export const SignUpForm = () => {
           setSuccessMessage("Wallet de referido válida.");
           setIsReferrerValid(true);
         } else {
-          setErrorMessage("La wallet de referido no está registrada.");
+          setSingleErrorMessage("La wallet de referido no está registrada.");
           setIsReferrerValid(false);
         }
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || "Error al validar la wallet de referido.");
+        setSingleErrorMessage(errorData.message || "Error al validar la wallet de referido.");
         setIsReferrerValid(false);
       }
     } catch (error) {
-      setErrorMessage("No se pudo conectar con el servidor.");
+      setSingleErrorMessage("No se pudo conectar con el servidor.");
       setIsReferrerValid(false);
     }
   };
@@ -100,7 +112,7 @@ export const SignUpForm = () => {
     handleConnectWallet();
     setIsSubmitting(true);
     setSuccessMessage("");
-    setErrorMessage("");
+    setSingleErrorMessage("");
 
     // For validations
     const validation = validateFormData(formData);
@@ -134,23 +146,23 @@ export const SignUpForm = () => {
         router.push("/login");
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || "Error en el registro.");
+        setSingleErrorMessage(errorData.message || "Error en el registro.");
       }
     } catch (error) {
-      setErrorMessage("No se pudo conectar con el servidor.");
+      setSingleErrorMessage("No se pudo conectar con el servidor.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleConnectWallet = async () => {
-    setErrorMessage("");
+  const handleConnectWallet = useCallback(async () => {
+    setSingleErrorMessage("");
     setSuccessMessage("");
 
-    if (!formData.wallet) {
-      setErrorMessage("Por favor, introduce una dirección de wallet.");
-      return;
-    }
+    // if (!formData.wallet) {
+    //   setSingleErrorMessage("Por favor, introduce una dirección de wallet.");
+    //   return;
+    // }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
@@ -166,7 +178,7 @@ export const SignUpForm = () => {
         const data = await response.json();
 
         if (data.exists) {
-          setErrorMessage("Esta wallet ya está registrada.");
+          setSingleErrorMessage("Esta wallet ya está registrada.");
           setIsWalletConnected(false); // Deshabilitar el registro si la wallet está registrada
         } else {
           setSuccessMessage("Wallet conectada con éxito.");
@@ -174,14 +186,24 @@ export const SignUpForm = () => {
         }
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || "Error al verificar la wallet.");
+        setSingleErrorMessage(errorData.message || "Error al verificar la wallet.");
         setIsWalletConnected(false); // Deshabilitar registro si ocurre un error con la wallet
       }
     } catch (error) {
-      setErrorMessage("No se pudo conectar con el servidor.");
+      setSingleErrorMessage("No se pudo conectar con el servidor.");
       setIsWalletConnected(false);
     }
-  };
+  }, [formData.wallet]);
+
+  // Para obtener direccion automatica de wallet conectada
+  useEffect(() => {
+    if (currentUser.status === "connected") {
+      setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
+      setTimeout(() => handleConnectWallet(), 1000);
+    }
+
+    if (currentUser.status === "disconnected") setFormData(prevData => ({ ...prevData, wallet: "" }));
+  }, [currentUser.status, currentUser.address, handleConnectWallet]);
 
   // Función para manejar el clic en el enlace de registro
   const handleLoginClick = () => {
@@ -263,24 +285,7 @@ export const SignUpForm = () => {
           Wallet
         </label>
         <div className="mt-1 relative flex">
-          <WalletConnectionBtn classBtn="w-full rounded-md" />
-          {/* <input
-            type="text"
-            id="wallet"
-            name="wallet"
-            value={formData.wallet}
-            onChange={handleChange}
-            className="block w-full pl-4 pr-20 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="0xABC123"
-            required
-          />
-          <button
-            type="button"
-            onClick={handleConnectWallet}
-            className="px-4 py-2 border border-gray-300 bg-gray-100 rounded-r-md text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          >
-            Conectar
-          </button> */}
+          <WalletConnectionBtn enableWallet={isWalletConnected} classBtn="w-full rounded-md" />
         </div>
       </div>
 
@@ -333,7 +338,7 @@ export const SignUpForm = () => {
 
       {/* Mensajes de éxito o error */}
       {successMessage && <p className="text-green-600 text-sm mt-2">{successMessage}</p>}
-      {errorMessage && <p className="text-red-600 text-sm mt-2">{errorMessage}</p>}
+      {singleErrorMessage && <p className="text-red-600 text-sm mt-2">{singleErrorMessage}</p>}
     </form>
   );
 };
