@@ -21,3 +21,14 @@ node_modules
 
 # cli
 dist
+
+# local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+packages/nextjs/.env
+packages/nextjs/.env.development
+packages/nextjs/.env.production
