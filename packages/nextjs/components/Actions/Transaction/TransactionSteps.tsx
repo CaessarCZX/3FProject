@@ -81,7 +81,7 @@ const FeaturedItem = ({ item, index, currentStep, isComplete }: ContentItemProps
         {isComplete ? (
           <div className="font-medium text-sm bg-green-100 px-2 py-1 rounded-md text-green-600">Completo</div>
         ) : isActive ? (
-          <div className="font-medium text-sm bg-blue-300 px-2 py-1 rounded-md text-blue-500">En proceso</div>
+          <div className="font-medium text-sm bg-blue-100 px-2 py-1 rounded-md text-blue-700">En proceso</div>
         ) : (
           <div className="font-medium text-sm bg-gray-100 px-2 py-1 rounded-md text-gray-400">Pendiente</div>
         )}
