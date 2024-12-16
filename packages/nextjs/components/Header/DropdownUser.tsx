@@ -15,7 +15,7 @@ interface CustomJwtPayload {
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userData, setUserData] = useState<{ name: string; email: string }>({ name: "", email: "" });
-  const { disconnect } = useDisconnect();
+  const { disconnect } = useDisconnect(); // For blockchain
 
   const router = useRouter();
 

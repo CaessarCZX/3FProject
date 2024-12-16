@@ -3,6 +3,7 @@
 import { ComponentType, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
+import { useGlobalState } from "~~/services/store/store";
 
 interface DecodedToken {
   isActive: boolean;
@@ -31,6 +32,7 @@ const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): Compone
         }
       } catch (error) {
         console.error("Error al decodificar el token:", error);
+        useGlobalState.persist.clearStorage(); // Borra el state local si es que el token es invalido
         router.push("/login"); // Redirige al login si el token es inválido
       }
     }, [router]);
