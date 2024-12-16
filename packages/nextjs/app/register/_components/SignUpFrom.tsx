@@ -113,6 +113,13 @@ export const SignUpForm = () => {
     setSuccessMessage("");
     setSingleErrorMessage("");
 
+    //For wallet connection
+    if (!isWalletConnected) {
+      setSingleErrorMessage("No tienes conectada una wallet");
+      setIsSubmitting(true);
+      return;
+    }
+
     // For validations
     const validation = validateFormData(formData);
     if (Object.values(validation).length > 0) {
@@ -324,7 +331,7 @@ export const SignUpForm = () => {
       <button
         type="submit"
         disabled={isSubmitting || !isWalletConnected || !isReferrerValid}
-        className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+        className={`w-full py-2 px-4 border border-transparent disabled:bg-gray-300 rounded-md shadow-sm text-sm font-medium text-white ${
           isSubmitting || !isWalletConnected || !isReferrerValid ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
         }`}
       >

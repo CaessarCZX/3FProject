@@ -63,11 +63,11 @@ export const SignInForm = () => {
         const data = await response.json();
 
         if (data.exists) {
-          setErrorMessage("Esta wallet ya está registrada.");
-          setIsWalletConnected(false); // Deshabilitar el registro si la wallet está registrada
-        } else {
           setSuccessMessage("Wallet conectada con éxito.");
-          setIsWalletConnected(true); // Habilitar el registro
+          setIsWalletConnected(true); // Habilitar el login
+        } else {
+          setErrorMessage("Esta wallet no está registrada.");
+          setIsWalletConnected(false); // Deshabilitar el login si la wallet no está registrada
         }
       } else {
         const errorData = await response.json();
@@ -95,6 +95,13 @@ export const SignInForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage("");
+
+    // For wallet connection
+    if (!isWalletConnected) {
+      setErrorMessage("No tienes conectada una wallet");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/login`, {
@@ -197,10 +204,10 @@ export const SignInForm = () => {
       <div>
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isWalletConnected}
           className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
             isSubmitting ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
-          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+          } disabled:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
         >
           {isSubmitting ? "Cargando..." : "INGRESAR AHORA"}
         </button>
