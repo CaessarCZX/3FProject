@@ -7,6 +7,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect } from "wagmi";
 import { ArrowLeftOnRectangleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { WrongNetworkDropdown } from "~~/components/scaffold-eth/RainbowKitCustomConnectButton/WrongNetworkDropdown";
+import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 
 /**
@@ -23,6 +24,14 @@ export const WalletConnectionBtn: React.FC<RainbowKitCustomConnectButtonProps> =
   const { disconnect } = useDisconnect();
   const [delayResponse, setDelayResponse] = useState<boolean>();
   const currentAccount = useAccount();
+  const { getCurrentMemberStatus } = useInitializeMemberStatus();
+
+  // For fetching member status
+  useEffect(() => {
+    if (currentAccount.isConnected) {
+      getCurrentMemberStatus();
+    }
+  }, [currentAccount, getCurrentMemberStatus]);
 
   // For connecting state
   useEffect(() => {

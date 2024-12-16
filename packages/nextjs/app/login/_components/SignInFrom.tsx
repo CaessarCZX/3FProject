@@ -95,8 +95,6 @@ export const SignInForm = () => {
     setIsSubmitting(true);
     setErrorMessage("");
 
-    console.log(formData);
-
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/login`, {
         method: "POST",

@@ -8,10 +8,9 @@ import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
 // import withAuth from "~~/app/hoc/withAuth";
 
 const Dashboard = () => {
-  const { memberStatus, isLoading } = useGetMemberStatus();
-  console.log(memberStatus, isLoading);
+  const { memberStatus } = useGetMemberStatus();
 
-  return <InternalLayout>{!memberStatus ? <CommonDashboard /> : <FirstDepositScreen />}</InternalLayout>;
+  return <InternalLayout>{!memberStatus ? <FirstDepositScreen /> : <CommonDashboard />}</InternalLayout>;
 };
 // Aplica el HOC al export
 // export default withAuth(Dashboard);

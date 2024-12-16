@@ -1,4 +1,5 @@
 import create from "zustand";
+import { persist } from "zustand/middleware";
 import scaffoldConfig from "~~/scaffold.config";
 import { MemberTransaction } from "~~/utils/3FContract/block";
 import { ChainWithAttributes } from "~~/utils/scaffold-eth";
@@ -46,39 +47,94 @@ type GlobalActions = {
 
 type GlobalStorage = GlobalState & GlobalActions;
 
-export const useGlobalState = create<GlobalStorage>(set => ({
-  nativeCurrency: {
-    price: 0,
-    isFetching: true,
-  },
-  setNativeCurrencyPrice: (newValue: number): void =>
-    set(state => ({ nativeCurrency: { ...state.nativeCurrency, price: newValue } })),
-  setIsNativeCurrencyFetching: (newValue: boolean): void =>
-    set(state => ({ nativeCurrency: { ...state.nativeCurrency, isFetching: newValue } })),
-  mexicanPeso: {
-    price: 0,
-    isFetching: true,
-  },
-  setMexicanPesoPrice: (newValue: number): void =>
-    set(state => ({ mexicanPeso: { ...state.mexicanPeso, price: newValue } })),
-  setIsMexicanPesoFetching: (newValue: boolean): void =>
-    set(state => ({ mexicanPeso: { ...state.mexicanPeso, isFetching: newValue } })),
-  targetNetwork: scaffoldConfig.targetNetworks[0],
-  setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
-  memberTransactions: {
-    transactions: [],
-    isFetching: true,
-  },
-  setMemberTransactions: (newValue: MemberTransaction[]): void =>
-    set(state => ({ memberTransactions: { ...state.memberTransactions, transactions: newValue } })),
-  setIsMemberTransactionsFetching: (newValue: boolean): void =>
-    set(state => ({ memberTransactions: { ...state.memberTransactions, isFetching: newValue } })),
-  memberStatus: {
-    active: false,
-    isFetching: true,
-  },
-  setIsActiveMemberStatus: (newValue: boolean): void =>
-    set(state => ({ memberStatus: { ...state.memberStatus, active: newValue } })),
-  setIsMemberStatusFetching: (newValue: boolean): void =>
-    set(state => ({ memberStatus: { ...state.memberStatus, isFetching: newValue } })),
-}));
+// export const useGlobalState = create<GlobalStorage>(set => ({
+//   nativeCurrency: {
+//     price: 0,
+//     isFetching: true,
+//   },
+//   setNativeCurrencyPrice: (newValue: number): void =>
+//     set(state => ({ nativeCurrency: { ...state.nativeCurrency, price: newValue } })),
+//   setIsNativeCurrencyFetching: (newValue: boolean): void =>
+//     set(state => ({ nativeCurrency: { ...state.nativeCurrency, isFetching: newValue } })),
+//   mexicanPeso: {
+//     price: 0,
+//     isFetching: true,
+//   },
+//   setMexicanPesoPrice: (newValue: number): void =>
+//     set(state => ({ mexicanPeso: { ...state.mexicanPeso, price: newValue } })),
+//   setIsMexicanPesoFetching: (newValue: boolean): void =>
+//     set(state => ({ mexicanPeso: { ...state.mexicanPeso, isFetching: newValue } })),
+//   targetNetwork: scaffoldConfig.targetNetworks[0],
+//   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
+//   memberTransactions: {
+//     transactions: [],
+//     isFetching: true,
+//   },
+//   setMemberTransactions: (newValue: MemberTransaction[]): void =>
+//     set(state => ({ memberTransactions: { ...state.memberTransactions, transactions: newValue } })),
+//   setIsMemberTransactionsFetching: (newValue: boolean): void =>
+//     set(state => ({ memberTransactions: { ...state.memberTransactions, isFetching: newValue } })),
+//   memberStatus: {
+//     active: false,
+//     isFetching: true,
+//   },
+//   setIsActiveMemberStatus: (newValue: boolean): void =>
+//     set(state => ({ memberStatus: { ...state.memberStatus, active: newValue } })),
+//   setIsMemberStatusFetching: (newValue: boolean): void =>
+//     set(state => ({ memberStatus: { ...state.memberStatus, isFetching: newValue } })),
+// }));
+
+export const useGlobalState = create<GlobalStorage>()(
+  persist(
+    set => ({
+      nativeCurrency: {
+        price: 0,
+        isFetching: true,
+      },
+      setNativeCurrencyPrice: (newValue: number): void =>
+        set(state => ({ nativeCurrency: { ...state.nativeCurrency, price: newValue } })),
+      setIsNativeCurrencyFetching: (newValue: boolean): void =>
+        set(state => ({ nativeCurrency: { ...state.nativeCurrency, isFetching: newValue } })),
+
+      mexicanPeso: {
+        price: 0,
+        isFetching: true,
+      },
+      setMexicanPesoPrice: (newValue: number): void =>
+        set(state => ({ mexicanPeso: { ...state.mexicanPeso, price: newValue } })),
+      setIsMexicanPesoFetching: (newValue: boolean): void =>
+        set(state => ({ mexicanPeso: { ...state.mexicanPeso, isFetching: newValue } })),
+
+      targetNetwork: scaffoldConfig.targetNetworks[0],
+      setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
+
+      memberTransactions: {
+        transactions: [],
+        isFetching: true,
+      },
+      setMemberTransactions: (newValue: MemberTransaction[]): void =>
+        set(state => ({ memberTransactions: { ...state.memberTransactions, transactions: newValue } })),
+      setIsMemberTransactionsFetching: (newValue: boolean): void =>
+        set(state => ({ memberTransactions: { ...state.memberTransactions, isFetching: newValue } })),
+
+      memberStatus: {
+        active: false,
+        isFetching: true,
+      },
+      setIsActiveMemberStatus: (newValue: boolean): void =>
+        set(state => ({ memberStatus: { ...state.memberStatus, active: newValue } })),
+      setIsMemberStatusFetching: (newValue: boolean): void =>
+        set(state => ({ memberStatus: { ...state.memberStatus, isFetching: newValue } })),
+    }),
+    {
+      name: "global-storage", // nombre único para localStorage
+      partialize: state => ({
+        nativeCurrency: state.nativeCurrency,
+        mexicanPeso: state.mexicanPeso,
+        targetNetwork: state.targetNetwork,
+        memberTransactions: state.memberTransactions,
+        memberStatus: state.memberStatus,
+      }),
+    },
+  ),
+);
