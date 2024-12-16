@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { CheckBadgeIcon, DocumentCheckIcon, DocumentTextIcon, HandThumbUpIcon } from "@heroicons/react/24/outline";
 // import { TransactionHash } from "~~/components/Display/TransactionHash";
 import { HeroIcon } from "~~/types/heroicon";
@@ -20,6 +20,8 @@ type ContentItemProps = {
   item: StepItem;
   index: number;
   hashes: string[];
+  currentStep: number;
+  isComplete: boolean;
 };
 
 const contents: StepItem[] = [
@@ -49,6 +51,90 @@ const contents: StepItem[] = [
   },
 ];
 
+// Componente individual del paso
+const FeaturedItem = ({ item, index, currentStep, isComplete }: ContentItemProps) => {
+  const isActive = index === currentStep;
+
+  return (
+    <div className="flex justify-between items-center">
+      <div className="flex">
+        {/* Step badge */}
+        <div
+          className={`min-w-[60px] h-12 rounded-xl text-lg flex justify-center items-center mb-6 ${
+            isComplete ? "bg-green-500 text-white" : "bg-slate-300 text-gray-600"
+          }`}
+        >
+          {isActive && !isComplete ? (
+            <span className="loading loading-spinner loading-md"></span>
+          ) : (
+            <h1 className="m-0 font-normal text-xl">{index + 1}</h1>
+          )}
+        </div>
+        {/* Textos */}
+        <div className="pl-4">
+          <h5 className="text-lg font-medium">{item.title}</h5>
+          <p className="text-gray-500 text-base mt-1 font-light leading-snug">{item.text}</p>
+        </div>
+      </div>
+      <div>
+        {/* Estado del paso */}
+        {isComplete ? (
+          <div className="font-medium text-sm bg-green-100 px-2 py-1 rounded-md text-green-600">Completo</div>
+        ) : isActive ? (
+          <div className="font-medium text-sm bg-blue-300 px-2 py-1 rounded-md text-blue-500">En proceso</div>
+        ) : (
+          <div className="font-medium text-sm bg-gray-100 px-2 py-1 rounded-md text-gray-400">Pendiente</div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Componente principal
+export const TransactionSteps = ({ transaction }: TransactionStepsProps) => {
+  const { allowanceHash, allowanceReceiptHash, depositContractHash, depositContractReceiptHash } = transaction;
+
+  const hashByStep = useMemo(
+    () => [
+      allowanceHash || "",
+      allowanceReceiptHash || "",
+      depositContractHash || "",
+      depositContractReceiptHash || "",
+    ],
+    [allowanceHash, allowanceReceiptHash, depositContractHash, depositContractReceiptHash],
+  );
+
+  const currentStep = useMemo(() => {
+    // Identificar el paso actual
+    for (let i = 0; i < hashByStep.length; i++) {
+      if (!hashByStep[i]) return i;
+    }
+    return hashByStep.length; // Todos completos
+  }, [hashByStep]);
+
+  const progress = useMemo(() => (currentStep / hashByStep.length) * 100, [currentStep, hashByStep.length]);
+
+  return (
+    <section className="bg-transparent text-zinc-900 dark:text-white">
+      <div className="container px-4 mx-auto">
+        <div className="flex flex-col justify-center gap-4 xl:mr-20 mt-8">
+          {contents.map((item, i) => (
+            <FeaturedItem
+              key={i}
+              item={item}
+              index={i}
+              currentStep={currentStep}
+              isComplete={i < currentStep}
+              hashes={hashByStep}
+            />
+          ))}
+        </div>
+        <progress className="progress progress-info w-full" value={progress} max="100"></progress>
+      </div>
+    </section>
+  );
+};
+
 // const ContentItem = ({ item, index, hashes }: ContentItemProps) => (
 //   <div className="bg-white dark:bg-slate-800 shadow-xl rounded-xl flex flex-col justify-center items-center text-center pb-10 px-6 h-full">
 //     <div
@@ -73,71 +159,71 @@ const contents: StepItem[] = [
 //   </div>
 // );
 
-const FeaturedItem = ({ item, index, hashes }: ContentItemProps) => {
-  return (
-    <div className="flex justify-between">
-      <div className="flex">
-        {/* Step badge */}
-        <div
-          className={`${
-            !hashes[index] ? "bg-slate-300" : "bg-green-500"
-          } text-white min-w-[60px] h-12 rounded-xl text-lg flex justify-center items-center mb-6`}
-        >
-          {hashes[index - 1] !== undefined ? (
-            <h1 className="m-0 font-normal text-xl text-white">{index + 1}</h1>
-          ) : (
-            <span className="loading loading-spinner loading-md bg-green-white"></span>
-          )}
-        </div>
-        {/* Step badge */}
-        <div className="pl-4">
-          <h5 className="text-lg font-medium">{item.title}</h5>
-          <p className="text-gray-500 text-base mt-1 font-light leading-snug">{item.text}</p>
-        </div>
-      </div>
-      <div>
-        {/* For badges */}
-        {hashes[index] == "" ? (
-          <div className="font-medium text-sm bg-slate-200 px-2 py-1 rounded-md text-gray-500">En proceso</div>
-        ) : (
-          <div className="font-medium text-sm bg-green-100 px-2 py-1 rounded-md text-green-600">Completo</div>
-        )}
-        {/* For badges */}
-      </div>
-    </div>
-  );
-};
+// const FeaturedItem = ({ item, index, hashes }: ContentItemProps) => {
+//   return (
+//     <div className="flex justify-between">
+//       <div className="flex">
+//         {/* Step badge */}
+//         <div
+//           className={`${
+//             !hashes[index] ? "bg-slate-300" : "bg-green-500"
+//           } text-white min-w-[60px] h-12 rounded-xl text-lg flex justify-center items-center mb-6`}
+//         >
+//           {hashes[index - 1] !== undefined ? (
+//             <h1 className="m-0 font-normal text-xl text-white">{index + 1}</h1>
+//           ) : (
+//             <span className="loading loading-spinner loading-md bg-green-white"></span>
+//           )}
+//         </div>
+//         {/* Step badge */}
+//         <div className="pl-4">
+//           <h5 className="text-lg font-medium">{item.title}</h5>
+//           <p className="text-gray-500 text-base mt-1 font-light leading-snug">{item.text}</p>
+//         </div>
+//       </div>
+//       <div>
+//         {/* For badges */}
+//         {hashes[index] == "" ? (
+//           <div className="font-medium text-sm bg-slate-200 px-2 py-1 rounded-md text-gray-500">En proceso</div>
+//         ) : (
+//           <div className="font-medium text-sm bg-green-100 px-2 py-1 rounded-md text-green-600">Completo</div>
+//         )}
+//         {/* For badges */}
+//       </div>
+//     </div>
+//   );
+// };
 
-export const TransactionSteps = (props: TransactionStepsProps) => {
-  const [progress, setProgress] = useState(0);
-  const { allowanceHash, allowanceReceiptHash, depositContractHash, depositContractReceiptHash } = props.transaction;
-  const hashByStep = [
-    allowanceHash || "",
-    allowanceReceiptHash || "",
-    depositContractHash || "",
-    depositContractReceiptHash || "",
-  ];
+// export const TransactionSteps = (props: TransactionStepsProps) => {
+//   const [progress, setProgress] = useState(0);
+//   const { allowanceHash, allowanceReceiptHash, depositContractHash, depositContractReceiptHash } = props.transaction;
+//   const hashByStep = [
+//     allowanceHash || "",
+//     allowanceReceiptHash || "",
+//     depositContractHash || "",
+//     depositContractReceiptHash || "",
+//   ];
 
-  useEffect(() => {
-    if (allowanceHash && !allowanceReceiptHash && !depositContractHash && !depositContractReceiptHash) setProgress(10);
-    if (allowanceHash && allowanceReceiptHash && !depositContractHash && !depositContractReceiptHash) setProgress(40);
-    if (allowanceHash && allowanceReceiptHash && depositContractHash && !depositContractReceiptHash) setProgress(70);
-    if (allowanceHash && allowanceReceiptHash && depositContractHash && depositContractReceiptHash) setProgress(100);
-  }, [allowanceHash, allowanceReceiptHash, depositContractReceiptHash, depositContractHash]);
-  return (
-    <section className="bg-transparent text-zinc-900 dark:text-white">
-      <div className="container px-4 mx-auto">
-        {/* <div className="grid grid-cols-2"> */}
-        <div className="flex flex-col justify-center gap-4 xl:mr-20 mt-8">
-          {contents.map((item, i) => (
-            <FeaturedItem key={i} item={item} index={i} hashes={hashByStep} />
-          ))}
-        </div>
-        <progress className="progress progress-info w-full" value={progress} max="100"></progress>
-      </div>
-    </section>
-  );
-};
+//   useEffect(() => {
+//     if (allowanceHash && !allowanceReceiptHash && !depositContractHash && !depositContractReceiptHash) setProgress(10);
+//     if (allowanceHash && allowanceReceiptHash && !depositContractHash && !depositContractReceiptHash) setProgress(40);
+//     if (allowanceHash && allowanceReceiptHash && depositContractHash && !depositContractReceiptHash) setProgress(70);
+//     if (allowanceHash && allowanceReceiptHash && depositContractHash && depositContractReceiptHash) setProgress(100);
+//   }, [allowanceHash, allowanceReceiptHash, depositContractReceiptHash, depositContractHash]);
+//   return (
+//     <section className="bg-transparent text-zinc-900 dark:text-white">
+//       <div className="container px-4 mx-auto">
+//         {/* <div className="grid grid-cols-2"> */}
+//         <div className="flex flex-col justify-center gap-4 xl:mr-20 mt-8">
+//           {contents.map((item, i) => (
+//             <FeaturedItem key={i} item={item} index={i} hashes={hashByStep} />
+//           ))}
+//         </div>
+//         <progress className="progress progress-info w-full" value={progress} max="100"></progress>
+//       </div>
+//     </section>
+//   );
+// };
 // lg:gap-y-0 lg:mt-12
 {
   /* <div className="col-span-4 sm:col-span-2 lg:col-span-1" key={i}>

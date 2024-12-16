@@ -56,9 +56,9 @@ export const StageTransactionModal = ({ activate, transaction, transactionDescri
                   </form>
                 </div>
               </div>
-              <p className="text-base mt-1 mb-4 font-light text-gray-400 dark:text-dark-6">
+              <div className="text-base mt-1 mb-4 font-light text-gray-400 dark:text-dark-6">
                 <RotatingPhrases phrases={depositUSDTPhrases} />
-              </p>
+              </div>
             </div>
           </div>
           <TransactionSteps transaction={transaction} description={transactionDescription || ""} />
