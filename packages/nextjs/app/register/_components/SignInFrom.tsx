@@ -158,11 +158,6 @@ export const SignUpForm = () => {
     setSingleErrorMessage("");
     setSuccessMessage("");
 
-    // if (!formData.wallet) {
-    //   setSingleErrorMessage("Por favor, introduce una dirección de wallet.");
-    //   return;
-    // }
-
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
         method: "POST",
@@ -198,7 +193,8 @@ export const SignUpForm = () => {
   useEffect(() => {
     if (currentUser.status === "connected") {
       setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
-      setTimeout(() => handleConnectWallet(), 1000);
+      const checkConnect = setTimeout(() => handleConnectWallet(), 2000);
+      return () => clearTimeout(checkConnect);
     }
 
     if (currentUser.status === "disconnected") setFormData(prevData => ({ ...prevData, wallet: "" }));

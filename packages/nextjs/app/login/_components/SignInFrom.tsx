@@ -84,7 +84,8 @@ export const SignInForm = () => {
   useEffect(() => {
     if (currentUser.status === "connected") {
       setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
-      setTimeout(() => handleConnectWallet(), 2000);
+      const checkConnect = setTimeout(() => handleConnectWallet(), 2000);
+      return () => clearTimeout(checkConnect);
     }
 
     if (currentUser.status === "disconnected") setFormData(prevData => ({ ...prevData, wallet: "" }));
