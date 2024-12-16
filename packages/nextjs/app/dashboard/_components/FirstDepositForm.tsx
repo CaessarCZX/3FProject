@@ -19,7 +19,7 @@ const FirstDepositForm: React.FC = () => {
               onChange={amount => setDeposit(amount)}
             />
           </div>
-          <MemberFirstDepositButton />
+          <MemberFirstDepositButton depositAmount={deposit} />
         </div>
       </div>
     </article>

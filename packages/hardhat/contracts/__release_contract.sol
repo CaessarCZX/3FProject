@@ -224,7 +224,12 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
     }
 
 
-	function memberEntrance(address _uplineAddress, uint _amount) public {
+	function memberEntrance(
+        address _uplineAddress,
+        address _secondLevelUpline,
+        address _thirtLevelUpline,
+        uint _amount
+    ) public {
         if (!members[msg.sender].isActive) {
             _createMember(payable(msg.sender));
         }
@@ -232,7 +237,7 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
             enrolled[_uplineAddress].push(msg.sender);
         }
 
-        _firstDeposit(_amount, _uplineAddress);
+        _firstDeposit(_amount, _uplineAddress, _secondLevelUpline, _thirtLevelUpline);
     }
 
 	function deposit(uint256 _amount) external onlyOwner() {
@@ -293,6 +298,10 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
         finalDeposit += (commissionFirstLevel + commissionSecondLevel + commissionThirtLevel);
 
         _processPayment(_businessWallet, finalDeposit);
+
+        // Update total balance in contract with total amount per deposit
+        _totalBalance += _amount;
+
         emit TransferBusiness(msg.sender, _amount, block.timestamp);
 
     }
@@ -302,7 +311,12 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
         token.safeTransfer(_to, _amount);
     }
 
-    function _firstDeposit(uint256 _amount, address _uplineAddress) private onlyActiveMember {
+    function _firstDeposit(
+        uint256 _amount,
+        address _uplineAddress,
+        address _secondLevelUpline,
+        address _thirtLevelUpline
+    ) private onlyActiveMember {
         uint256 membership = _MEMBERSHIP_PAYMENT_TO_BUSINESS + _MEMBERSHIP_PAYMENT_TO_UPLINE;
         uint256 firstDeposit = _amount - membership;
 
@@ -317,11 +331,7 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
         emit CommisionPaid(_uplineAddress, _MEMBERSHIP_PAYMENT_TO_UPLINE, block.timestamp);
 
         // For saving
-        members[msg.sender].balance += firstDeposit;
-        _processPayment(_businessWallet, firstDeposit);
-
-        // Update total balance in contract
-        _totalBalance += firstDeposit;
+        depositMemberFunds(firstDeposit, _uplineAddress, _secondLevelUpline, _thirtLevelUpline);
 
         emit NewSaving(msg.sender, firstDeposit, block.timestamp);
     }
