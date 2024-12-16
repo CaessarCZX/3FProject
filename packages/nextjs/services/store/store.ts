@@ -95,7 +95,6 @@ export const useGlobalState = create<GlobalStorage>()(
         nativeCurrency: state.nativeCurrency,
         mexicanPeso: state.mexicanPeso,
         targetNetwork: state.targetNetwork,
-        memberTransactions: state.memberTransactions,
         memberStatus: state.memberStatus,
       }),
     },

@@ -8,13 +8,13 @@ export const fetchMemberTransactions = async (
   contractAddress: string | null,
 ): Promise<FetchTransactionsResult> => {
   if (!address) {
-    console.error("Address parameter is null or undefined.");
-    return { transactions: [] };
+    console.error("Wallet de cliente no se ha encontrado.");
+    return { transactions: [], error: "Wallet de cliente no se ha encontrado." };
   }
 
   if (!contractAddress) {
-    console.error("Contract address is null or undefined.");
-    return { transactions: [] };
+    console.error("Direccion del contrato es nulo o no se ha proporcionado.");
+    return { transactions: [], error: "Direccion del contrato es nulo o no se ha proporcionado" };
   }
 
   const data = {
@@ -34,12 +34,9 @@ export const fetchMemberTransactions = async (
     ],
   };
 
-  console.log(url);
-
   try {
     const response = await axios.post(url, data);
     const transfers = await response.data?.result?.transfers;
-    console.log(await response.data);
 
     const relevantTransfers = transfers.filter((tx: AlchemyTransaction) => tx.to === contractAddress?.toLowerCase());
 
@@ -53,6 +50,7 @@ export const fetchMemberTransactions = async (
 
     return {
       transactions: formattedTransactions,
+      error: "",
     };
   } catch (error) {
     // console.warn("Error fetching transactions:");
@@ -64,6 +62,7 @@ export const fetchMemberTransactions = async (
 
     return {
       transactions: [],
+      error: "ha ocurrido un error en la peticion de transacciones",
     };
   }
 };

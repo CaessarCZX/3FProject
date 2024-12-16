@@ -4,23 +4,26 @@
 import { useEffect, useState } from "react";
 import { TransactionsTable } from "./TransactionsTable";
 import { jwtDecode } from "jwt-decode";
-// import { PaginationButton } from "./PaginationButton";
+import { useGetMemberTransactions } from "~~/hooks/user/useGetMemberTransactions";
 import { useGlobalState } from "~~/services/store/store";
+import { notification } from "~~/utils/scaffold-eth";
 
-// import { notification } from "~~/utils/scaffold-eth";
+// import { PaginationButton } from "./PaginationButton";
 
 interface DecodedToken {
   wallet: string;
 }
 
-const BlockExplorer = () => {
-  // const { filteredTransactions, transactionReceipts, currentPage, totalBlocks, setCurrentPage, error } =
-  //   useFetchFilteredBlocks(address);
+// const { filteredTransactions, transactionReceipts, currentPage, totalBlocks, setCurrentPage, error } =
+//   useFetchFilteredBlocks(address);
 
+const BlockExplorer = () => {
   const [wallet, setWallet] = useState<string | null>(null);
 
   const memberTransactions = useGlobalState(state => state.memberTransactions.transactions);
   const isLoading = useGlobalState(state => state.memberTransactions.isFetching);
+  const isActiveMember = useGlobalState(state => state.memberStatus.active);
+  const { fetchTransactions, error } = useGetMemberTransactions();
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -35,6 +38,24 @@ const BlockExplorer = () => {
       }
     }
   }, []);
+
+  // Obtener las transacciones de los miembros del state global
+  useEffect(() => {
+    try {
+      // Si el miembro esta activo pero surgio un error con la peticion, suelta un error
+      if (isActiveMember && error) {
+        throw new Error();
+      }
+
+      // Si esta activo, sus transacciones son 0 pero no tiene error, hace peticion
+      if (isActiveMember && !error && memberTransactions.length === 0) {
+        fetchTransactions();
+      }
+    } catch (e) {
+      console.error("Error al intentar traer transacciones");
+      notification.error(error);
+    }
+  }, [fetchTransactions, isActiveMember, error, memberTransactions]);
 
   // const { targetNetwork } = useTargetNetwork();
   // const [hasError, setHasError] = useState(false);

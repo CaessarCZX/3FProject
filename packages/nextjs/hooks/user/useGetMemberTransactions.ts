@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDeployedContractInfo } from "../scaffold-eth/useDeployedContractInfo";
 import { useAccount, useChainId } from "wagmi";
 import { useGlobalState } from "~~/services/store/store";
@@ -11,6 +11,7 @@ export const useGetMemberTransactions = () => {
   const currentMember = useAccount();
   const setIsMemberTransactionsFetching = useGlobalState(state => state.setIsMemberTransactionsFetching);
   const setMemberTransactions = useGlobalState(state => state.setMemberTransactions);
+  const [errorRequest, setErrorRequest] = useState("");
   const chainId = useChainId();
   const url = getAlchemyHttpUrl(chainId) ?? "0x";
   // const url = process.env.NEXT_PUBLIC_GOOGLE_API_ENDPOINT ?? "";
@@ -20,10 +21,11 @@ export const useGetMemberTransactions = () => {
 
   const fetchTransactions = useCallback(async () => {
     setIsMemberTransactionsFetching(true);
-    const { transactions } = await fetchMemberTransactions(url, memberAddress, contractAddress);
+    const { transactions, error } = await fetchMemberTransactions(url, memberAddress, contractAddress);
+    if (error) setErrorRequest(error);
     if (transactions) setMemberTransactions(transactions);
     setIsMemberTransactionsFetching(false);
   }, [setIsMemberTransactionsFetching, setMemberTransactions, url, memberAddress, contractAddress]);
 
-  return { fetchTransactions };
+  return { fetchTransactions, error: errorRequest };
 };

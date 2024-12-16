@@ -12,7 +12,8 @@ export interface MemberTransaction {
 }
 
 export interface FetchTransactionsResult {
-  transactions: MemberTransaction[] | null;
+  transactions: MemberTransaction[];
+  error: string;
 }
 
 export interface AlchemyTransaction {
