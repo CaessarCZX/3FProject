@@ -9,7 +9,7 @@ const TransactionsTable: React.FC = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await fetch("http://localhost:3001/f3api/transaction");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/transaction`);
         if (!response.ok) {
           throw new Error("No se pudieron obtener las transacciones.");
         }

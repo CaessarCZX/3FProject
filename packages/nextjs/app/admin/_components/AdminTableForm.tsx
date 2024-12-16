@@ -1,7 +1,6 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import "../_css/AdminTableForm.css";
+import UserModal from "../_modal/UserModal";
 import { jwtDecode } from "jwt-decode";
 
 interface User {
@@ -20,6 +19,8 @@ const TableForm = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,8 +30,6 @@ const TableForm = () => {
           throw new Error("Error al obtener los usuarios");
         }
         const data = await response.json();
-        console.log("Datos obtenidos de la API:", data);
-
         setUsers(data.users || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -44,30 +43,21 @@ const TableForm = () => {
 
   const handleToggle = async (userId: string, field: "isActive" | "isAdmin") => {
     try {
-      const token = localStorage.getItem("token"); // Suponiendo que el token está en localStorage
+      const token = localStorage.getItem("token");
 
       if (token) {
-        try {
-          const decoded: DecodedToken = jwtDecode(token); // Decodificar el token
-          console.log(decoded);
-          const currentUserId = decoded.id;
+        const decoded: DecodedToken = jwtDecode(token);
+        const currentUserId = decoded.id;
 
-          // Verificar si el usuario actual está intentando modificar su propio campo
-          if (userId === currentUserId) {
-            alert("No puedes modificar tu propio campo.");
-            return;
-          }
-        } catch (error) {
-          console.error("Error al decodificar el token:", error);
+        // Verificar si el usuario actual está intentando modificar su propio campo
+        if (userId === currentUserId) {
+          alert("No puedes modificar tu propio campo.");
+          return;
         }
-      } else {
-        console.log("Token no encontrado.");
       }
 
-      // Actualiza el estado local
       setUsers(prevUsers => prevUsers.map(user => (user._id === userId ? { ...user, [field]: !user[field] } : user)));
 
-      // Realizar la actualización en el backend
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -83,6 +73,16 @@ const TableForm = () => {
       console.error("Error al actualizar el usuario:", error);
       setError("No se pudo actualizar el usuario.");
     }
+  };
+
+  const openModal = (userId: string) => {
+    setSelectedUserId(userId);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedUserId(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -106,8 +106,12 @@ const TableForm = () => {
             {users.length > 0 ? (
               users.map(user => (
                 <tr key={user._id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
+                  <td onClick={() => openModal(user._id)} className="clickable">
+                    {user.name}
+                  </td>
+                  <td onClick={() => openModal(user._id)} className="clickable">
+                    {user.email}
+                  </td>
                   <td>
                     <div className="switch-container">
                       <span className={`status-badge ${user.isActive ? "active" : "inactive"}`}>
@@ -148,6 +152,7 @@ const TableForm = () => {
           </tbody>
         </table>
       )}
+      <UserModal userId={selectedUserId} isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
 };
