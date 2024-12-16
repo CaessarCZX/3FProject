@@ -17,9 +17,20 @@ export const SignInForm = () => {
 
   const currentUser = useAccount();
 
+  // Ingreso datos en el input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
+  // Obtener correo electronico a traves de parametros
+  useEffect(() => {
+    const currentParams = new URL(window.location.href, window.location.origin);
+    const email = currentParams.searchParams.get("email") ?? "";
+
+    if (email !== "" && formData.email === "") {
+      setFormData(prevData => ({ ...prevData, email: email }));
+    }
+  }, [formData]);
 
   // Mensajes a ui
   useEffect(() => {
@@ -37,11 +48,6 @@ export const SignInForm = () => {
   const handleConnectWallet = useCallback(async () => {
     setErrorMessage("");
     setSuccessMessage("");
-
-    // if (!formData.wallet) {
-    //   setSingleErrorMessage("Por favor, introduce una dirección de wallet.");
-    //   return;
-    // }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
@@ -88,6 +94,8 @@ export const SignInForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage("");
+
+    console.log(formData);
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/login`, {
