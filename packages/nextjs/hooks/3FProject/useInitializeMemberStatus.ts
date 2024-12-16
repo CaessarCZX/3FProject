@@ -16,7 +16,6 @@ export const useInitializeMemberStatus = () => {
 
   const getCurrentMemberStatus = () => {
     setIsMemberStatusFetching(true);
-    console.log(checkActiveMember);
     if (checkActiveMember && memberAddress !== "0x0") setIsActiveMemberStatus(true);
     setIsMemberStatusFetching(false);
   };
