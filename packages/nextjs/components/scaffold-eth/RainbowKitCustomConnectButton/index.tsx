@@ -1,6 +1,7 @@
 "use client";
 
 // @refresh reset
+import React from "react";
 import { Balance } from "../Balance";
 import { AddressInfoDropdown } from "./AddressInfoDropdown";
 import { AddressQRCodeModal } from "./AddressQRCodeModal";
@@ -14,7 +15,12 @@ import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
 /**
  * Custom Wagmi Connect Button (watch balance + custom design)
  */
-export const RainbowKitCustomConnectButton = () => {
+
+type RainbowKitCustomConnectButtonProps = {
+  classBtn?: string;
+};
+
+export const RainbowKitCustomConnectButton: React.FC<RainbowKitCustomConnectButtonProps> = ({ classBtn }) => {
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
 
@@ -31,7 +37,7 @@ export const RainbowKitCustomConnectButton = () => {
             {(() => {
               if (!connected) {
                 return (
-                  <button className="btn btn-primary btn-sm" onClick={openConnectModal} type="button">
+                  <button className={`btn btn-primary ${classBtn ?? ""}`} onClick={openConnectModal} type="button">
                     Connect Wallet
                   </button>
                 );
@@ -43,7 +49,7 @@ export const RainbowKitCustomConnectButton = () => {
 
               return (
                 <>
-                  <div className="flex flex-col items-center mr-1">
+                  <div className="flex flex-col items-center mr-1 ">
                     <Balance address={account.address as Address} className="min-h-0 h-auto" />
                     <span className="text-xs" style={{ color: networkColor }}>
                       {chain.name}

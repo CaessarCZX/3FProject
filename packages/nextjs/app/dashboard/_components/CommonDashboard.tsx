@@ -1,0 +1,29 @@
+import React from "react";
+import useGetContentStats from "../_content/ContentStats";
+import BlockExplorer from "./BlockExplorer";
+import DepositContract from "./DepositContract";
+import CardDataStats from "~~/components/UI/CardDataStats";
+
+const CommonDashboard: React.FC = () => {
+  const ContentStats = useGetContentStats();
+
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4 xl:grid-cols-5 2xl:gap-7.5">
+        <DepositContract />
+        {ContentStats.map((statInfo, statIndex) => (
+          <CardDataStats key={statIndex} title={statInfo.title} total={statInfo.total} rate={statInfo.rate}>
+            <statInfo.icon className="w-6 h-6 text-primary dark:text-white" />
+          </CardDataStats>
+        ))}
+      </div>
+      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
+        <div className="col-span-12">
+          <BlockExplorer />
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default CommonDashboard;

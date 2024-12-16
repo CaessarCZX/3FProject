@@ -31,7 +31,6 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
     allowanceReceiptHash: "",
     depositContractHash: "",
     depositContractReceiptHash: "",
-    error: "",
   });
 
   const resetFlags = () => {
@@ -43,7 +42,6 @@ const MemberEntranceButton = ({ uplineAddress, depositAmount, btnText }: Deposit
       allowanceReceiptHash: "",
       depositContractHash: "",
       depositContractReceiptHash: "",
-      error: "",
     }));
   };
 

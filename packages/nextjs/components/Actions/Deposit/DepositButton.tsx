@@ -1,41 +1,45 @@
-import { useCallback, useState } from "react";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import { useState } from "react";
+import { readContract, waitForTransactionReceipt } from "@wagmi/core";
 import { Abi } from "abitype";
 import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
-import { useAccount, useChainId, useWriteContract } from "wagmi";
+import { useAccount, useWriteContract } from "wagmi";
 import { StageTransactionModal } from "~~/components/Actions/Transaction/StageTransactionModal";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
-import { useGlobalState } from "~~/services/store/store";
+// import { useGetAllowance } from "~~/hooks/token/useGetAllowance";
+import { useGetMemberTransactions } from "~~/hooks/user/useGetMemberTransactions";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { DepositBtnProps, TransactionInfo } from "~~/utils/3FContract/deposit";
-import { fetchMemberTransactions } from "~~/utils/3FContract/fetchMemberTransactions";
 import { DepositErrors as err } from "~~/utils/errors/errors";
-import { getAlchemyHttpUrl } from "~~/utils/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 
 const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
-  const currentMember = useAccount();
+  const { fetchTransactions } = useGetMemberTransactions();
   const { writeContractAsync } = useWriteContract();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
-  const setIsMemberTransactionsFetching = useGlobalState(state => state.setIsMemberTransactionsFetching);
-  const setMemberTransactions = useGlobalState(state => state.setMemberTransactions);
-  const [isStarted, setIsStarted] = useState(false);
-  const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
+  // const { currentAllowance } = useGetAllowance(tokenUsdt);
+  // const [isAllowanceAproved, setIsAllowanceApproved] = useState(false);
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
-  const chainId = useChainId();
   const contractAbi = contract?.abi;
-  const url = getAlchemyHttpUrl(chainId) ?? "";
   const currentContract = contract?.address ?? "0x";
-  const memberAddress = currentMember?.address ?? "0x0";
+  const member = useAccount();
+  const memberAddress = member?.address ?? "0x0";
+
+  // Deposit Rules
+  const minDeposit = parseUnits("2000", 6);
+  const depositMultiple = parseUnits("500", 6);
+
   const [transaction, setTransaction] = useState<TransactionInfo>({
     allowanceHash: "",
     allowanceReceiptHash: "",
     depositContractHash: "",
     depositContractReceiptHash: "",
-    error: "",
   });
+
+  const [isStarted, setIsStarted] = useState(false);
+  const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
 
   const resetFlags = () => {
     setIsStarted(false);
@@ -46,53 +50,81 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
       allowanceReceiptHash: "",
       depositContractHash: "",
       depositContractReceiptHash: "",
-      error: "",
     }));
   };
 
-  const fetchTransactions = useCallback(async () => {
-    setIsMemberTransactionsFetching(true);
-    const { transactions } = await fetchMemberTransactions(url, memberAddress, currentContract);
-    if (transactions) setMemberTransactions(transactions);
-    setIsMemberTransactionsFetching(false);
-  }, [setIsMemberTransactionsFetching, setMemberTransactions, url, memberAddress, currentContract]);
+  const ShowNotification = (message: string) => {
+    notification.error(message, { position: "bottom-right", duration: 5000 });
+  };
+
+  // const HandleTest = () => {
+  //   setIsStarted(true);
+  //   setIsHandleModalActivate(true);
+  // };
 
   const HandleDeposit = async () => {
+    if (!depositAmount || depositAmount === "0") {
+      ShowNotification(err.nonDeposit);
+      resetFlags();
+      return;
+    }
+
+    if (allowanceAmount < minDeposit || allowanceAmount % depositMultiple !== 0n) {
+      ShowNotification(err.deposit);
+      resetFlags();
+      return;
+    }
+
     try {
       setIsStarted(true);
-      if (!depositAmount || isStarted === true || !tokenUsdt || !currentContract) {
-        setTransaction(prev => ({
-          ...prev,
-          error: err.general,
-        }));
+      let allowanceReceiptHash = { status: "success", transactionHash: "previous approve" };
+
+      if (isStarted === true || !tokenUsdt || !currentContract) {
+        ShowNotification(err.general);
         resetFlags();
         return;
       }
+      // Activate modal
       setIsHandleModalActivate(true);
 
-      const txHash = await writeContractAsync({
-        abi: erc20Abi,
+      // Allowance query
+      const currentAllowance = await readContract(wagmiConfig, {
         address: tokenUsdt,
-        functionName: "approve",
-        args: [currentContract, allowanceAmount],
+        abi: erc20Abi,
+        functionName: "allowance",
+        args: [memberAddress, currentContract],
       });
 
-      setTransaction(prev => ({
-        ...prev,
-        allowanceHash: txHash,
-      }));
+      console.log("currentAllowance: ", currentAllowance); //For debug
 
-      const receipt = await waitForTransactionReceipt(wagmiConfig, {
-        hash: txHash,
-      });
+      if (currentAllowance < allowanceAmount) {
+        const allowanceRequest = allowanceAmount - currentAllowance;
+        console.log(allowanceRequest);
 
-      if (receipt.status === "success") {
+        const allowanceHash = await writeContractAsync({
+          abi: erc20Abi,
+          address: tokenUsdt,
+          functionName: "approve",
+          args: [currentContract, allowanceAmount],
+        });
+
         setTransaction(prev => ({
           ...prev,
-          allowanceReceiptHash: receipt.transactionHash,
+          allowanceHash: allowanceHash,
         }));
 
-        const txHash = await writeContractAsync({
+        allowanceReceiptHash = await waitForTransactionReceipt(wagmiConfig, {
+          hash: allowanceHash,
+        });
+      }
+
+      if (allowanceReceiptHash.status === "success") {
+        setTransaction(prev => ({
+          ...prev,
+          allowanceReceiptHash: allowanceReceiptHash.transactionHash,
+        }));
+
+        const depositContractHash = await writeContractAsync({
           abi: contractAbi as Abi,
           address: currentContract,
           functionName: "depositMemberFunds",
@@ -101,35 +133,31 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
 
         setTransaction(prev => ({
           ...prev,
-          depositContractHash: txHash,
+          depositContractHash: depositContractHash,
         }));
 
-        const receiptTx = await waitForTransactionReceipt(wagmiConfig, {
-          hash: txHash,
+        const depositContractReceiptHash = await waitForTransactionReceipt(wagmiConfig, {
+          hash: depositContractHash,
         });
 
-        if (receiptTx.status === "success") {
+        if (depositContractReceiptHash.status === "success") {
           setTransaction(prev => ({
             ...prev,
-            depositContractReceiptHash: receiptTx.transactionHash,
+            depositContractReceiptHash: depositContractReceiptHash.transactionHash,
           }));
 
           setTimeout(() => {
             fetchTransactions();
           }, 3000);
+        } else {
+          ShowNotification(err.onTransaction);
         }
       } else {
-        setTransaction(prev => ({
-          ...prev,
-          error: err.onTransaction,
-        }));
+        ShowNotification(err.allowance);
       }
-    } catch (e) {
-      setTransaction(prev => ({
-        ...prev,
-        error: err.general,
-      }));
-      console.error(e);
+    } catch (e: any) {
+      ShowNotification(err.general);
+      console.error(e.message);
     } finally {
       resetFlags();
     }
@@ -140,7 +168,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
       {!isStarted && (
         <button
           type="button"
-          className="text-white bg-blue-700 disabled:bg-slate-500 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          className="text-white bg-blue-700 disabled:bg-slate-500 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-md text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
           onClick={() => HandleDeposit()}
         >
           {isStarted ? "Pendiente" : btnText}
