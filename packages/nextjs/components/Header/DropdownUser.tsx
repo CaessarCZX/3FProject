@@ -1,20 +1,27 @@
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { useDisconnect } from "wagmi";
 import ClickOutside from "~~/components/Actions/ClickOutside";
+import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
+
+// import Image from "next/image";
 
 interface CustomJwtPayload {
   name: string;
   email: string;
+  wallet: string;
 }
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userData, setUserData] = useState<{ name: string; email: string }>({ name: "", email: "" });
+  const [userData, setUserData] = useState<{ name: string; email: string; wallet: string }>({
+    name: "",
+    email: "",
+    wallet: "",
+  });
   const { disconnect } = useDisconnect(); // For blockchain
 
   const router = useRouter();
@@ -24,7 +31,7 @@ const DropdownUser = () => {
     if (token) {
       try {
         const decoded = jwtDecode<CustomJwtPayload>(token);
-        setUserData({ name: decoded.name, email: decoded.email });
+        setUserData({ name: decoded.name, email: decoded.email, wallet: decoded.wallet });
       } catch (error) {
         console.error("Error al decodificar el token:", error);
       }
@@ -34,7 +41,7 @@ const DropdownUser = () => {
   const Logout = () => {
     localStorage.removeItem("token"); // Cerrar sesión
     useGlobalState.persist.clearStorage(); //Limpiar state local
-    setUserData({ name: "", email: "" });
+    setUserData({ name: "", email: "", wallet: "" });
     disconnect(); // Desconectar wallet
     router.replace("/login");
   };
@@ -48,16 +55,7 @@ const DropdownUser = () => {
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <Image
-            width={112}
-            height={112}
-            src={"/user/user-01.png"}
-            style={{
-              width: "auto",
-              height: "auto",
-            }}
-            alt="User"
-          />
+          <BlockieAvatar address={userData.wallet} size={112} />
         </span>
 
         <svg
