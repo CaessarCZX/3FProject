@@ -1,7 +1,7 @@
 "use client";
 
 import withAccessControl from "../hoc/withAccessControl";
-import { SignUpForm } from "./_components/SignInFrom";
+import { SignUpForm } from "./_components/SignUpFrom";
 import type { NextPage } from "next";
 
 // import { SignUpForm } from "~~/app/register/_components/SignInFrom";
