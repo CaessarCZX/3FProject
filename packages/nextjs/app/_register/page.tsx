@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import userIcon from "../../public/userIcon.svg";
 import type { NextPage } from "next";
-import MemberEntranceButton from "~~/components/Actions/Entrance_member/MemberEntranceButton";
+import MemberEntranceButton from "~~/components/Actions/Entrance_member/_MemberEntranceButton";
 import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 import { AddressInput } from "~~/components/scaffold-eth";
 

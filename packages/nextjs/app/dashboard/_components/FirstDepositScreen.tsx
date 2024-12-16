@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
+import FirstDepositForm from "./FirstDepositForm";
 
 const Shapes = () => (
   <>
@@ -56,12 +57,7 @@ const FirstDepositScreen: React.FC = () => {
                 Inicia tu primer deposito y comienza a ahorrar con nosotros.
               </p>
               <div>
-                <a
-                  href="#!"
-                  className="bg-blue-600 font-medium rounded py-3 px-8 hover:bg-opacity-90 duration-300 text-white text-xl inline-flex mt-6"
-                >
-                  Primer ahorro
-                </a>
+                <FirstDepositForm />
               </div>
             </div>
           </div>

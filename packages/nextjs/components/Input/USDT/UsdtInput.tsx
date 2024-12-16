@@ -42,12 +42,27 @@ function mxnValueToUsdtValue(mxnMode: boolean, mxnValue: string, mexicanPesoPric
   }
 }
 
+type InputBaseClassModifierProps = {
+  classNameBox?: string; // To overwrite current styles accoirding be neccessary
+  classNameInput?: string; // To overwrite current styles accoirding be neccessary
+};
+
+type UsdtInputProps = CommonInputProps & InputBaseClassModifierProps;
+
 /**
  * Input for USDT amount with MXN conversion.
  *
  * onChange will always be called with the value in USDT
  */
-export const UsdtInput = ({ value, name, onChange, disabled, mxnMode }: CommonInputProps & { mxnMode?: boolean }) => {
+export const UsdtInput = ({
+  value,
+  name,
+  onChange,
+  disabled,
+  mxnMode,
+  classNameBox,
+  classNameInput,
+}: UsdtInputProps & { mxnMode?: boolean }) => {
   const [transitoryDisplayValue, setTransitoryDisplayValue] = useState<string>();
   const mexicanPesoPrice = useGlobalState(state => state.mexicanPeso.price);
   const isMexicanPesoPriceFetching = useGlobalState(state => state.mexicanPeso.isFetching);
@@ -129,6 +144,8 @@ export const UsdtInput = ({ value, name, onChange, disabled, mxnMode }: CommonIn
           </button>
         </div>
       }
+      classNameBox={classNameBox}
+      classNameInput={classNameInput}
     />
   );
 };

@@ -97,11 +97,12 @@ export const SignInForm = () => {
     setErrorMessage("");
 
     // For wallet connection
-    if (!isWalletConnected) {
-      setErrorMessage("No tienes conectada una wallet");
-      setIsSubmitting(false);
-      return;
-    }
+    // !IMPORTANT: DISABLED FOR DEVELOPMENT
+    // if (!isWalletConnected) {
+    //   setErrorMessage("No tienes conectada una wallet");
+    //   setIsSubmitting(false);
+    //   return;
+    // }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/login`, {
@@ -204,7 +205,9 @@ export const SignInForm = () => {
       <div>
         <button
           type="submit"
-          disabled={isSubmitting || !isWalletConnected}
+          disabled={isSubmitting}
+          // !IMPORTANT: DISABLED FOR DEVELOPMENT
+          // disabled={isSubmitting || !isWalletConnected}
           className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
             isSubmitting ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
           } disabled:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}

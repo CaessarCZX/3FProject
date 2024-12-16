@@ -1,12 +1,18 @@
 import { ChangeEvent, FocusEvent, ReactNode, useCallback, useEffect, useRef } from "react";
 import { CommonInputProps } from "~~/components/scaffold-eth";
 
-type InputBaseProps<T> = CommonInputProps<T> & {
-  error?: boolean;
-  prefix?: ReactNode;
-  suffix?: ReactNode;
-  reFocus?: boolean;
+type InputBaseClassModifierProps = {
+  classNameBox?: string; // To overwrite current styles accoirding be neccessary
+  classNameInput?: string; // To overwrite current styles accoirding be neccessary
 };
+
+type InputBaseProps<T> = CommonInputProps<T> &
+  InputBaseClassModifierProps & {
+    error?: boolean;
+    prefix?: ReactNode;
+    suffix?: ReactNode;
+    reFocus?: boolean;
+  };
 
 export const InputBase = <T extends { toString: () => string } | undefined = string>({
   name,
@@ -18,6 +24,8 @@ export const InputBase = <T extends { toString: () => string } | undefined = str
   prefix,
   suffix,
   reFocus,
+  classNameBox,
+  classNameInput,
 }: InputBaseProps<T>) => {
   const inputReft = useRef<HTMLInputElement>(null);
 
@@ -48,11 +56,11 @@ export const InputBase = <T extends { toString: () => string } | undefined = str
   }, [reFocus]);
 
   return (
-    <div className={`flex flex-grow border border-gray-300 rounded-l-md text-accent shadow-sm ${modifier}`}>
+    <div className={`flex flex-grow border border-gray-300 text-accent shadow-sm ${modifier} ${classNameBox}`}>
       {prefix}
       <input
         // className="input input-ghost focus-within:border-transparent focus:outline-none focus:bg-transparent focus:text-gray-400 h-[2.2rem] min-h-[2.2rem] px-4 border w-full font-medium placeholder:text-accent/50 text-gray-400"
-        className="input input-ghost rounded-none w-full pl-10 pr-2 py-2 focus-within:border-transparent focus:outline-none focus:bg-transparent focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"
+        className={`input input-ghost rounded-none w-full pl-10 pr-2 py-2 focus-within:border-transparent focus:outline-none focus:bg-transparent focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium ${classNameInput}`}
         placeholder={placeholder}
         name={name}
         value={value?.toString()}

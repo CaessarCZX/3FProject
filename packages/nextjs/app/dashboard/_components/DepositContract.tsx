@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { TbPigMoney } from "react-icons/tb";
 import DepositButton from "~~/components/Actions/Deposit/DepositButton";
-import MemberEntranceButton from "~~/components/Actions/Entrance_member/MemberEntranceButton";
 import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 import CardBox from "~~/components/UI/CardBox";
 
@@ -26,11 +25,6 @@ const DepositContract: React.FC = () => {
       {/* Input for savings */}
       <article className="flex space-x-4 w-full">
         <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
-        <MemberEntranceButton
-          uplineAddress="0x2C286498a497dA07cAa975ad435b0fD047F7C6aE"
-          depositAmount={deposit}
-          btnText="test"
-        />
         <DepositButton depositAmount={deposit} btnText="Depositar" />
       </article>
       {/* Input for savings */}
