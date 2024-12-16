@@ -364,6 +364,10 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
         _totalMembers++;
         emit NewMember(_newMember, block.timestamp);
     }
+
+    function PaymentMembers (uint256 _paymentAmount, address _memberAddress) external onlyOwner {
+        
+    }
     
 	receive() external payable {
 		revert("Ether not accepted");

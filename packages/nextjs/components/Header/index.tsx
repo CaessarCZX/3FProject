@@ -1,6 +1,6 @@
 import { SwitchTheme } from "../Actions/Theme/SwitchTheme";
-import DropdownMessage from "./DropdownMessage";
-import DropdownNotification from "./DropdownNotification";
+// import DropdownMessage from "./DropdownMessage";
+// import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
@@ -80,11 +80,11 @@ const Header = (props: { sidebarOpen: string | boolean | undefined; setSidebarOp
             {/* <!-- Dark Mode Toggler --> */}
 
             {/* <!-- Notification Menu Area --> */}
-            <DropdownNotification />
+            {/* <DropdownNotification /> */}
             {/* <!-- Notification Menu Area --> */}
 
             {/* <!-- Chat Notification Area --> */}
-            <DropdownMessage />
+            {/* <DropdownMessage /> */}
             {/* <!-- Chat Notification Area --> */}
           </ul>
 

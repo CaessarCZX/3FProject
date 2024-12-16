@@ -34,6 +34,8 @@ export const fetchMemberTransactions = async (
     ],
   };
 
+  console.log(url);
+
   try {
     const response = await axios.post(url, data);
     const transfers = await response.data?.result?.transfers;
