@@ -3,15 +3,16 @@ import { Balance } from "./Balance";
 import GlasRainbowCard from "./GlasRainbowCard";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { IoWalletOutline } from "react-icons/io5";
-import { getAddress } from "viem";
-import { Address } from "viem";
+// import { getAddress } from "viem";
+// import { Address } from "viem";
 import { useAccount } from "wagmi";
 import { CheckCircleIcon, DocumentDuplicateIcon, EyeIcon } from "@heroicons/react/24/outline";
 
 const WalletWidget: React.FC = () => {
   const currentAccount = useAccount();
-  const checkSumAddress = getAddress(currentAccount.address as Address);
+  const checkSumAddress = currentAccount.address ?? "0x";
   const [addressCopied, setAddressCopied] = useState<boolean>();
+
   return (
     <GlasRainbowCard>
       <div className="px-4 py-4 min-w-[254px] max-w-[254px]">

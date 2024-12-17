@@ -65,7 +65,7 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
         uint amount,
         uint timestamp
     );
-	event CommisionPaid(
+	event CommissionPaid(
         address indexed to,
         uint amount,
         uint timestamp
@@ -124,6 +124,12 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
 		require(_recipient != address(0), "Direccion invalida");
 		_;
 	}
+
+    modifier checkValidPaiment(uint256 _amount) {
+        require(_amount > 0, "Retiro no puede ser vacio");
+        require(getCurrentContractBalance() >= _amount, "Contrato no cuenta ocn suficientes fondos");
+        _;
+    }
 
     // Checkers
     function checkActiveMember(address _member) public view returns(bool) {
@@ -251,6 +257,13 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
         _withdraw(msg.sender, currentBalance);
     }
 
+    function PaymentCommissions (
+        uint256 _paymentAmount,
+        address _memberAddress
+    ) external onlyOwner checkValidPaiment(_paymentAmount) {
+        
+    }
+
     function depositMemberFunds(
         uint _amount,
         address _firstLevelUpline,
@@ -280,17 +293,17 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
         // Payment to uplines in case exists
         if (_firstLevelUpline != address(0)) {
             _processPayment(_firstLevelUpline, commissionFirstLevel);
-            emit CommisionPaid(_firstLevelUpline, commissionFirstLevel, block.timestamp);
+            emit CommissionPaid(_firstLevelUpline, commissionFirstLevel, block.timestamp);
             commissionFirstLevel = 0;
         }
         if (_secondLevelUpline != address(0)) {
             _processPayment(_secondLevelUpline, commissionSecondLevel);
-            emit CommisionPaid(_secondLevelUpline, commissionSecondLevel, block.timestamp);
+            emit CommissionPaid(_secondLevelUpline, commissionSecondLevel, block.timestamp);
             commissionSecondLevel = 0;
         }
         if (_thirtLevelUpline != address(0)) {
             _processPayment(_thirtLevelUpline, commissionThirtLevel);
-            emit CommisionPaid(_thirtLevelUpline, commissionFirstLevel, block.timestamp);
+            emit CommissionPaid(_thirtLevelUpline, commissionFirstLevel, block.timestamp);
             commissionThirtLevel = 0;
         }
 
@@ -328,7 +341,7 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
         emit MembershipPaid(msg.sender, _MEMBERSHIP_PAYMENT_TO_BUSINESS, block.timestamp);
         // Membership payment to upline
         _processPayment(_uplineAddress, _MEMBERSHIP_PAYMENT_TO_UPLINE);
-        emit CommisionPaid(_uplineAddress, _MEMBERSHIP_PAYMENT_TO_UPLINE, block.timestamp);
+        emit CommissionPaid(_uplineAddress, _MEMBERSHIP_PAYMENT_TO_UPLINE, block.timestamp);
 
         // For saving
         depositMemberFunds(firstDeposit, _uplineAddress, _secondLevelUpline, _thirtLevelUpline);
@@ -363,10 +376,6 @@ contract _FFFBusiness_rel is Ownable, ReentrancyGuard {
 
         _totalMembers++;
         emit NewMember(_newMember, block.timestamp);
-    }
-
-    function PaymentMembers (uint256 _paymentAmount, address _memberAddress) external onlyOwner {
-        
     }
     
 	receive() external payable {
