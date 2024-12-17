@@ -77,11 +77,13 @@ const TableForm = () => {
 
   const openModal = (userId: string) => {
     setSelectedUserId(userId);
+    console.log("Abriendo el modal...");
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setSelectedUserId(null);
+    console.log("Cerrando el modal...");
     setIsModalOpen(false);
   };
 
