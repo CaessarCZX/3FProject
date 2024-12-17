@@ -40,6 +40,10 @@
   color: #333;
 }
 
+td {
+  color: #333;
+}
+
 .transaction-fecha {
   font-size: 14px;
   color: #666;
