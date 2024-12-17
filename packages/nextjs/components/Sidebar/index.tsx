@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import WalletWidget from "../Wallet/WalletWidget";
 import { projectMenuGoups } from "./SidebarContent";
 import { jwtDecode } from "jwt-decode";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
@@ -62,9 +63,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         </div>
         {/* <!-- SIDEBAR HEADER --> */}
 
+        {/* <!-- WALLET WIDGET --> */}
+        <div className="mx-4">
+          <WalletWidget />
+        </div>
+        {/* <!-- WALLET WIDGET --> */}
+
         <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
           {/* <!-- Sidebar Menu --> */}
-          <nav className="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
+          <nav className="px-4 py-4 lg:px-6">
             {filteredMenuGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">{group.name}</h3>
