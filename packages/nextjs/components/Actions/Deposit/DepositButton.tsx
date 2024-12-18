@@ -62,6 +62,29 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   //   setIsHandleModalActivate(true);
   // };
 
+  //Validar el servidor y bd funcionando
+  const performHealthCheck = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/f3api/health");
+
+      if (!response.ok) {
+        throw new Error("El servidor no respondió correctamente.");
+      }
+
+      const data = await response.json();
+
+      if (data.status === "ok") {
+        console.log("Health check: Base de datos y servidor en línea");
+      } else {
+        console.warn("Health check: Problema detectado con el servidor o la base de datos");
+      }
+    } catch (error) {
+      // Convertimos el error a tipo Error
+      const errorMessage = (error as Error).message || "Error desconocido";
+      console.error("Error en el health check:", errorMessage);
+    }
+  };
+
   const HandleDeposit = async () => {
     if (!depositAmount || depositAmount === "0") {
       ShowNotification(err.nonDeposit);
@@ -149,6 +172,8 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
           setTimeout(() => {
             fetchTransactions();
           }, 3000);
+
+          performHealthCheck(); //Llamar a la funcion para validar el servidor/bd al momento de completar exitosamente un deposito
         } else {
           ShowNotification(err.onTransaction);
         }
