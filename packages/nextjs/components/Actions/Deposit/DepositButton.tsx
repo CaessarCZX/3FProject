@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { readContract, waitForTransactionReceipt } from "@wagmi/core";
 import { Abi } from "abitype";
+import { jwtDecode } from "jwt-decode";
 import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
@@ -12,6 +13,10 @@ import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { DepositBtnProps, TransactionInfo } from "~~/utils/3FContract/deposit";
 import { DepositErrors as err } from "~~/utils/errors/errors";
 import { notification } from "~~/utils/scaffold-eth";
+
+interface DecodedToken {
+  id: string;
+}
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 
@@ -26,6 +31,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
   const memberAddress = member?.address ?? "0x0";
+  const [id, setId] = useState<string | null>(null);
 
   // Deposit Rules
   const minDeposit = parseUnits("2000", 6);
@@ -53,6 +59,20 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
     }));
   };
 
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+
+    if (storedToken) {
+      try {
+        // Decodifica el JWT para obtener el contenido del payload
+        const decoded: DecodedToken = jwtDecode(storedToken);
+        setId(decoded.id || null); // Extrae la propiedad id del usuario en el token
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+      }
+    }
+  }, []);
+
   const ShowNotification = (message: string) => {
     notification.error(message, { position: "bottom-right", duration: 5000 });
   };
@@ -63,8 +83,9 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   // };
 
   //Validar el servidor y bd funcionando
-  const performHealthCheck = async () => {
+  const performHealthCheck = async (amount: number) => {
     try {
+      // Realizar el health check
       const response = await fetch("http://localhost:3001/f3api/health");
 
       if (!response.ok) {
@@ -75,13 +96,34 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
 
       if (data.status === "ok") {
         console.log("Health check: Base de datos y servidor en línea");
+
+        // **POST a /f3api/transaction si el health check es exitoso**
+        const transactionResponse = await fetch("http://localhost:3001/f3api/transaction", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: id, // token id a userId
+            amount,
+          }),
+        });
+
+        if (!transactionResponse.ok) {
+          throw new Error("No se pudo crear la transacción.");
+        }
+
+        const transactionData = await transactionResponse.json();
+        console.log("Transacción creada exitosamente:", transactionData);
       } else {
         console.warn("Health check: Problema detectado con el servidor o la base de datos");
       }
     } catch (error) {
-      // Convertimos el error a tipo Error
-      const errorMessage = (error as Error).message || "Error desconocido";
-      console.error("Error en el health check:", errorMessage);
+      if (error instanceof Error) {
+        console.error("Error en el proceso:", error.message);
+      } else {
+        console.error("Error desconocido en el proceso:", error);
+      }
     }
   };
 
@@ -169,11 +211,12 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
             depositContractReceiptHash: depositContractReceiptHash.transactionHash,
           }));
 
+          const amount = parseFloat(depositAmount); // Monto a enviar al servidor convertido a number
+          await performHealthCheck(amount);
+
           setTimeout(() => {
             fetchTransactions();
           }, 3000);
-
-          performHealthCheck(); //Llamar a la funcion para validar el servidor/bd al momento de completar exitosamente un deposito
         } else {
           ShowNotification(err.onTransaction);
         }
