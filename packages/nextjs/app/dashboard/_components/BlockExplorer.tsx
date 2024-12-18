@@ -87,7 +87,7 @@ const BlockExplorer = () => {
       )}
 
       <div>
-        <p>{wallet ? `Wallet: ${wallet}` : "Wallet no asignado."}</p>
+        <p>{wallet ? `Wallet: conectada` : "Wallet no asignado."}</p>
       </div>
 
       {/* <PaginationButton currentPage={currentPage} totalItems={Number(totalBlocks)} setCurrentPage={setCurrentPage} /> */}
