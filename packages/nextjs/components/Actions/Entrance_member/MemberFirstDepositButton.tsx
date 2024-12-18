@@ -18,6 +18,7 @@ const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 interface DecodedToken {
   uplineCommissions: string[];
+  id: string;
 }
 
 interface UplineMembers {
@@ -30,18 +31,19 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   const { fetchTransactions } = useGetMemberTransactions();
   const { writeContractAsync } = useWriteContract();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
-  const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
+  const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n); // Deposit for contract
   const contractAbi = contract?.abi;
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
   const memberAddress = member?.address ?? "0x0";
+  const [id, setId] = useState<string | null>(null);
   const [uplineMembers, setUplineMembers] = useState<UplineMembers>({
     uplineAddress: "",
     secondLevelUpline: "",
     thirtLevelUpline: "",
   });
 
-  // Get upline referrals for commission
+  // Get upline referrals for commission and user id
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
 
@@ -50,12 +52,18 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
         // Decodifica el JWT para obtener el contenido del payload
         const decoded: DecodedToken = jwtDecode(storedToken);
         const uplines: string[] = decoded.uplineCommissions;
+        const userId = decoded.id; // Extrae la propiedad id del usuario en el token
+
         if (uplines) {
           setUplineMembers({
             uplineAddress: uplines[0] || INVALID_ADDRESS, //For direct upline
             secondLevelUpline: uplines[1] || INVALID_ADDRESS, // For indirect upline in level 2
             thirtLevelUpline: uplines[2] || INVALID_ADDRESS, // For indirect upline in level 3
           });
+        }
+
+        if (userId) {
+          setId(userId || null); // Ingresa propiedad Id
         }
       } catch (error) {
         console.error("Error al decodificar el token:", error);
@@ -64,7 +72,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   }, []);
 
   // Deposit Rules
-  const minDeposit = parseUnits("2000", 6);
+  const minDeposit = parseUnits("2500", 6); // Solo para primer deposito
   const depositMultiple = parseUnits("500", 6);
 
   const [transaction, setTransaction] = useState<TransactionInfo>({
@@ -98,6 +106,51 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   //   setIsStarted(true);
   //   setIsHandleModalActivate(true);
   // };
+
+  //Validar el servidor y bd funcionando
+  const performHealthCheck = async (amount: number) => {
+    try {
+      // Realizar el health check
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/health`);
+
+      if (!response.ok) {
+        throw new Error("El servidor no respondió correctamente.");
+      }
+
+      const data = await response.json();
+
+      if (data.status === "ok") {
+        console.log("Health check: Base de datos y servidor en línea");
+
+        // **POST a /f3api/transaction si el health check es exitoso**
+        const transactionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/transaction`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: id, // token id a userId
+            amount,
+          }),
+        });
+
+        if (!transactionResponse.ok) {
+          throw new Error("No se pudo crear la transacción.");
+        }
+
+        const transactionData = await transactionResponse.json();
+        console.log("Transacción creada exitosamente:", transactionData);
+      } else {
+        console.warn("Health check: Problema detectado con el servidor o la base de datos");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error en el proceso:", error.message);
+      } else {
+        console.error("Error desconocido en el proceso:", error);
+      }
+    }
+  };
 
   const HandleDeposit = async () => {
     if (!depositAmount || depositAmount === "0") {
@@ -134,6 +187,14 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
 
       console.log("currentAllowance: ", currentAllowance); //For debug
 
+      // To patch previous allowance
+      if (currentAllowance === allowanceAmount) {
+        setTransaction(prev => ({
+          ...prev,
+          allowanceHash: allowanceReceiptHash.transactionHash,
+        }));
+      }
+
       if (currentAllowance < allowanceAmount) {
         const allowanceRequest = allowanceAmount - currentAllowance;
         console.log(allowanceRequest);
@@ -164,6 +225,13 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
         /**
          * "memberEntrance" function ere sort params for right execution according to ABI encoder
          */
+        console.log(
+          //For debug only
+          `you are deposit: ${allowanceAmount}
+          your direct upline: ${uplineMembers.uplineAddress}
+          your second level upline: ${uplineMembers.secondLevelUpline}
+          your thirt level upline: ${uplineMembers.thirtLevelUpline}`,
+        );
 
         const depositContractHash = await writeContractAsync({
           abi: contractAbi as Abi,
@@ -191,6 +259,9 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
             ...prev,
             depositContractReceiptHash: depositContractReceiptHash.transactionHash,
           }));
+
+          const amount = parseFloat(depositAmount); // Monto a enviar al servidor convertido a number
+          await performHealthCheck(amount);
 
           setTimeout(() => {
             fetchTransactions();

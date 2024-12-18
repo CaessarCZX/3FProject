@@ -7,7 +7,6 @@ import { erc20Abi } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
 import { StageTransactionModal } from "~~/components/Actions/Transaction/StageTransactionModal";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
-// import { useGetAllowance } from "~~/hooks/token/useGetAllowance";
 import { useGetMemberTransactions } from "~~/hooks/user/useGetMemberTransactions";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { DepositBtnProps, TransactionInfo } from "~~/utils/3FContract/deposit";
@@ -35,10 +34,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   const { fetchTransactions } = useGetMemberTransactions();
   const { writeContractAsync } = useWriteContract();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
-  // const { currentAllowance } = useGetAllowance(tokenUsdt);
-  // const [isAllowanceAproved, setIsAllowanceApproved] = useState(false);
-  const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
-  // console.log(allowanceAmount);
+  const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n); // Deposit for contract
   const contractAbi = contract?.abi;
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
@@ -211,7 +207,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
 
       if (currentAllowance < allowanceAmount) {
         const allowanceRequest = allowanceAmount - currentAllowance;
-        console.log(allowanceRequest);
+        console.log("currentAllowance: ", allowanceRequest); //For debug
 
         const allowanceHash = await writeContractAsync({
           abi: erc20Abi,
@@ -239,6 +235,13 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         /**
          * "depositMemberFunds" function ere sort params for right execution according to ABI encoder
          */
+        console.log(
+          //For debug only
+          `you are deposit: ${allowanceAmount}
+          your direct upline: ${uplineMembers.uplineAddress}
+          your second level upline: ${uplineMembers.secondLevelUpline}
+          your thirt level upline: ${uplineMembers.thirtLevelUpline}`,
+        );
 
         const depositContractHash = await writeContractAsync({
           abi: contractAbi as Abi,
