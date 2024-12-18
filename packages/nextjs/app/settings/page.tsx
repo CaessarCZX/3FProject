@@ -1,5 +1,6 @@
 "use client";
 
+import withAuth from "../hoc/withAuth";
 import SettingsForm from "./_components/SettingsForm";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
 
@@ -15,4 +16,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default withAuth(Settings);

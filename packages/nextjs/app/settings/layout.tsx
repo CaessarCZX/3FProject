@@ -5,8 +5,8 @@ export const metadata = getMetadata({
   description: "Tu tienes el control",
 });
 
-const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-export default AdminLayout;
+export default SettingsLayout;
