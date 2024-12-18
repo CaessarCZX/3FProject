@@ -140,6 +140,7 @@ export const SignInForm = () => {
           <input
             type="email"
             id="email"
+            autoComplete="username"
             value={formData.email}
             readOnly
             className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
@@ -160,6 +161,7 @@ export const SignInForm = () => {
           <input
             type="password"
             id="password"
+            autoComplete="current-password"
             value={formData.password}
             onChange={handleChange}
             className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"

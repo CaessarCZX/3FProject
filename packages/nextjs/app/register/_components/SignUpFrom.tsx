@@ -124,6 +124,7 @@ export const SignUpForm = () => {
     const validation = validateFormData(formData);
     if (Object.values(validation).length > 0) {
       RenderWarningMessages(validation);
+      return;
     }
 
     try {
@@ -144,12 +145,14 @@ export const SignUpForm = () => {
 
       if (response.ok) {
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
+        const saveEmail = formData.email;
         setFormData({ name: "", email: "", password: "", wallet: "", referredBy: "" });
         setIsWalletConnected(false);
         setIsReferrerValid(false);
 
+        const loginUrl = saveEmail ? `/login?email=${encodeURIComponent(saveEmail)}` : "/login";
         sessionStorage.setItem("allowAccess", "true");
-        router.push("/login");
+        router.push(loginUrl);
       } else {
         const errorData = await response.json();
         setSingleErrorMessage(errorData.message || "Error en el registro.");
@@ -249,6 +252,7 @@ export const SignUpForm = () => {
             type="email"
             id="email"
             name="email"
+            autoComplete="new-username"
             value={formData.email}
             readOnly
             className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
@@ -269,6 +273,7 @@ export const SignUpForm = () => {
             type="password"
             id="password"
             name="password"
+            autoComplete="new-password"
             value={formData.password}
             onChange={handleChange}
             className="block w-full pr-10 pl-4 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
