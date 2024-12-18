@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { readContract, waitForTransactionReceipt } from "@wagmi/core";
 import { Abi } from "abitype";
+import { jwtDecode } from "jwt-decode";
 import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
@@ -14,6 +15,16 @@ import { notification } from "~~/utils/scaffold-eth";
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 
+interface DecodedToken {
+  uplineCommissions: string[];
+}
+
+interface UplineMembers {
+  uplineAddress: string;
+  secondLevelUpline: string;
+  thirtLevelUpline: string;
+}
+
 const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ depositAmount }) => {
   const { fetchTransactions } = useGetMemberTransactions();
   const { writeContractAsync } = useWriteContract();
@@ -23,6 +34,33 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
   const memberAddress = member?.address ?? "0x0";
+  const [uplineMembers, setUplineMembers] = useState<UplineMembers>({
+    uplineAddress: "",
+    secondLevelUpline: "",
+    thirtLevelUpline: "",
+  });
+
+  // Get upline referrals for commission
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+
+    if (storedToken) {
+      try {
+        // Decodifica el JWT para obtener el contenido del payload
+        const decoded: DecodedToken = jwtDecode(storedToken);
+        const uplines: string[] = decoded.uplineCommissions;
+        if (uplines) {
+          setUplineMembers({
+            uplineAddress: uplines[0] ?? "", //For direct upline
+            secondLevelUpline: uplines[1] ?? "", // For indirect upline in level 2
+            thirtLevelUpline: uplines[2] ?? "", // For indirect upline in level 3
+          });
+        }
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+      }
+    }
+  }, []);
 
   // Deposit Rules
   const minDeposit = parseUnits("2000", 6);
@@ -122,11 +160,20 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
           allowanceReceiptHash: allowanceReceiptHash.transactionHash,
         }));
 
+        /**
+         * "memberEntrance" function ere sort params for right execution according to ABI encoder
+         */
+
         const depositContractHash = await writeContractAsync({
           abi: contractAbi as Abi,
           address: currentContract,
           functionName: "memberEntrance",
-          args: [allowanceAmount],
+          args: [
+            uplineMembers.uplineAddress,
+            uplineMembers.secondLevelUpline,
+            uplineMembers.thirtLevelUpline,
+            allowanceAmount,
+          ],
         });
 
         setTransaction(prev => ({

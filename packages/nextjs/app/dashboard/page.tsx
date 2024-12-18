@@ -9,7 +9,8 @@ import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
 const Dashboard = () => {
   const { memberStatus } = useGetMemberStatus();
 
-  return <InternalLayout>{!memberStatus ? <FirstDepositScreen /> : <CommonDashboard />}</InternalLayout>;
+  // Chage memberStatus to false to production
+  return <InternalLayout>{memberStatus ? <FirstDepositScreen /> : <CommonDashboard />}</InternalLayout>;
 };
 // Aplica el HOC al export
 export default withAuth(Dashboard);
