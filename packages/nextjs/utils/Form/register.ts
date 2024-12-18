@@ -56,6 +56,6 @@ export const validateFormData = (formData: ValidateFormData) => {
 
 export const RenderWarningMessages = (errors: any) => {
   Object.keys(errors).forEach(key => {
-    notification.warning(errors[key]);
+    notification.warning(errors[key], { position: "bottom-right", duration: 5000 });
   });
 };

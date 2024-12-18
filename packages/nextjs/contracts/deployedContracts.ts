@@ -7,18 +7,68 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   11155111: {
     FFFBusiness: {
-      address: "0x6b8B46420bd21E7Cd1207621a0e513B0E888245e",
+      address: "0x7FA59Dc45EeCfa6238802A5Aa259ab4853F179B5",
       abi: [
         {
           inputs: [
             {
               internalType: "address",
-              name: "tokenAddress",
+              name: "_tokenAddress",
               type: "address",
             },
           ],
           stateMutability: "nonpayable",
           type: "constructor",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "CommissionPaid",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "config",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "newValue",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "ConfigUpdated",
+          type: "event",
         },
         {
           anonymous: false,
@@ -42,7 +92,63 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "Deposit",
+          name: "DepositContract",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "from",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "MembershipPaid",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "message",
+              type: "string",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "oldOwner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "NewBusinessOwner",
           type: "event",
         },
         {
@@ -75,31 +181,6 @@ const deployedContracts = {
             },
             {
               indexed: false,
-              internalType: "string",
-              name: "rank",
-              type: "string",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "timestamp",
-              type: "uint256",
-            },
-          ],
-          name: "NewRankReached",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              indexed: false,
               internalType: "uint256",
               name: "amount",
               type: "uint256",
@@ -111,7 +192,26 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "Refund",
+          name: "NewSaving",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "previousOwner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "OwnershipTransferred",
           type: "event",
         },
         {
@@ -124,12 +224,6 @@ const deployedContracts = {
               type: "address",
             },
             {
-              indexed: true,
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
               indexed: false,
               internalType: "uint256",
               name: "amount",
@@ -142,7 +236,7 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "Transfer",
+          name: "TransferBusiness",
           type: "event",
         },
         {
@@ -167,8 +261,37 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "WithdrawalRequest",
+          name: "WithdrawalContract",
           type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "WithdrawalMember",
+          type: "event",
+        },
+        {
+          stateMutability: "payable",
+          type: "fallback",
         },
         {
           inputs: [
@@ -190,10 +313,21 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "deposit",
+          inputs: [
+            {
+              internalType: "address",
+              name: "_memberAddress",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "_decreaseAmount",
+              type: "uint256",
+            },
+          ],
+          name: "decreaseMemberFunds",
           outputs: [],
-          stateMutability: "payable",
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -202,6 +336,34 @@ const deployedContracts = {
               internalType: "uint256",
               name: "_amount",
               type: "uint256",
+            },
+          ],
+          name: "deposit",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_amount",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_firstLevelUpline",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_secondLevelUpline",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_thirtLevelUpline",
+              type: "address",
             },
           ],
           name: "depositMemberFunds",
@@ -223,6 +385,58 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [],
+          name: "getCommissionTimestamp",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCurrentContractBalance",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getDepositMultiple",
+          outputs: [
+            {
+              internalType: "uint128",
+              name: "",
+              type: "uint128",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMaxContractBalance",
+          outputs: [
+            {
+              internalType: "uint128",
+              name: "",
+              type: "uint128",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
           inputs: [
             {
               internalType: "address",
@@ -231,6 +445,32 @@ const deployedContracts = {
             },
           ],
           name: "getMemberBalance",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMinAmountToDeposit",
+          outputs: [
+            {
+              internalType: "uint128",
+              name: "",
+              type: "uint128",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getPytTimestamp",
           outputs: [
             {
               internalType: "uint256",
@@ -281,12 +521,171 @@ const deployedContracts = {
               type: "address",
             },
             {
+              internalType: "address",
+              name: "_secondLevelUpline",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_thirtLevelUpline",
+              type: "address",
+            },
+            {
               internalType: "uint256",
               name: "_amount",
               type: "uint256",
             },
           ],
           name: "memberEntrance",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_paymentAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_memberAddress",
+              type: "address",
+            },
+          ],
+          name: "paymentCommissions",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "renounceOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address payable",
+              name: "_newBusinessWallet",
+              type: "address",
+            },
+          ],
+          name: "setBusinessWallet",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint8",
+              name: "_tier1",
+              type: "uint8",
+            },
+            {
+              internalType: "uint8",
+              name: "_tier2",
+              type: "uint8",
+            },
+            {
+              internalType: "uint8",
+              name: "_tier3",
+              type: "uint8",
+            },
+          ],
+          name: "setCommissionRates",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint128",
+              name: "_newMultiple",
+              type: "uint128",
+            },
+          ],
+          name: "setDepositMultiple",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint128",
+              name: "_newMaxBalance",
+              type: "uint128",
+            },
+          ],
+          name: "setMaxContractBalance",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint128",
+              name: "_toBusiness",
+              type: "uint128",
+            },
+            {
+              internalType: "uint128",
+              name: "_toUpline",
+              type: "uint128",
+            },
+          ],
+          name: "setMembershipPayments",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint128",
+              name: "_newMinAmount",
+              type: "uint128",
+            },
+          ],
+          name: "setMinAmountToDeposit",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_pyt",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_commission",
+              type: "uint256",
+            },
+          ],
+          name: "setTimestamps",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -305,11 +704,35 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [
+            {
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "transferOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "withdraw",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
           stateMutability: "payable",
           type: "receive",
         },
       ],
-      inheritedFunctions: {},
+      inheritedFunctions: {
+        owner: "@openzeppelin/contracts/access/Ownable.sol",
+        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+      },
     },
   },
 } as const;
