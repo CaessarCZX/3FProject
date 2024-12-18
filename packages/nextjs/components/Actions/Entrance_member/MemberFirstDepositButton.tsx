@@ -14,6 +14,7 @@ import { DepositErrors as err } from "~~/utils/errors/errors";
 import { notification } from "~~/utils/scaffold-eth";
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 interface DecodedToken {
   uplineCommissions: string[];
@@ -51,9 +52,9 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
         const uplines: string[] = decoded.uplineCommissions;
         if (uplines) {
           setUplineMembers({
-            uplineAddress: uplines[0] ?? "", //For direct upline
-            secondLevelUpline: uplines[1] ?? "", // For indirect upline in level 2
-            thirtLevelUpline: uplines[2] ?? "", // For indirect upline in level 3
+            uplineAddress: uplines[0] || INVALID_ADDRESS, //For direct upline
+            secondLevelUpline: uplines[1] || INVALID_ADDRESS, // For indirect upline in level 2
+            thirtLevelUpline: uplines[2] || INVALID_ADDRESS, // For indirect upline in level 3
           });
         }
       } catch (error) {

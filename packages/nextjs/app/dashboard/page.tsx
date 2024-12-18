@@ -10,7 +10,7 @@ const Dashboard = () => {
   const { memberStatus } = useGetMemberStatus();
 
   // Chage memberStatus to false to production
-  return <InternalLayout>{memberStatus ? <FirstDepositScreen /> : <CommonDashboard />}</InternalLayout>;
+  return <InternalLayout>{!memberStatus ? <FirstDepositScreen /> : <CommonDashboard />}</InternalLayout>;
 };
 // Aplica el HOC al export
 export default withAuth(Dashboard);

@@ -19,6 +19,7 @@ interface DecodedToken {
 }
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 interface DecodedToken {
   uplineCommissions: string[];
@@ -37,6 +38,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   // const { currentAllowance } = useGetAllowance(tokenUsdt);
   // const [isAllowanceAproved, setIsAllowanceApproved] = useState(false);
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n);
+  // console.log(allowanceAmount);
   const contractAbi = contract?.abi;
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
@@ -58,9 +60,9 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         const uplines: string[] = decoded.uplineCommissions;
         if (uplines) {
           setUplineMembers({
-            uplineAddress: uplines[0] ?? "", //For direct upline
-            secondLevelUpline: uplines[1] ?? "", // For indirect upline in level 2
-            thirtLevelUpline: uplines[2] ?? "", // For indirect upline in level 3
+            uplineAddress: uplines[0] || INVALID_ADDRESS, //For direct upline
+            secondLevelUpline: uplines[1] || INVALID_ADDRESS, // For indirect upline in level 2
+            thirtLevelUpline: uplines[2] || INVALID_ADDRESS, // For indirect upline in level 3
           });
         }
       } catch (error) {
@@ -123,7 +125,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   const performHealthCheck = async (amount: number) => {
     try {
       // Realizar el health check
-      const response = await fetch("http://localhost:3001/f3api/health");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/health`);
 
       if (!response.ok) {
         throw new Error("El servidor no respondió correctamente.");
@@ -135,7 +137,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         console.log("Health check: Base de datos y servidor en línea");
 
         // **POST a /f3api/transaction si el health check es exitoso**
-        const transactionResponse = await fetch("http://localhost:3001/f3api/transaction", {
+        const transactionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/transaction`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -198,6 +200,14 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
       });
 
       console.log("currentAllowance: ", currentAllowance); //For debug
+
+      // To patch previous allowance
+      if (currentAllowance === allowanceAmount) {
+        setTransaction(prev => ({
+          ...prev,
+          allowanceHash: allowanceReceiptHash.transactionHash,
+        }));
+      }
 
       if (currentAllowance < allowanceAmount) {
         const allowanceRequest = allowanceAmount - currentAllowance;
