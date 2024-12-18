@@ -11,32 +11,29 @@ export const SignInForm = () => {
   const [formData, setFormData] = useState({ email: "", password: "", wallet: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const router = useRouter();
 
   const currentUser = useAccount();
 
-  // Ingreso datos en el input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // Obtener correo electronico a traves de parametros
   useEffect(() => {
     const currentParams = new URL(window.location.href, window.location.origin);
     const email = currentParams.searchParams.get("email") ?? "";
 
-    if (email !== "" && formData.email === "") {
-      setFormData(prevData => ({ ...prevData, email: email }));
+    if (email && !formData.email) {
+      setFormData(prevData => ({ ...prevData, email }));
     }
   }, [formData]);
 
-  // Mensajes a ui
   useEffect(() => {
     if (errorMessage) {
-      notification.error(errorMessage, { position: "bottom-right", duration: 5000 }); // Muestra la notificicacion con el error encontrado
-      setErrorMessage(""); // Borra el mensaje de error registrado
+      notification.error(errorMessage, { position: "bottom-right", duration: 5000 });
+      setErrorMessage("");
     }
 
     if (successMessage) {
@@ -64,15 +61,15 @@ export const SignInForm = () => {
 
         if (data.exists) {
           setSuccessMessage("Wallet conectada con éxito.");
-          setIsWalletConnected(true); // Habilitar el login
+          setIsWalletConnected(true);
         } else {
           setErrorMessage("Esta wallet no está registrada.");
-          setIsWalletConnected(false); // Deshabilitar el login si la wallet no está registrada
+          setIsWalletConnected(false);
         }
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Error al verificar la wallet.");
-        setIsWalletConnected(false); // Deshabilitar registro si ocurre un error con la wallet
+        setIsWalletConnected(false);
       }
     } catch (error) {
       setErrorMessage("No se pudo conectar con el servidor.");
@@ -80,7 +77,6 @@ export const SignInForm = () => {
     }
   }, [formData.wallet]);
 
-  // Para obtener direccion automatica de wallet conectada
   useEffect(() => {
     if (currentUser.status === "connected") {
       setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
@@ -88,7 +84,9 @@ export const SignInForm = () => {
       return () => clearTimeout(checkConnect);
     }
 
-    if (currentUser.status === "disconnected") setFormData(prevData => ({ ...prevData, wallet: "" }));
+    if (currentUser.status === "disconnected") {
+      setFormData(prevData => ({ ...prevData, wallet: "" }));
+    }
   }, [currentUser.status, currentUser.address, handleConnectWallet]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,13 +94,11 @@ export const SignInForm = () => {
     setIsSubmitting(true);
     setErrorMessage("");
 
-    // For wallet connection
-    // !IMPORTANT: DISABLED FOR DEVELOPMENT
-    // if (!isWalletConnected) {
-    //   setErrorMessage("No tienes conectada una wallet");
-    //   setIsSubmitting(false);
-    //   return;
-    // }
+    if (!isWalletConnected) {
+      setErrorMessage("No tienes conectada una wallet válida.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/login`, {
@@ -113,10 +109,7 @@ export const SignInForm = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Token JWT:", data.token);
-
         localStorage.setItem("token", data.token);
-
         router.push("/dashboard");
       } else {
         const errorData = await response.json();
@@ -129,7 +122,6 @@ export const SignInForm = () => {
     }
   };
 
-  // Función para manejar el clic en el enlace de registro
   const handleSignUpClick = () => {
     const email = formData.email;
     const registerUrl = email ? `/register?email=${encodeURIComponent(email)}` : "/register";
@@ -189,35 +181,30 @@ export const SignInForm = () => {
           <WalletConnectionBtn enableWallet={isWalletConnected} classBtn="w-full rounded-md" />
         </div>
       </div>
-      {/* Wallet connection */}
 
       {/* Register link */}
       <div className="text-sm text-center">
         <p>
           ¿No tienes una cuenta?{" "}
           <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleSignUpClick}>
-            Registrate aquí
+            Regístrate aquí
           </a>
         </p>
       </div>
 
       {/* Submit */}
-      <div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          // !IMPORTANT: DISABLED FOR DEVELOPMENT
-          // disabled={isSubmitting || !isWalletConnected}
-          className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-            isSubmitting ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
-          } disabled:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-        >
-          {isSubmitting ? "Cargando..." : "INGRESAR AHORA"}
-        </button>
-      </div>
+      <button
+        type="submit"
+        disabled={isSubmitting || !isWalletConnected}
+        className={`w-full py-2 px-4 border border-transparent disabled:bg-gray-300 rounded-md shadow-sm text-sm font-medium text-white ${
+          isSubmitting || !isWalletConnected ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
+        }`}
+      >
+        {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
+      </button>
 
-      {/* Error Message */}
       {errorMessage && <p className="text-red-600 text-sm mt-2">{errorMessage}</p>}
+      {successMessage && <p className="text-green-600 text-sm mt-2">{successMessage}</p>}
     </form>
   );
 };
