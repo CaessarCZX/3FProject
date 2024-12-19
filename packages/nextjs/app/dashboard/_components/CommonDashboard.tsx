@@ -6,6 +6,7 @@ import CardDataStats from "~~/components/UI/CardDataStats";
 
 const CommonDashboard: React.FC = () => {
   const ContentStats = useGetContentStats();
+  // md:grid-cols-2
 
   return (
     <>

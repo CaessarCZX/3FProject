@@ -9,7 +9,7 @@ import CardBox from "~~/components/UI/CardBox";
 const DepositContract: React.FC = () => {
   const [deposit, setDeposit] = useState("");
   return (
-    <CardBox className="col-span-1 md:col-span-2">
+    <CardBox className="col-span-1 md:col-span-3 lg:col-span-2">
       <div className="flex items-center space-x-4 mb-4">
         {/* For Icon */}
         <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
