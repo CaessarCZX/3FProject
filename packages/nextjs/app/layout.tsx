@@ -12,6 +12,11 @@ export const metadata = getMetadata({
 const MainApp = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="Es" suppressHydrationWarning>
+      {/* Provisional meta tag for http request */}
+      <head>
+        <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+      </head>
+      {/* Provisional meta tag for http request */}
       <body>
         <ThemeProvider enableSystem>
           <BlockchainAppWithProviders>{children}</BlockchainAppWithProviders>
