@@ -14,14 +14,6 @@ const nextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: "/f3api/:path*",
-        destination: "http://35.238.13.68:3001/:path*",
-      },
-    ];
-  },
 };
 
 module.exports = nextConfig;
