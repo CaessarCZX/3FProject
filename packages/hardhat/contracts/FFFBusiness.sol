@@ -100,8 +100,8 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         _DEPOSIT_MULTIPLE = 500 * 10 ** 6; // Múltiple 500 USDT
         _PYT_TIMESTAMP = 90 days;
         _COMMISSION_TIMESTAMP = 30 days;
-        _MEMBERSHIP_PAYMENT_TO_BUSINESS = 400;
-        _MEMBERSHIP_PAYMENT_TO_UPLINE = 100;
+        _MEMBERSHIP_PAYMENT_TO_BUSINESS = 400 * 10 ** 6; //400 USDT
+        _MEMBERSHIP_PAYMENT_TO_UPLINE = 100 * 10 ** 6; //100 USDT
         _COMMISSION_PER_TIER_ONE = 4;
         _COMMISSION_PER_TIER_TWO = 2;
         _COMMISSION_PER_TIER_THREE = 2;
