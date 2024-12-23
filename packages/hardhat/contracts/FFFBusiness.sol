@@ -100,8 +100,8 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         _DEPOSIT_MULTIPLE = 500 * 10 ** 6; // Múltiple 500 USDT
         _PYT_TIMESTAMP = 90 days;
         _COMMISSION_TIMESTAMP = 30 days;
-        _MEMBERSHIP_PAYMENT_TO_BUSINESS = 400;
-        _MEMBERSHIP_PAYMENT_TO_UPLINE = 100;
+        _MEMBERSHIP_PAYMENT_TO_BUSINESS = 400 * 10 ** 6; //400 USDT
+        _MEMBERSHIP_PAYMENT_TO_UPLINE = 100 * 10 ** 6; //100 USDT
         _COMMISSION_PER_TIER_ONE = 4;
         _COMMISSION_PER_TIER_TWO = 2;
         _COMMISSION_PER_TIER_THREE = 2;
@@ -350,7 +350,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         uint256 firstDeposit = _amount - membership;
 
         require(_amount >= _MIN_AMOUNT_TO_DEPOSIT + membership, "Monto insuficiente");
-        _deposit(msg.sender, _amount);
+        _deposit(msg.sender, membership);
 
         // Membership payment to bussiness
         _processPayment(_businessWallet, _MEMBERSHIP_PAYMENT_TO_BUSINESS);
@@ -366,6 +366,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
     }
 
     function _deposit(address _from, uint256 _amount) private {
+        require(token.allowance(_from, address(this)) >= _amount, "Insufficient allowance");
         require(_amount <= token.balanceOf(_from), "No cuentas con USDT en tu wallet");
         require(_amount > 0, "Deposito no puede ser vacio");
         token.safeTransferFrom(_from, address(this), _amount);

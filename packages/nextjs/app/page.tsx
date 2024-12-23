@@ -25,7 +25,7 @@ const Home: NextPage = () => {
         {/* For background */}
 
         {/* Main container */}
-        <div className="container px-4 pt-16 mt-18 md:pt-8 relative m-auto">
+        <div className="container px-4 pt-16 mt-32 md:pt-8 relative m-auto">
           <div className="grid grid-cols-12">
             <div className="col-span-12 text-center">
               <picture className="w-full mb-8 block">
@@ -34,8 +34,8 @@ const Home: NextPage = () => {
                 <p className="m-0 p-0 font-light tracking-widest text-xs md:text-lg">FRIENDS & FAMILY</p>
               </picture>
 
-              <h2 className="text-3xl leading-none md:text-[70px] font-bold mb-6">Bienvenido a la familia!</h2>
-              <div className="flex w-full items-center justify-center mt-12">
+              <h2 className="text-3xl leading-none md:text-[57px] font-bold mb-6">Bienvenido a la familia!</h2>
+              <div className="flex w-full items-center justify-center mt-4">
                 <SubscribeForm />
               </div>
               <p className="mt-6 font-light text-xs">* Solo miembros aprobados</p>

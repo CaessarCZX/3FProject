@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { CheckCircleIcon, ExclamationCircleIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
+import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
+import { notification } from "~~/utils/scaffold-eth";
 
 export const SubscribeForm = () => {
   const [email, setEmail] = useState<string>("");
@@ -53,54 +54,41 @@ export const SubscribeForm = () => {
     }
   };
 
-  useEffect(() => {
-    if (error || success) {
-      const timer = setTimeout(() => {
-        setError(null);
-        setSuccess(false);
-      }, 5500);
+  const resetMessages = () => {
+    setError(null);
+    setSuccess(false);
+  };
 
-      return () => clearTimeout(timer);
+  // For messages to UI
+  useEffect(() => {
+    if (error !== null) {
+      notification.error(error, { position: "top-right", duration: 5000 });
+      resetMessages();
+    }
+
+    if (success) {
+      notification.success("Suscripción completada, espera la validación!", { position: "top-right", duration: 5000 });
+      resetMessages();
     }
   }, [error, success]);
 
   return (
-    <div className="relative">
-      {/* Mensajes de error y éxito */}
-      {error && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white text-sm py-2 px-4 rounded-lg shadow-md flex items-center gap-2 z-50">
-          <ExclamationCircleIcon className="w-5 h-5" />
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-sm py-2 px-4 rounded-lg shadow-md flex items-center gap-2 z-50">
-          <CheckCircleIcon className="w-5 h-5" />
-          Suscripción completada, espera la validación!
-        </div>
-      )}
-
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white bg-opacity-10 rounded-[50px] overflow-hidden text-white flex flex-grow items-center mt-6 md:max-w-[500px]"
-      >
-        <input
-          name="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className="bg-transparent py-4 px-5 placeholder:text-lg placeholder:text-white placeholder:text-opacity-80 focus:outline-none w-full"
-          type="email"
-          placeholder="Ingresa tu email"
-          required
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="text-xl font-semibold duration-500 hover:text-blue-600 mr-7"
-        >
-          {loading ? "Loading..." : <PaperAirplaneIcon className="w-8 h-8 opacity-60" />}
-        </button>
-      </form>
-    </div>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white bg-opacity-10 rounded-[50px] overflow-hidden text-white flex flex-grow items-center mt-6 md:max-w-[500px]"
+    >
+      <input
+        name="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        className="bg-transparent text-base py-4 px-5 placeholder:text-base placeholder:text-white placeholder:text-opacity-80 focus:outline-none w-full"
+        type="email"
+        placeholder="Ingresa tu email"
+        required
+      />
+      <button type="submit" disabled={loading} className="text-xl font-semibold duration-500 hover:text-blue-600 mr-7">
+        {loading ? "Loading..." : <PaperAirplaneIcon className="w-8 h-8 opacity-60" />}
+      </button>
+    </form>
   );
 };
