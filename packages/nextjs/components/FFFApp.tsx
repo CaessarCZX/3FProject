@@ -4,13 +4,11 @@ import { Toaster } from "react-hot-toast";
 // import { useInitializeMemberTransactions } from "~~/hooks/3FProject/useInitializeMemberTransactions";
 import { useInitializeMexicanPesoPrice } from "~~/hooks/3FProject/useInitializeMexicanPesoPrice";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
-import { useGetMemberCommissions } from "~~/hooks/user/useGetMemberCommissions";
 
 export const FFFApp = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
   useInitializeNativeCurrencyPrice();
   useInitializeMexicanPesoPrice();
-  useGetMemberCommissions();
   // useInitializeMemberTransactions();
 
   useEffect(() => {

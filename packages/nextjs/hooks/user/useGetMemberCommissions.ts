@@ -13,6 +13,8 @@ const client = createPublicClient({
 });
 
 async function listenToEvents(userAddress: string, contractAddress: string) {
+  console.log("Escuchando eventos...");
+
   client.watchEvent({
     address: contractAddress,
     event: {
@@ -27,6 +29,7 @@ async function listenToEvents(userAddress: string, contractAddress: string) {
     args: {
       to: userAddress, // Filtra por la dirección del usuario conectado
     },
+    onError: e => console.log(e),
     onLogs: logs => {
       logs.forEach(log => {
         console.log("Evento recibido:", log);
@@ -43,7 +46,10 @@ export const useGetMemberCommissions = () => {
 
   useEffect(() => {
     if (isConnected && address) {
+      console.log("It's active for logs");
       listenToEvents(address, currentContract); // Pasa la dirección conectada al filtro
     }
+
+    return () => console.log("Cleanup: Detener escucha de eventos");
   }, [isConnected, address, currentContract]);
 };
