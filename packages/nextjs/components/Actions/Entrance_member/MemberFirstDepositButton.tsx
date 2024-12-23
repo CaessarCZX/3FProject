@@ -6,6 +6,7 @@ import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
 import { StageTransactionModal } from "~~/components/Actions/Transaction/StageTransactionModal";
+import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
 import { useGetMemberTransactions } from "~~/hooks/user/useGetMemberTransactions";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
@@ -32,6 +33,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   const { writeContractAsync } = useWriteContract();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n); // Deposit for contract
+  const { getCurrentMemberStatus } = useInitializeMemberStatus();
   const contractAbi = contract?.abi;
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
@@ -265,6 +267,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
           await performHealthCheck(amount);
 
           setTimeout(() => {
+            getCurrentMemberStatus(); // Actualiza el status de activo del miembro en el contrato para dashboard comun
             fetchTransactions();
           }, 3000);
         } else {
