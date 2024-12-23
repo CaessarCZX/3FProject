@@ -185,7 +185,8 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
         args: [memberAddress, currentContract],
       });
 
-      console.log("currentAllowance: ", currentAllowance); //For debug
+      console.log("currentAllowance: ", currentAllowance);
+      console.log(typeof currentAllowance); //For debug
 
       // To patch previous allowance
       if (currentAllowance === allowanceAmount) {
