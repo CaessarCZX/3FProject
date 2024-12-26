@@ -3,19 +3,25 @@
 import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-interface UplineCommission {
+interface Referral {
   wallet: string;
   name: string;
   email: string;
+  parentWallet: string; // Relación con el nivel anterior
+}
+
+interface ReferersCommissions {
+  level: number;
+  referrals: Referral[];
 }
 
 const TableForm: React.FC = () => {
-  const [uplineCommissions, setUplineCommissions] = useState<UplineCommission[]>([]);
+  const [referersCommissions, setReferersCommissions] = useState<ReferersCommissions[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUplineCommissions = async () => {
+    const fetchReferersCommissions = async () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
@@ -36,12 +42,10 @@ const TableForm: React.FC = () => {
           return;
         }
 
-        const url = `${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/upline/${userWallet}`;
+        const url = `${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/referers/${userWallet}`;
         console.log("Realizando solicitud a:", url);
 
         const response = await fetch(url, { method: "GET" });
-
-        console.log("Respuesta del servidor:", response);
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -51,54 +55,67 @@ const TableForm: React.FC = () => {
         const data = await response.json();
         console.log("Datos obtenidos:", data);
 
-        setUplineCommissions(data.uplineCommissions || []);
+        if (Array.isArray(data.ReferersCommissions)) {
+          setReferersCommissions(data.ReferersCommissions);
+        } else {
+          setError("Los datos de comisiones no son válidos.");
+        }
       } catch (error: any) {
         console.error("Error al obtener las comisiones:", error);
-        setError(error.message || "Error inesperado.");
+        setError("Ocurrió un error al obtener los referidos. Intenta de nuevo más tarde.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchUplineCommissions();
+    fetchReferersCommissions();
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Upline Commissions</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">Referidos</h2>
 
         {isLoading ? (
           <p className="text-gray-500 mt-4">Cargando datos...</p>
         ) : error ? (
           <p className="text-red-500 mt-4">{error}</p>
         ) : (
-          <table className="min-w-full mt-6 border-collapse border border-gray-300">
-            <thead>
-              <tr>
-                <th className="border border-gray-300 px-4 py-2">Wallet</th>
-                <th className="border border-gray-300 px-4 py-2">Nombre</th>
-                <th className="border border-gray-300 px-4 py-2">Email</th>
-              </tr>
-            </thead>
-            <tbody>
-              {uplineCommissions.length > 0 ? (
-                uplineCommissions.map((upline, index) => (
-                  <tr key={index}>
-                    <td className="border border-gray-300 px-4 py-2 text-center">{upline.wallet}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-center">{upline.name}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-center">{upline.email}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="border border-gray-300 px-4 py-2 text-center" colSpan={3}>
-                    No se encontraron comisiones.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <div>
+            {referersCommissions.map(commission => (
+              <div key={commission.level} className="mt-6">
+                <h3 className="text-lg font-semibold text-gray-700">Nivel {commission.level}</h3>
+                <table className="min-w-full mt-2 border-collapse border border-gray-300">
+                  <thead>
+                    <tr>
+                      <th className="border border-gray-300 px-4 py-2">Wallet</th>
+                      <th className="border border-gray-300 px-4 py-2">Nombre</th>
+                      <th className="border border-gray-300 px-4 py-2">Email</th>
+                      <th className="border border-gray-300 px-4 py-2">Pertenece a</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {commission.referrals.length > 0 ? (
+                      commission.referrals.map(referral => (
+                        <tr key={`${commission.level}-${referral.wallet}`}>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{referral.wallet}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{referral.name}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{referral.email}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{referral.parentWallet}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td className="border border-gray-300 px-4 py-2 text-center" colSpan={4}>
+                          No se encontraron referidos en este nivel.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
