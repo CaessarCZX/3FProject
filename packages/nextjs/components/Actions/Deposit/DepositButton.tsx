@@ -118,7 +118,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
   // };
 
   //Validar el servidor y bd funcionando
-  const performHealthCheck = async (amount: number) => {
+  const performHealthCheck = async (amount: number, hash: string) => {
     try {
       // Realizar el health check
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/health`);
@@ -141,6 +141,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
           body: JSON.stringify({
             userId: id, // token id a userId
             amount,
+            hash,
           }),
         });
 
@@ -271,7 +272,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
           }));
 
           const amount = parseFloat(depositAmount); // Monto a enviar al servidor convertido a number
-          await performHealthCheck(amount);
+          await performHealthCheck(amount, depositContractReceiptHash.transactionHash);
 
           setTimeout(() => {
             fetchTransactions();
