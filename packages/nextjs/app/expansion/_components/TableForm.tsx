@@ -124,7 +124,7 @@ const ReferralNetwork: React.FC = () => {
           xOffset += 375; // Espaciado horizontal entre nodos
         });
 
-        yOffset = levelYOffset + 125; // Incrementar el espacio vertical
+        yOffset = levelYOffset + 175; // Incrementar el espacio vertical
       });
 
       setNodes(tempNodes);
