@@ -72,12 +72,20 @@ const ReferralNetwork: React.FC = () => {
       // Nodo raíz (Usuario principal)
       tempNodes.push({
         id: rootWallet,
-        data: { label: `Wallet: ${rootWallet}` },
+        data: {
+          label: (
+            <div>
+              <p>
+                <strong>Tu Wallet:</strong> {rootWallet}
+              </p>
+            </div>
+          ),
+        },
         position: { x: 500, y: 0 },
-        style: { background: "#f5f5f5", border: "1px solid #ccc", borderRadius: "8px" },
+        style: { background: "#f5f5f5", border: "1px solid #ccc", borderRadius: "8px", width: 350 },
       });
 
-      let yOffset = 100;
+      let yOffset = 125;
 
       referersCommissions.forEach(level => {
         const levelYOffset = yOffset; // Offset inicial por nivel
@@ -86,9 +94,23 @@ const ReferralNetwork: React.FC = () => {
         level.referrals.forEach(referral => {
           tempNodes.push({
             id: referral.wallet,
-            data: { label: `Wallet: ${referral.wallet}\nName: ${referral.name}` },
+            data: {
+              label: (
+                <div style={{ textAlign: "center" }}>
+                  <p>
+                    <strong>Wallet:</strong> {referral.wallet}
+                  </p>
+                  <p>
+                    <strong>Nombre:</strong> {referral.name}
+                  </p>
+                  <p>
+                    <strong>Correo:</strong> {referral.email}
+                  </p>
+                </div>
+              ),
+            },
             position: { x: xOffset, y: yOffset },
-            style: { background: "#e3f2fd", border: "1px solid #64b5f6", borderRadius: "8px" },
+            style: { background: "#e3f2fd", border: "1px solid #64b5f6", borderRadius: "8px", width: 350 },
           });
 
           // Conectar al "padre"
@@ -99,10 +121,10 @@ const ReferralNetwork: React.FC = () => {
             animated: true,
           });
 
-          xOffset += 200; // Espaciado horizontal entre nodos
+          xOffset += 375; // Espaciado horizontal entre nodos
         });
 
-        yOffset = levelYOffset + 150; // Incrementar el espacio vertical
+        yOffset = levelYOffset + 125; // Incrementar el espacio vertical
       });
 
       setNodes(tempNodes);
