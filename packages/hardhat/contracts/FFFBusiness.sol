@@ -136,7 +136,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
     }
 
     // Getters for bussiness logic vars
-    function getTotalBalance() private view onlyOwner returns (uint) {
+    function getTotalBalance() private view returns (uint) {
         return _totalBalance;
     }
 
@@ -277,6 +277,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         require(currentMember.balance >= _decreaseAmount, "Monto invalido");
 
         currentMember.balance -= _decreaseAmount;
+        _totalBalance -= _decreaseAmount;
         emit WithdrawalMember(_memberAddress, _decreaseAmount, block.timestamp);
     }
 
@@ -331,7 +332,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         // Update total balance in contract with total amount per deposit
         _totalBalance += _amount;
 
-        emit TransferBusiness(msg.sender, _amount, block.timestamp);
+        emit TransferBusiness(msg.sender, finalDeposit, block.timestamp);
 
     }
 

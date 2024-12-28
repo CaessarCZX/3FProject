@@ -10,7 +10,7 @@ import {
 
 type NotificationProps = {
   content: React.ReactNode;
-  status: "success" | "info" | "loading" | "error" | "warning";
+  status: "success" | "info" | "loading" | "error" | "warning" | "none";
   duration?: number;
   icon?: string;
   position?: ToastPosition;
@@ -28,6 +28,7 @@ const ENUM_STATUSES = {
   error: <ExclamationCircleIcon className="w-7 text-error" />,
   info: <InformationCircleIcon className="w-7 text-info" />,
   warning: <ExclamationTriangleIcon className="w-7 text-warning" />,
+  none: "",
 };
 
 const DEFAULT_DURATION = 3000;
@@ -83,6 +84,9 @@ export const notification = {
   },
   loading: (content: React.ReactNode, options?: NotificationOptions) => {
     return Notification({ content, status: "loading", ...options });
+  },
+  none: (content: React.ReactNode, options?: NotificationOptions) => {
+    return Notification({ content, status: "none", ...options });
   },
   remove: (toastId: string) => {
     toast.remove(toastId);

@@ -2,11 +2,23 @@
 
 import CommonDashboard from "./_components/CommonDashboard";
 import FirstDepositScreen from "./_components/FirstDepositScreen";
+// import { useWatchContractEvent } from "wagmi";
 import withAuth from "~~/app/hoc/withAuth";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
+// import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
+import { useGetNotfications } from "~~/hooks/user/useGetNotifications";
 
 const Dashboard = () => {
+  // const { data: currentContract } = useDeployedContractInfo("FFFBusiness");
+
+  // useWatchContractEvent({
+  //   address: currentContract?.address,
+  //   abi: currentContract?.abi,
+  //   eventName: "CommissionPaid",
+  //   onLogs: log => console.log("new log:", log),
+  // });
+  useGetNotfications();
   const { memberStatus } = useGetMemberStatus();
 
   // Chage memberStatus to false to production

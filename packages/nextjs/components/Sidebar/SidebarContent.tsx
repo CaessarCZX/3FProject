@@ -1,3 +1,4 @@
+import { FaPeopleGroup } from "react-icons/fa6";
 import {
   CalendarDaysIcon,
   ChartPieIcon,
@@ -22,6 +23,11 @@ export const projectMenuGoups: SidebarMenuGroup[] = [
         label: "Panel de control",
         route: "#",
         children: [{ label: "Mi cuenta", route: "/dashboard" }],
+      },
+      {
+        icon: <FaPeopleGroup className={defaultSizeIcon} />,
+        label: "Expansion",
+        route: "/expansion",
       },
       // {
       //   icon: <CalendarDaysIcon className={defaultSizeIcon} />,

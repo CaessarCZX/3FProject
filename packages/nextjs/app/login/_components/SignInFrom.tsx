@@ -3,11 +3,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiLock, FiMail } from "react-icons/fi";
+import { RiEyeLine } from "react-icons/ri";
+import { RiEyeCloseLine } from "react-icons/ri";
 import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import { notification } from "~~/utils/scaffold-eth/notification";
 
 export const SignInForm = () => {
+  // Show password feature
+  const [showpass, setShowpass] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
   const [formData, setFormData] = useState({ email: "", password: "", wallet: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -155,21 +161,45 @@ export const SignInForm = () => {
       {/* Password */}
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
+          Contraseña
         </label>
         <div className="mt-1 relative">
           <input
-            type="password"
+            type={showpass ? "type" : "password"}
             id="password"
             autoComplete="current-password"
             value={formData.password}
             onChange={handleChange}
+            onFocus={() => {
+              setIsFocused(true);
+            }}
+            onBlur={() => {
+              if (!formData.password) {
+                setIsFocused(false);
+              }
+            }}
             className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter your password"
+            placeholder="Ingresa tu contraseña"
             required
           />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiLock />
+          <div
+            className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto"
+            onClick={e => {
+              e.stopPropagation();
+              isFocused && setShowpass(!showpass);
+            }}
+          >
+            {!isFocused ? (
+              <FiLock className="text-gray-400" />
+            ) : showpass ? (
+              <div className="tooltip" data-tip="Ocultar contraseña">
+                <RiEyeLine className="text-gray-600" />
+              </div>
+            ) : (
+              <div className="tooltip" data-tip="Mostrar contraseña">
+                <RiEyeCloseLine className="text-gray-600" />
+              </div>
+            )}
           </div>
         </div>
       </div>

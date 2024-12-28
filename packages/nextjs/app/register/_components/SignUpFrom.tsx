@@ -3,12 +3,19 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
+import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
+import { isAddress } from "viem";
 import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
 import { notification } from "~~/utils/scaffold-eth/notification";
 
+const ETH_WALLET_LENGTH = 42;
+
 export const SignUpForm = () => {
+  // Show password feature
+  const [showpass, setShowpass] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,10 +25,12 @@ export const SignUpForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false); // Validacion de wallet
-  const [isReferrerValid, setIsReferrerValid] = useState(false); // Validador de referido
+  // Validador de referido
+  const [isReferrerValid, setIsReferrerValid] = useState(false);
+  const [isReferredFocused, setIsReferredFocused] = useState(false);
+  // Mensajes
   const [successMessage, setSuccessMessage] = useState("");
   const [singleErrorMessage, setSingleErrorMessage] = useState("");
-  // const [errors, setErrors] = useState<Record<string, string>>({});
 
   //For blockchain
   const currentUser = useAccount();
@@ -65,6 +74,14 @@ export const SignUpForm = () => {
       setIsReferrerValid(false);
       setSingleErrorMessage("");
       setSuccessMessage("");
+
+      //TODO: for validation
+      if (value.length === ETH_WALLET_LENGTH) {
+        if (!isAddress(value)) return;
+        console.log(formData.referredBy);
+
+        // setTimeout(() => handleValidateReferrer(), 5000);
+      }
     }
   };
 
@@ -223,7 +240,7 @@ export const SignUpForm = () => {
       {/* Name */}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Name
+          Nombre
         </label>
         <div className="mt-1 relative">
           <input
@@ -233,7 +250,7 @@ export const SignUpForm = () => {
             value={formData.name}
             onChange={handleChange}
             className="block w-full pr-10 pl-4 font-light text-gray-700 dark:text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter your full name"
+            placeholder="Ingresa tu nombre"
             required
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -266,22 +283,46 @@ export const SignUpForm = () => {
       {/* Password */}
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
+          Contraseña
         </label>
         <div className="mt-1 relative">
           <input
-            type="password"
+            type={showpass ? "type" : "password"}
             id="password"
             name="password"
             autoComplete="new-password"
             value={formData.password}
             onChange={handleChange}
+            onFocus={() => {
+              setIsFocused(true);
+            }}
+            onBlur={() => {
+              if (!formData.password) {
+                setIsFocused(false);
+              }
+            }}
             className="block w-full pr-10 pl-4 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Enter your password"
+            placeholder="Ingresa una nueva contraseña"
             required
           />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiLock />
+          <div
+            className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto"
+            onClick={e => {
+              e.stopPropagation();
+              isFocused && setShowpass(!showpass);
+            }}
+          >
+            {!isFocused ? (
+              <FiLock className="text-gray-400" />
+            ) : showpass ? (
+              <div className="tooltip" data-tip="Ocultar contraseña">
+                <RiEyeLine className="text-gray-600" />
+              </div>
+            ) : (
+              <div className="tooltip" data-tip="Mostrar contraseña">
+                <RiEyeCloseLine className="text-gray-600" />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -308,7 +349,17 @@ export const SignUpForm = () => {
             name="referredBy"
             value={formData.referredBy}
             onChange={handleChange}
-            className="block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            onFocus={() => {
+              setIsReferredFocused(true);
+            }}
+            onBlur={() => {
+              if (!formData.password) {
+                setIsReferredFocused(false);
+              }
+            }}
+            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+              !isReferredFocused ? "bg-inherit" : !isReferrerValid ? "bg-red-200" : "bg-green-200"
+            }`}
             placeholder="0xABC123"
             required
           />

@@ -110,7 +110,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   // };
 
   //Validar el servidor y bd funcionando
-  const performHealthCheck = async (amount: number) => {
+  const performHealthCheck = async (amount: number, hash: string) => {
     try {
       // Realizar el health check
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/health`);
@@ -133,6 +133,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
           body: JSON.stringify({
             userId: id, // token id a userId
             amount,
+            hash,
           }),
         });
 
@@ -264,7 +265,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
           }));
 
           const amount = parseFloat(depositAmount); // Monto a enviar al servidor convertido a number
-          await performHealthCheck(amount);
+          await performHealthCheck(amount, depositContractReceiptHash.transactionHash);
 
           setTimeout(() => {
             getCurrentMemberStatus(); // Actualiza el status de activo del miembro en el contrato para dashboard comun

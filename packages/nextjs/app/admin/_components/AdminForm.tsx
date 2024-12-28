@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AdminTableForm from "./AdminTableForm";
+import TransactionsAdminTableForm from "./TransactionsAdminTableForm";
 import TransactionsTableForm from "./TransactionsTableForm";
 import WhiteListTableForm from "./WhiteListTableForm";
 
@@ -16,6 +17,8 @@ const AdminForm = () => {
         return <WhiteListTableForm />;
       case "transactions":
         return <TransactionsTableForm />;
+      case "transactionsAdmin":
+        return <TransactionsAdminTableForm />;
       default:
         return <AdminTableForm />;
     }
@@ -42,6 +45,14 @@ const AdminForm = () => {
           className={`px-4 py-2 rounded ${currentView === "transactions" ? "bg-gray-600 text-white" : "bg-black-200"}`}
         >
           Transactions Table
+        </button>
+        <button
+          onClick={() => setCurrentView("transactionsAdmin")}
+          className={`px-4 py-2 rounded ${
+            currentView === "transactionsAdmin" ? "bg-gray-600 text-white" : "bg-black-200"
+          }`}
+        >
+          Transactions Admin Table
         </button>
       </div>
 
