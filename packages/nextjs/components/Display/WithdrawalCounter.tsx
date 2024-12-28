@@ -92,13 +92,5 @@ export const WithdrawalCounter = ({ date, time }: { date: string; time: string }
     return () => clearInterval(timer);
   }, [calculateTimeLeft]);
 
-  return (
-    <>
-      {isExpired ? (
-        <p>Retiro disponible</p>
-      ) : (
-        <p>{`${timeLeft.days}d ${timeLeft.hours} : ${timeLeft.minutes} : ${timeLeft.seconds}`}</p>
-      )}
-    </>
-  );
+  return <>{isExpired ? <p>Retiro disponible</p> : <p>{`${timeLeft.days}d`}</p>}</>;
 };
