@@ -306,7 +306,9 @@ export const SignUpForm = () => {
             required
           />
           <div
-            className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto"
+            className={`absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto ${
+              isFocused && "cursor-pointer"
+            }`}
             onClick={e => {
               e.stopPropagation();
               isFocused && setShowpass(!showpass);
