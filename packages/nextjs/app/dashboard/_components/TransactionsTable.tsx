@@ -1,33 +1,17 @@
 // import { useEffect, useState } from "react";
 import { TransactionsTableRow } from "./TransactionsTableRow";
-import { formatUnits } from "viem";
+import { MemberSaving } from "~~/types/transaction/saving";
 import { getDateAndTimeFromTimestamp } from "~~/utils/3FContract/timestampFormatter";
 
-interface Transaction {
-  hash: string;
-  value: string;
-  timestamp: string;
-  status: string;
-}
-
 type TransactionTableProps = {
-  transactions: Transaction[] | null;
+  transactions: MemberSaving[];
 };
 
 export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
-  // Function disabled for req
-  // const [totalSavings, setTotalSavings] = useState<string[]>();
-
-  // useEffect(() => {
-  //   if (!transactions) return;
-  //   const createSavings = Array.from({ length: transactions.length }, (_, i) => `Ahorro-${i + 1}`);
-  //   setTotalSavings(createSavings);
-  // }, [transactions]);
-
   if (!transactions) {
     return (
       <>
-        <p className="font-black text-2xl">No desponible</p>
+        <p className="font-black text-2xl">No disponible</p>
       </>
     );
   }
@@ -59,18 +43,17 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
 
         <tbody>
           {transactions.map((tx, key) => {
-            const hash = tx.hash;
-            const { date, time } = getDateAndTimeFromTimestamp(tx.timestamp);
-            const value = formatUnits(BigInt(tx.value), 6);
+            const { date, time } = getDateAndTimeFromTimestamp(tx.date);
+            // const value = formatUnits(BigInt(tx.value), 6);
             return (
               <TransactionsTableRow
-                key={+hash * key}
+                key={tx._id}
                 index={key}
-                hash={hash}
-                value={value}
+                hash={tx.hash}
+                value={tx.amount}
                 date={date}
                 time={time}
-                status=""
+                status={tx.status}
                 lengthData={transactions.length}
               />
             );
