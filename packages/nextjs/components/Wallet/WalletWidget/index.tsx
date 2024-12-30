@@ -17,7 +17,7 @@ const WalletWidget: React.FC = () => {
     <GlasRainbowCard>
       <div className="px-4 py-4 min-w-[254px] max-w-[254px]">
         <div className="flex items-center mb-2 gap-1">
-          <div className="font-light text-sm tracking-wide text-gray-300 group-hover:text-gray-200">Tu balance</div>
+          <div className="font-light text-sm tracking-wide text-gray-300 group-hover:text-gray-200">Tu Wallet</div>
           <span>
             <EyeIcon className="w-3 h-3 text-green-500 group-hover:text-white" />
           </span>
