@@ -12,14 +12,8 @@ const useGetContentStats = () => {
     functionName: "getMemberBalance",
     args: [currentMember?.address],
   });
-  // const { data: totalAffiliates } = useScaffoldReadContract({
-  //   contractName: "FFFBusiness",
-  //   functionName: "getTotalAffiliatesPerMember",
-  //   args: [currentMember?.address],
-  // });
 
   const dolarBalance = Number(formatUnits(BigInt(memberBalance || 0), 6));
-  // const affiliates = `${Number(totalAffiliates)}`;
 
   const ContentStats: ContentStatsType[] = [
     {
@@ -38,14 +32,6 @@ const useGetContentStats = () => {
       levelUp: true,
       levelDown: false,
     },
-    // {
-    //   icon: UsersIcon,
-    //   title: "Miembros Afiliados",
-    //   total: affiliates ?? "",
-    //   rate: "25%",
-    //   levelUp: true,
-    //   levelDown: false,
-    // },
   ];
 
   return ContentStats;
