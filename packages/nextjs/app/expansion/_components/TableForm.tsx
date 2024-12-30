@@ -136,7 +136,7 @@ const ReferralNetwork: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ height: "100vh" }}>
+    <div style={{ height: "90%", width: "100%", marginBottom: "1rem" }}>
       {isLoading ? (
         <p>Cargando datos...</p>
       ) : error ? (
