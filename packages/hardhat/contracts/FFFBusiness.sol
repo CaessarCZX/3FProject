@@ -14,7 +14,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 	// For Bussiness
 	address payable private _businessWallet;
     uint128 private _totalMembers;
-    uint256 private _totalBalance; 
+    uint256 private _totalBalance;
 
 	//Limits
 	uint128 private _MIN_AMOUNT_TO_DEPOSIT;
@@ -268,7 +268,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
     }
 
     // Provitional function for decrease memberfunds, in case to whitdraw in a future
-    function decreaseMemberFunds(
+    function liquidateMemberFunds(
         address _memberAddress,
         uint _decreaseAmount
     ) external onlyOwner {
@@ -278,6 +278,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 
         currentMember.balance -= _decreaseAmount;
         _totalBalance -= _decreaseAmount;
+        _withdraw(_memberAddress, _decreaseAmount);
         emit WithdrawalMember(_memberAddress, _decreaseAmount, block.timestamp);
     }
 
