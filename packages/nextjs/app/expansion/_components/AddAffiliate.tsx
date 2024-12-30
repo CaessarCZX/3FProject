@@ -1,14 +1,70 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { notification } from "~~/utils/scaffold-eth/notification";
 
 const AddAffiliate: React.FC = () => {
   const [affiliateEmail, setAffiliateEmail] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string>("");
 
-  const handleAddAffiliate = () => {
-    setIsSaving(true);
+  const resetMessages = () => {
+    setError(null);
+    setSuccess("");
   };
+
+  const handleAddAffiliate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    resetMessages();
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/create-white-list`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          affiliateEmail,
+          isApproved: true,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          setSuccess(data.message || "Usuario previamente registrado");
+          return;
+        }
+
+        setError(data.message || "Ocurrió un error inesperado");
+        return;
+      }
+
+      setSuccess("Prospecto registrado");
+      setAffiliateEmail("");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Un error desconocido ha ocurrido";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // For messages to UI
+  useEffect(() => {
+    if (error !== null) {
+      notification.error(error, { position: "top-right", duration: 5000 });
+      resetMessages();
+    }
+
+    if (success) {
+      notification.success("Suscripción completada, espera la validación!", { position: "top-right", duration: 5000 });
+      resetMessages();
+    }
+  }, [error, success]);
 
   return (
     <>
@@ -17,7 +73,7 @@ const AddAffiliate: React.FC = () => {
         <div className=" bg-white shadow-md rounded-lg p-6">
           <h2 className="text-3xl font-light text-gray-500 mb-4">Añadir prospecto</h2>
           <div>
-            <div className="">
+            <form onSubmit={handleAddAffiliate}>
               <label className="block text-sm font-medium text-gray-700">Correo</label>
               <div className="flex max-h-13 gap-8">
                 <input
@@ -29,14 +85,14 @@ const AddAffiliate: React.FC = () => {
                   className="flex-1 block px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
                 <button
-                  onClick={handleAddAffiliate}
-                  disabled={isSaving}
+                  type="submit"
+                  disabled={loading}
                   className="max-w-55 px-6 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none"
                 >
-                  {isSaving ? "Registrando..." : "Crear referido"}
+                  {loading ? "Registrando..." : "Crear referido"}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
