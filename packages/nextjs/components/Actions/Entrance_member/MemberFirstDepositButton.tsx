@@ -8,7 +8,7 @@ import { useAccount, useWriteContract } from "wagmi";
 import { StageTransactionModal } from "~~/components/Actions/Transaction/StageTransactionModal";
 import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
-import { useGetMemberTransactions } from "~~/hooks/user/useGetMemberTransactions";
+import { useGetMemberSavings } from "~~/hooks/user/useGetMemberSavings";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { TransactionInfo } from "~~/utils/3FContract/deposit";
 import { DepositErrors as err } from "~~/utils/errors/errors";
@@ -18,7 +18,7 @@ const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 interface DecodedToken {
-  uplineCommissions: string[];
+  ReferersCommissions: string[];
   id: string;
 }
 
@@ -29,7 +29,7 @@ interface UplineMembers {
 }
 
 const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ depositAmount }) => {
-  const { fetchTransactions } = useGetMemberTransactions();
+  const { fetchSavings } = useGetMemberSavings();
   const { writeContractAsync } = useWriteContract();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n); // Deposit for contract
@@ -53,7 +53,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
       try {
         // Decodifica el JWT para obtener el contenido del payload
         const decoded: DecodedToken = jwtDecode(storedToken);
-        const uplines: string[] = decoded.uplineCommissions;
+        const uplines: string[] = decoded.ReferersCommissions;
         const userId = decoded.id; // Extrae la propiedad id del usuario en el token
 
         if (uplines) {
@@ -269,7 +269,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
 
           setTimeout(() => {
             getCurrentMemberStatus(); // Actualiza el status de activo del miembro en el contrato para dashboard comun
-            fetchTransactions();
+            fetchSavings();
           }, 3000);
         } else {
           ShowNotification(err.onTransaction);

@@ -19,13 +19,14 @@ export const WithdrawalCounter = ({ date, time }: { date: string; time: string }
   const [isExpired, setIsExpired] = useState(false);
 
   const parseTimestamp = (timestamp: string): Date | null => {
-    const match = timestamp.match(/(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (AM|PM)/);
+    // const match = timestamp.match(/(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (AM|PM)/);
+    const match = timestamp.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?: (\d{1,2}):(\d{2}):(\d{2}) (AM|PM))?$/);
 
     if (!match) {
       console.error("Timestamp no coincide con el formato esperado.");
       return null;
     }
-    const [, month, day, year, hourStr, minuteStr, secondStr, period] = match;
+    const [, day, month, year, hourStr, minuteStr, secondStr, period] = match;
     let hours = parseInt(hourStr, 10);
     const minutes = parseInt(minuteStr, 10);
     const seconds = parseInt(secondStr, 10);

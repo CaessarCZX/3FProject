@@ -1,7 +1,7 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
 import scaffoldConfig from "~~/scaffold.config";
-import { MemberTransaction } from "~~/utils/3FContract/block";
+import { MemberSaving } from "~~/types/transaction/saving";
 import { ChainWithAttributes } from "~~/utils/scaffold-eth";
 
 /**
@@ -23,8 +23,8 @@ type GlobalState = {
     isFetching: boolean;
   };
   targetNetwork: ChainWithAttributes;
-  memberTransactions: {
-    transactions: MemberTransaction[];
+  memberSavings: {
+    transactions: MemberSaving[];
     isFetching: boolean;
   };
   memberStatus: {
@@ -39,8 +39,8 @@ type GlobalActions = {
   setMexicanPesoPrice: (newMexicanPesoPriceState: number) => void;
   setIsMexicanPesoFetching: (newIsMexicanPesoFetching: boolean) => void;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
-  setMemberTransactions: (newMemberTransactions: MemberTransaction[]) => void;
-  setIsMemberTransactionsFetching: (newIsMemberTransactionsFetching: boolean) => void;
+  setMemberSavings: (newMemberSavings: MemberSaving[]) => void;
+  setIsMemberSavingsFetching: (newIsMemberSavingsFetching: boolean) => void;
   setIsActiveMemberStatus: (newCurrentMemberStatus: boolean) => void;
   setIsMemberStatusFetching: (newIsMemeberStatusFetching: boolean) => void;
 };
@@ -71,14 +71,14 @@ export const useGlobalState = create<GlobalStorage>()(
       targetNetwork: scaffoldConfig.targetNetworks[0],
       setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
 
-      memberTransactions: {
+      memberSavings: {
         transactions: [],
-        isFetching: true,
+        isFetching: false,
       },
-      setMemberTransactions: (newValue: MemberTransaction[]): void =>
-        set(state => ({ memberTransactions: { ...state.memberTransactions, transactions: newValue } })),
-      setIsMemberTransactionsFetching: (newValue: boolean): void =>
-        set(state => ({ memberTransactions: { ...state.memberTransactions, isFetching: newValue } })),
+      setMemberSavings: (newValue: MemberSaving[]): void =>
+        set(state => ({ memberSavings: { ...state.memberSavings, transactions: newValue } })),
+      setIsMemberSavingsFetching: (newValue: boolean): void =>
+        set(state => ({ memberSavings: { ...state.memberSavings, isFetching: newValue } })),
 
       memberStatus: {
         active: false,

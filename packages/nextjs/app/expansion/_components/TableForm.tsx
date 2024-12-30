@@ -76,13 +76,13 @@ const ReferralNetwork: React.FC = () => {
           label: (
             <div>
               <p>
-                <strong>Tu Wallet:</strong> {rootWallet}
+                <strong>Tu</strong>
               </p>
             </div>
           ),
         },
         position: { x: 500, y: 0 },
-        style: { background: "#f5f5f5", border: "1px solid #ccc", borderRadius: "8px", width: 350 },
+        style: { background: "#f5f5f5", border: "1px solid #ccc", borderRadius: "8px", width: 150 },
       });
 
       let yOffset = 125;
@@ -97,20 +97,20 @@ const ReferralNetwork: React.FC = () => {
             data: {
               label: (
                 <div style={{ textAlign: "center" }}>
-                  <p>
+                  {/* <p>
                     <strong>Wallet:</strong> {referral.wallet}
-                  </p>
+                  </p> */}
                   <p>
                     <strong>Nombre:</strong> {referral.name}
                   </p>
-                  <p>
+                  {/* <p>
                     <strong>Correo:</strong> {referral.email}
-                  </p>
+                  </p> */}
                 </div>
               ),
             },
             position: { x: xOffset, y: yOffset },
-            style: { background: "#e3f2fd", border: "1px solid #64b5f6", borderRadius: "8px", width: 350 },
+            style: { background: "#e3f2fd", border: "1px solid #64b5f6", borderRadius: "8px", width: 150 },
           });
 
           // Conectar al "padre"
@@ -121,7 +121,8 @@ const ReferralNetwork: React.FC = () => {
             animated: true,
           });
 
-          xOffset += 375; // Espaciado horizontal entre nodos
+          // xOffset += 375; // Espaciado horizontal entre nodos
+          xOffset += 175; // Espaciado horizontal entre nodos
         });
 
         yOffset = levelYOffset + 175; // Incrementar el espacio vertical
@@ -135,7 +136,7 @@ const ReferralNetwork: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ height: "100vh", width: "100%" }}>
+    <div style={{ height: "100vh" }}>
       {isLoading ? (
         <p>Cargando datos...</p>
       ) : error ? (

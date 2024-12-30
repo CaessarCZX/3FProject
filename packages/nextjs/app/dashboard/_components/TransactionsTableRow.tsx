@@ -13,7 +13,15 @@ type TransactionTableRowProps = {
   lengthData: number;
 };
 
-export const TransactionsTableRow = ({ hash, value, date, time, lengthData, index }: TransactionTableRowProps) => {
+export const TransactionsTableRow = ({
+  hash,
+  value,
+  date,
+  time,
+  status,
+  lengthData,
+  index,
+}: TransactionTableRowProps) => {
   return (
     <tr
       className={`grid grid-cols-3 sm:grid-cols-5 ${
@@ -41,7 +49,8 @@ export const TransactionsTableRow = ({ hash, value, date, time, lengthData, inde
 
       <td className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
         {/* <p className="text-meta-5">{brand.conversion}%</p> */}
-        <p className="text-meta-5">Pendiente</p>
+        {/* <p className="text-meta-5">Pendiente</p> */}
+        <p className="text-meta-5">{status}</p>
       </td>
     </tr>
   );

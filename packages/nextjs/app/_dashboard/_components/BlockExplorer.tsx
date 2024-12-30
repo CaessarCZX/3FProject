@@ -1,18 +1,20 @@
 "use client";
 
+//Legacy page fro transactions in blockchain
+
 // import { useEffect, useState } from "react";
-import { TransactionsTable } from "./TransactionsTable";
+// import { TransactionsTable } from "./TransactionsTable";
 // import { useFetchTransactions } from "~~/hooks/3FProject/useFetchTransactions";
 // import { PaginationButton } from "./PaginationButton";
-import { useGlobalState } from "~~/services/store/store";
+// import { useGlobalState } from "~~/services/store/store";
 
 // import { notification } from "~~/utils/scaffold-eth";
 
 const BlockExplorer = () => {
   // const { filteredTransactions, transactionReceipts, currentPage, totalBlocks, setCurrentPage, error } =
   //   useFetchFilteredBlocks(address);
-  const memberTransactions = useGlobalState(state => state.memberTransactions.transactions);
-  const isLoading = useGlobalState(state => state.memberTransactions.isFetching);
+  // const memberTransactions = useGlobalState(state => state.memberTransactions.transactions);
+  // const isLoading = useGlobalState(state => state.memberTransactions.isFetching);
   // const { targetNetwork } = useTargetNetwork();
   // const [hasError, setHasError] = useState(false);
 
@@ -34,7 +36,7 @@ const BlockExplorer = () => {
 
   return (
     <div className="container mx-auto rounded-xl overflow-hidden">
-      {isLoading ? <p>Loading Data</p> : <TransactionsTable transactions={memberTransactions} />}
+      {/* {isLoading ? <p>Loading Data</p> : <TransactionsTable transactions={memberTransactions} />} */}
       {/* <PaginationButton currentPage={currentPage} totalItems={Number(totalBlocks)} setCurrentPage={setCurrentPage} /> */}
     </div>
   );
