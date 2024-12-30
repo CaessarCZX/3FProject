@@ -26,7 +26,7 @@ const AddAffiliate: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          affiliateEmail,
+          email: affiliateEmail,
           isApproved: true,
         }),
       });
@@ -61,7 +61,7 @@ const AddAffiliate: React.FC = () => {
     }
 
     if (success) {
-      notification.success("Suscripción completada, espera la validación!", { position: "top-right", duration: 5000 });
+      notification.success(success, { position: "top-right", duration: 5000 });
       resetMessages();
     }
   }, [error, success]);
