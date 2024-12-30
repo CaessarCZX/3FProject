@@ -22,7 +22,10 @@ export const projectMenuGoups: SidebarMenuGroup[] = [
         icon: <Squares2X2Icon className={defaultSizeIcon} />,
         label: "Panel de control",
         route: "#",
-        children: [{ label: "Mi cuenta", route: "/dashboard" }],
+        children: [
+          { label: "Mi cuenta", route: "/dashboard" },
+          { label: "Detalle de ahorros", route: "/savings" },
+        ],
       },
       {
         icon: <FaPeopleGroup className={defaultSizeIcon} />,

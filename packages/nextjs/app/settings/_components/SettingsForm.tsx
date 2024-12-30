@@ -89,7 +89,7 @@ const SettingsForm: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold text-gray-800">General</h2>
+        <h2 className="text-3xl font-light text-gray-500">General</h2>
 
         {/* Información del Usuario */}
         {userInfo ? (
@@ -159,34 +159,6 @@ const SettingsForm: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* Campo para referido directo */}
-        <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-700">Agregar Referido</h3>
-          <div>
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700">Correo</label>
-              <div className="flex max-h-13 gap-8">
-                <input
-                  type="email"
-                  name="email"
-                  value={beneficiary.email || userInfo?.email_beneficiary || ""}
-                  onChange={handleInputChange}
-                  placeholder="Correo de nuevo referido"
-                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  readOnly={!!userInfo?.email_beneficiary}
-                />
-                <button
-                  disabled={isSaving || !!userInfo?.email_beneficiary}
-                  className="px-6 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none min-w-55"
-                >
-                  {isSaving ? "Guardando..." : "Crear referido"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
