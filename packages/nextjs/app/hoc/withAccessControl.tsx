@@ -13,7 +13,7 @@ const withAccessControl = <P extends object>(WrappedComponent: ComponentType<P>)
       const allowedAccess = sessionStorage.getItem("allowAccess");
 
       // Bloquea el acceso si no hay permiso
-      if (!allowedAccess && (pathname === "/register" || pathname === "/login")) {
+      if (!allowedAccess && (pathname === "/register" || pathname === "/login" || pathname === "/resetPassword")) {
         router.push("/");
       } else {
         setIsAllowed(true); // Permitir acceso
@@ -22,7 +22,7 @@ const withAccessControl = <P extends object>(WrappedComponent: ComponentType<P>)
 
     // Mantener el estado de permiso durante la sesión, eliminar al iniciar sesion
     useEffect(() => {
-      if (isAllowed && (pathname === "/register" || pathname === "/login")) {
+      if (isAllowed && (pathname === "/register" || pathname === "/login" || pathname === "/resetPassword")) {
         sessionStorage.removeItem("allowAccess");
       }
     }, [pathname, isAllowed]);
