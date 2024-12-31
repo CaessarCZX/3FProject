@@ -47,7 +47,7 @@ const Notification = ({
   return toast.custom(
     t => (
       <div
-        className={`flex flex-row items-start justify-between max-w-sm rounded-xl shadow-center shadow-accent bg-base-200 p-4 transform-gpu relative transition-all duration-500 ease-in-out space-x-2
+        className={`flex flex-row rounded-xl items-start justify-between max-w-sm p-4 transform-gpu relative transition-all duration-500 ease-in-out space-x-2 bg-opacity-50 bg-gray-800 dark:bg-gray-400 dark:bg-opacity-25 shadow-lg backdrop-blur-md text-whiten
         ${
           position.substring(0, 3) == "top"
             ? `hover:translate-y-1 ${t.visible ? "top-0" : "-top-96"}`
