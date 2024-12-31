@@ -52,7 +52,7 @@ const HeroExpansion: React.FC = () => {
     <section className="mb-8 py-4 bg-white shadow-default rounded-md dark:border-strokedark dark:bg-boxdark text-zinc-900 dark:text-white">
       <div className="container px-4 mx-auto">
         <div className="flex items-center text-center max-w-6xl mx-auto space-x-8">
-          <p className="text-base md:text-lg text-gray-600 opacity-80 max-w-4xl mx-auto">
+          <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 opacity-80 max-w-4xl mx-auto">
             Puedes dar seguimiento a tu organización, verifica el crecimiento de tus afiliados
           </p>
         </div>
