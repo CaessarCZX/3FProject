@@ -123,3 +123,39 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(20px);
 }
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.pagination-button {
+  background-color: #007bff; /* Azul moderno */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.pagination-button:hover {
+  background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+  transform: scale(1.05); /* Ligeramente más grande al hacer hover */
+}
+
+.pagination-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pagination-info {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
