@@ -87,7 +87,8 @@ const AddAffiliate: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="max-w-55 px-6 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none"
+                  className={`max-w-55 px-6 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none
+                    ${loading ? "bg-indigo-400" : "bg-indigo-600 hover:bg-indigo-700"}`}
                 >
                   {loading ? "Registrando..." : "Crear referido"}
                 </button>

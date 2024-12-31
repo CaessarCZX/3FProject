@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 
@@ -20,83 +19,83 @@ const CardItemComponent: React.FC<CardItemProps> = ({ item }) => (
   </>
 );
 
-export const SubscribeForm = () => {
-  const [email, setEmail] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
+// export const SubscribeForm = () => {
+//   const [email, setEmail] = useState<string>("");
+//   const [loading, setLoading] = useState<boolean>(false);
+//   const [error, setError] = useState<string | null>(null);
+//   const [success, setSuccess] = useState<boolean>(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
+//   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     setError(null);
+//     setSuccess(false);
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/create-white-list`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          isApproved: true,
-        }),
-      });
+//     try {
+//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/create-white-list`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           email,
+//           isApproved: true,
+//         }),
+//       });
 
-      const data = await response.json();
+//       const data = await response.json();
 
-      if (!response.ok) {
-        if (response.status === 409 && data.redirect) {
-          setSuccess(true);
-          return;
-        }
+//       if (!response.ok) {
+//         if (response.status === 409 && data.redirect) {
+//           setSuccess(true);
+//           return;
+//         }
 
-        setError(data.message || "Ocurrió un error inesperado");
-        return;
-      }
+//         setError(data.message || "Ocurrió un error inesperado");
+//         return;
+//       }
 
-      setSuccess(true);
-      setEmail("");
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
+//       setSuccess(true);
+//       setEmail("");
+//     } catch (err: unknown) {
+//       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+//       setError(errorMessage);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  return (
-    <form onSubmit={handleSubmit} className="mt-8">
-      <h3 className="text-lg font-medium text-gray-700">Agregar Referido</h3>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Correo</label>
-        <div className="flex max-h-13 gap-4 mt-2">
-          <input
-            type="email"
-            name="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="Correo de nuevo referido"
-            className="block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className={`px-6 py-2 text-white rounded-md shadow focus:outline-none min-w-55 ${
-              loading ? "bg-indigo-400" : "bg-indigo-600 hover:bg-indigo-700"
-            }`}
-          >
-            {loading ? "Guardando..." : "Crear referido"}
-          </button>
-        </div>
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-        {success && <p className="text-green-500 text-sm mt-2">Referido agregado exitosamente</p>}
-      </div>
-    </form>
-  );
-};
+//   return (
+//     <form onSubmit={handleSubmit} className="mt-8">
+//       <h3 className="text-lg font-medium text-gray-700">Agregar Referido</h3>
+//       <div>
+//         <label className="block text-sm font-medium text-gray-700">Correo</label>
+//         <div className="flex max-h-13 gap-4 mt-2">
+//           <input
+//             type="email"
+//             name="email"
+//             value={email}
+//             onChange={e => setEmail(e.target.value)}
+//             placeholder="Correo de nuevo referido"
+//             className="block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+//             required
+//           />
+//           <button
+//             type="submit"
+//             disabled={loading}
+//             className={`px-6 py-2 text-white rounded-md shadow focus:outline-none min-w-55 ${
+//               loading ? "bg-indigo-400" : "bg-indigo-600 hover:bg-indigo-700"
+//             }`}
+//           >
+//             {loading ? "Guardando..." : "Crear referido"}
+//           </button>
+//         </div>
+//         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+//         {success && <p className="text-green-500 text-sm mt-2">Referido agregado exitosamente</p>}
+//       </div>
+//     </form>
+//   );
+// };
 
 const HeroExpansion: React.FC = () => {
   const currentMember = useAccount();
@@ -143,7 +142,7 @@ const HeroExpansion: React.FC = () => {
           ))}
         </div>
 
-        <SubscribeForm />
+        {/* <SubscribeForm /> */}
       </div>
     </section>
   );
