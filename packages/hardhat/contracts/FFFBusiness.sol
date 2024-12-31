@@ -20,8 +20,6 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 	uint128 private _MIN_AMOUNT_TO_DEPOSIT;
 	uint128 private _MAX_CONTRACT_BALANCE;
 	uint128 private _DEPOSIT_MULTIPLE;
-    uint256 private _PYT_TIMESTAMP;
-    uint256 private _COMMISSION_TIMESTAMP;
     uint128 private _MEMBERSHIP_PAYMENT_TO_BUSINESS;
     uint128 private _MEMBERSHIP_PAYMENT_TO_UPLINE;
     uint8 private _COMMISSION_PER_TIER_ONE;
@@ -98,8 +96,6 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         _MIN_AMOUNT_TO_DEPOSIT = 2000 * 10 ** 6; // 2000 USDT
         _MAX_CONTRACT_BALANCE = 10000000 * 10 ** 6; // 10M USDT
         _DEPOSIT_MULTIPLE = 500 * 10 ** 6; // Múltiple 500 USDT
-        _PYT_TIMESTAMP = 90 days;
-        _COMMISSION_TIMESTAMP = 30 days;
         _MEMBERSHIP_PAYMENT_TO_BUSINESS = 400 * 10 ** 6; //400 USDT
         _MEMBERSHIP_PAYMENT_TO_UPLINE = 100 * 10 ** 6; //100 USDT
         _COMMISSION_PER_TIER_ONE = 4;
@@ -168,15 +164,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         return _DEPOSIT_MULTIPLE;
     }
 
-    function getPytTimestamp() public view returns (uint256) {
-        return _PYT_TIMESTAMP;
-    }
-
-    function getCommissionTimestamp() public view returns (uint256) {
-        return _COMMISSION_TIMESTAMP;
-    }
-
-    function getCurrentContractBalance() public view onlyOwner returns (uint256) {
+    function getCurrentContractBalance() public view returns (uint256) {
         return token.balanceOf(address(this));
     }
 
@@ -213,13 +201,6 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         _COMMISSION_PER_TIER_TWO = _tier2;
         _COMMISSION_PER_TIER_THREE = _tier3;
         emit ConfigUpdated("COMMISSION_RATES", _tier1 + _tier2 + _tier3, block.timestamp);
-    }
-
-    function setTimestamps(uint256 _pyt, uint256 _commission) external onlyOwner {
-        require(_pyt > 0 && _commission > 0, "Timestamps must be greater than 0");
-        _PYT_TIMESTAMP = _pyt;
-        _COMMISSION_TIMESTAMP = _commission;
-        emit ConfigUpdated("TIMESTAMPS", _pyt + _commission, block.timestamp);
     }
 
     function setBusinessWallet(address payable _newBusinessWallet) external onlyOwner {

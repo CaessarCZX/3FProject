@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   11155111: {
     FFFBusiness: {
-      address: "0xEbd5b020FEF9413CB420fff0C0CAE632315E8DdE",
+      address: "0x81E709243A25C7c1F2295025eeA543D6Ffc1DCf1",
       abi: [
         {
           inputs: [
@@ -315,24 +315,6 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
-              name: "_memberAddress",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "_decreaseAmount",
-              type: "uint256",
-            },
-          ],
-          name: "decreaseMemberFunds",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
               internalType: "uint256",
               name: "_amount",
               type: "uint256",
@@ -379,19 +361,6 @@ const deployedContracts = {
               internalType: "address",
               name: "",
               type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "getCommissionTimestamp",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -469,19 +438,6 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "getPytTimestamp",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
             {
               internalType: "address",
@@ -511,6 +467,24 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_memberAddress",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "_decreaseAmount",
+              type: "uint256",
+            },
+          ],
+          name: "liquidateMemberFunds",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -668,24 +642,6 @@ const deployedContracts = {
             },
           ],
           name: "setMinAmountToDeposit",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_pyt",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_commission",
-              type: "uint256",
-            },
-          ],
-          name: "setTimestamps",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
