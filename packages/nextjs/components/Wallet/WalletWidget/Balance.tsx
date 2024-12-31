@@ -19,6 +19,7 @@ type BalanceProps = {
 export const Balance = ({ address, className = "", currenciesMode }: BalanceProps) => {
   const { mexicanPeso, isLoading: isFetching } = useMexicanPesoPrice();
   const [currentUsdtBalance, setCurrentUsdtBalance] = useState(0);
+  const [logngAmount, setLongAmount] = useState(false);
 
   const {
     data: balance,
@@ -35,6 +36,8 @@ export const Balance = ({ address, className = "", currenciesMode }: BalanceProp
   useEffect(() => {
     if (!isLoading && !isError) {
       const dolarBalance = balance ? Number(formatUnits(balance?.value, 6)) : 0;
+      const lengthBalance = balance?.value.toString().length ?? 0;
+      if (lengthBalance > 10) setLongAmount(true);
       setCurrentUsdtBalance(dolarBalance);
     }
   }, [isLoading, isError, balance]);
@@ -71,17 +74,17 @@ export const Balance = ({ address, className = "", currenciesMode }: BalanceProp
       <div className="w-full flex items-center justify-center gap-2">
         {displayCurrenciesMode ? (
           <>
-            <span className="font-light text-xl text-whiten tracking-widest">
+            <span className={`font-light text-whiten ${logngAmount ? "text-sm" : "text-xl tracking-widest"}`}>
               {displayCurrencyConvertion({ longCurrenci: currentUsdtBalance, exchangeRatio: mexicanPeso })}
             </span>
-            <span className="text-xl font-bold">MXN</span>
+            <span className={logngAmount ? "text-sm font-bold" : "text-xl font-bold"}>MXN</span>
           </>
         ) : (
           <>
-            <span className="font-light text-2xl text-whiten tracking-widest">
+            <span className={`font-light text-whiten ${logngAmount ? "text-sm" : "text-2xl tracking-widest"}`}>
               {formatCurrency(currentUsdtBalance)}
             </span>
-            <span className="text-xl font-bold">USDT</span>
+            <span className={logngAmount ? "text-sm font-bold" : "text-xl font-bold"}>USDT</span>
           </>
         )}
       </div>
