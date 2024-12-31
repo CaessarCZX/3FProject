@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
-import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
+import { RiEyeCloseLine, RiEyeLine, RiInformation2Line } from "react-icons/ri";
 import { isAddress } from "viem";
 import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
+import ApiRateLimiter from "~~/utils/API/ApiRateLimiter";
 import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
 import { notification } from "~~/utils/scaffold-eth/notification";
 
@@ -26,8 +27,7 @@ export const SignUpForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false); // Validacion de wallet
   // Validador de referido
-  const [isReferrerValid, setIsReferrerValid] = useState(false);
-  const [isReferredFocused, setIsReferredFocused] = useState(false);
+  const [isReferrerValid, setIsReferrerValid] = useState<boolean | null>(null);
   // Mensajes
   const [successMessage, setSuccessMessage] = useState("");
   const [singleErrorMessage, setSingleErrorMessage] = useState("");
@@ -74,18 +74,13 @@ export const SignUpForm = () => {
       setIsReferrerValid(false);
       setSingleErrorMessage("");
       setSuccessMessage("");
-
-      //TODO: for validation
-      if (value.length === ETH_WALLET_LENGTH) {
-        if (!isAddress(value)) return;
-        console.log(formData.referredBy);
-
-        // setTimeout(() => handleValidateReferrer(), 5000);
-      }
     }
   };
 
-  const handleValidateReferrer = async () => {
+  // Limitador para llamadas a la API
+  const rateLimiter = useRef(new ApiRateLimiter());
+
+  const handleValidateReferrer = useCallback(async () => {
     setSingleErrorMessage("");
     setSuccessMessage("");
 
@@ -95,34 +90,52 @@ export const SignUpForm = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ wallet: formData.referredBy }),
-        credentials: "include",
-      });
+      await rateLimiter.current.executeWithRateLimit(async () => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ wallet: formData.referredBy }),
+          credentials: "include",
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.exists) {
-          setSuccessMessage("Wallet de referido válida.");
-          setIsReferrerValid(true);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.exists) {
+            setSuccessMessage("Wallet de referido válida.");
+            setIsReferrerValid(true);
+          } else {
+            setSingleErrorMessage("La wallet de referido no está registrada.");
+            setIsReferrerValid(false);
+          }
         } else {
-          setSingleErrorMessage("La wallet de referido no está registrada.");
+          const errorData = await response.json();
+          setSingleErrorMessage(errorData.message || "Error al validar la wallet de referido.");
           setIsReferrerValid(false);
         }
-      } else {
-        const errorData = await response.json();
-        setSingleErrorMessage(errorData.message || "Error al validar la wallet de referido.");
-        setIsReferrerValid(false);
-      }
+      });
     } catch (error) {
       setSingleErrorMessage("No se pudo conectar con el servidor.");
       setIsReferrerValid(false);
     }
-  };
+  }, [formData.referredBy]);
+
+  // automatic referred wallet validation
+  useEffect(() => {
+    if (formData.referredBy.length === 0) setIsReferrerValid(null); // To set in null
+
+    // To validate referred wallet
+    if (formData.referredBy.length === ETH_WALLET_LENGTH) {
+      if (!isAddress(formData.referredBy)) {
+        notification.error("No es un formato de wallet valido.", { position: "bottom-right", duration: 5000 });
+        return;
+      }
+
+      // Ejecutar la validacion
+      handleValidateReferrer();
+    }
+  }, [formData.referredBy, handleValidateReferrer]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,42 +354,36 @@ export const SignUpForm = () => {
 
       {/* Referred Wallet */}
       <div>
-        <label htmlFor="referredBy" className="block text-sm font-medium text-gray-700">
-          Wallet de Referido
-        </label>
+        <div className="flex justify-between items-center">
+          <label htmlFor="referredBy" className="block text-sm font-medium text-gray-700">
+            Wallet de Referido
+          </label>
+          <div className="tooltip" data-tip="Escribe una dirección de wallet">
+            <RiInformation2Line className="text-gray-300 mr-1 hover:cursor-pointer w-4 h-4" />
+          </div>
+        </div>
         <div className="mt-1 relative flex">
           <input
+            autoComplete="none"
             type="text"
             id="referredBy"
             name="referredBy"
             value={formData.referredBy}
             onChange={handleChange}
-            onFocus={() => {
-              setIsReferredFocused(true);
-            }}
-            onBlur={() => {
-              if (!formData.password) {
-                setIsReferredFocused(false);
-              }
-            }}
             className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-              !isReferredFocused ? "bg-inherit" : !isReferrerValid ? "bg-red-200" : "bg-green-200"
+              isReferrerValid === null ? "bg-transparent" : isReferrerValid === false ? "bg-red-100" : "bg-green-100"
             }`}
             placeholder="0xABC123"
             required
           />
-          <button
-            type="button"
-            onClick={handleValidateReferrer}
-            className="px-4 py-2 border border-gray-300 bg-gray-100 rounded-r-md text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          >
-            Validar
-          </button>
+          {isReferrerValid === false && (
+            <p className="m-0 absolute text-[12px] text-center w-full translate-y-10 text-red-500">Wallet invalida</p>
+          )}
         </div>
       </div>
 
       {/* Login link */}
-      <div className="text-sm text-center">
+      <div className="text-sm text-center mt-4">
         <p>
           ¿Ya tienes una cuenta?{" "}
           <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleLoginClick}>
