@@ -30,7 +30,7 @@ type BlockchainLogMember = {
   member?: string | "";
 };
 
-const ParseBlockchainRecieverEvent = (log: BlockchainLogReciever & BlockchainLogToken) => {
+const ParseBlockchainRecieverEvent = (log: BlockchainLogReciever & BlockchainLogToken, isMembership?: boolean) => {
   const from = log.from;
   const amount = log.amount;
   const timestamp = new Date(Number(log.timestamp) * 1000).toLocaleString();
@@ -48,9 +48,11 @@ const ParseBlockchainRecieverEvent = (log: BlockchainLogReciever & BlockchainLog
           </svg>
         </div>
         <div className="flex flex-col ml-3">
-          <div className="text-base font-normal">Deposito a wallet concentradora</div>
+          <div className="text-base font-normal">
+            {isMembership ? "Nueva membresia entrante" : "Deposito a wallet concentradora"}
+          </div>
           <div className="text-sm font-medium">
-            De wallet: <span className="text-blue-500 font-light text-[8px]">{from}</span>
+            De wallet: <span className="text-green-400 font-light text-[8px]">{from}</span>
           </div>
           <div className="text-sm font-medium">
             <span className="font-light">$</span> {formatUnits(BigInt(amount || 0), 6)}{" "}
@@ -72,7 +74,7 @@ const ParseBlockchainNewSavingEvent = (log: BlockchainLogMember & BlockchainLogT
     <div className="flex flex-col ml-3">
       <div className="text-base font-normal">Nuevo ahorro detectado</div>
       <div className="text-sm font-medium">
-        De wallet: <span className="text-blue-500 font-light text-[8px]">{from}</span>
+        De wallet: <span className="text-green-400 font-light text-[8px]">{from}</span>
       </div>
       <div className="text-sm font-medium">
         <span className="font-light">$</span> {formatUnits(BigInt(amount || 0), 6)}{" "}
@@ -84,8 +86,24 @@ const ParseBlockchainNewSavingEvent = (log: BlockchainLogMember & BlockchainLogT
   );
 };
 
+const ParseBlockchainCommissionEvent = (log: BlockchainLogToken) => {
+  const amount = log.amount;
+  const timestamp = new Date(Number(log.timestamp) * 1000).toLocaleString();
+  return notification.success(
+    <div className="flex flex-col ml-3">
+      <div className="text-base font-normal">Comisión recibida</div>
+      <div className="text-base font-medium">
+        <span className="text-green-400">$</span> {formatUnits(BigInt(amount || 0), 6)}{" "}
+        <span className="ml-1 font-bold">USDT</span>
+      </div>
+      <div className="text-sm font-light">{timestamp}</div>
+    </div>,
+    { position: "bottom-right", duration: 7000 },
+  );
+};
+
 async function listenToCommissions(userAddress: string, contractAddress: string) {
-  console.log("Escuchando eventos...");
+  // console.log("Escuchando eventos...");
 
   client.watchEvent({
     address: contractAddress,
@@ -103,14 +121,14 @@ async function listenToCommissions(userAddress: string, contractAddress: string)
     },
     onLogs: logs => {
       logs.forEach(log => {
-        console.log("Evento recibido:", log);
+        ParseBlockchainCommissionEvent(log.args);
       });
     },
   });
 }
 
 async function listenToTransferBusiness(contractAddress: string) {
-  console.log("Escuchando eventos...");
+  // console.log("Escuchando eventos...");
 
   client.watchEvent({
     address: contractAddress,
@@ -131,8 +149,30 @@ async function listenToTransferBusiness(contractAddress: string) {
   });
 }
 
+async function listenToMembershipPaid(contractAddress: string) {
+  // console.log("Escuchando eventos...");
+
+  client.watchEvent({
+    address: contractAddress,
+    event: {
+      name: "MembershipPaid",
+      type: "event",
+      inputs: [
+        { indexed: true, name: "from", type: "address" },
+        { indexed: false, name: "amount", type: "uint256" },
+        { indexed: false, name: "timestamp", type: "uint256" },
+      ],
+    },
+    onLogs: logs => {
+      logs.forEach(log => {
+        ParseBlockchainRecieverEvent(log.args, true);
+      });
+    },
+  });
+}
+
 async function listenToNewSavings(userAddress: string, contractAddress: string) {
-  console.log("Escuchando eventos...");
+  // console.log("Escuchando eventos...");
 
   client.watchEvent({
     address: contractAddress,
@@ -192,6 +232,7 @@ export const useGetNotfications = () => {
 
     if (isConnected && address && isAdmin) {
       listenToTransferBusiness(currentContract);
+      listenToMembershipPaid(currentContract);
     }
   }, [isConnected, address, currentContract, isAdmin]);
 };
