@@ -190,7 +190,7 @@ const Info: React.FC = () => {
             <strong className="pr-4 inline-block">i</strong>
             <div>Desarrollar distintas líneas de ingreso respetando un volumen máximo por línea.</div>
           </div>
-          <ol className="text-[12px] w-fit mx-auto my-8">
+          <ol className="text-[12px] mx-auto my-8">
             <li>
               <IoMdArrowRoundForward className="inline mr-2" />
               Pulls 1-3: Distribución de montos acumulados: 40%, 30%, 20%, 10%.
@@ -204,7 +204,7 @@ const Info: React.FC = () => {
             <strong className="pr-4 inline-block">ii</strong>
             <div>Bono según niveles del Pull de Organización:</div>
           </div>
-          <ol className="text-[12px] w-fit mx-auto my-8">
+          <ol className="text-[12px] mx-auto my-8">
             <li>
               <IoMdArrowRoundForward className="inline mr-2" />
               Pull 1: Volumen: $50,000 USDT; Bono: $500 USDT

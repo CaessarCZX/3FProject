@@ -6,7 +6,7 @@ import { IoWalletOutline } from "react-icons/io5";
 // import { getAddress } from "viem";
 // import { Address } from "viem";
 import { useAccount } from "wagmi";
-import { CheckCircleIcon, DocumentDuplicateIcon, EyeIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 
 const WalletWidget: React.FC = () => {
   const currentAccount = useAccount();
@@ -18,9 +18,7 @@ const WalletWidget: React.FC = () => {
       <div className="px-4 py-4 min-w-[254px] max-w-[254px]">
         <div className="flex items-center mb-2 gap-1">
           <div className="font-light text-sm tracking-wide text-gray-300 group-hover:text-gray-200">Tu Wallet</div>
-          <span>
-            <EyeIcon className="w-3 h-3 text-green-500 group-hover:text-white" />
-          </span>
+          <span>{/* <EyeIcon className="w-3 h-3 text-green-500 group-hover:text-white" /> */}</span>
         </div>
         <div className=" mb-2 space-x-2">
           <Balance address={currentAccount.address} />
