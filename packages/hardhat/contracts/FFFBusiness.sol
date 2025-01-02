@@ -8,6 +8,9 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract FFFBusiness is Ownable, ReentrancyGuard {
 	using SafeERC20 for IERC20;
 
+    //Securty
+    bytes32 private _ADMIN_KEY;
+
 	// USDT
 	IERC20 public token;
 
@@ -36,7 +39,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 	mapping(address => Member) private members;
 	mapping(address => address[]) private enrolled; // Warning! for verification only
 
-    // Main Events
+    // Setup events
     event NewBusinessOwner(
         string message,
         address indexed oldOwner,
@@ -48,6 +51,13 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         uint newValue,
         uint timestamp
     );
+
+    //Security events
+    event KeyUpdated(
+        address indexed updater
+    );
+
+    //Business events
 	event DepositContract(
         address indexed from,
         uint amount,
@@ -63,6 +73,13 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         uint amount,
         uint timestamp
     );
+    event MembershipPaid(
+        address indexed from,
+        uint amount,
+        uint timestamp
+    );
+
+    //Member events
     event WithdrawalMember(
         address indexed to,
         uint amount,
@@ -73,8 +90,8 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         uint amount,
         uint timestamp
     );
-    event MembershipPaid(
-        address indexed from,
+    event PullPayment(
+        address indexed to,
         uint amount,
         uint timestamp
     );
@@ -89,8 +106,11 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
     );
 
 	// Initiallize USDT address && only DEPLOYER wallet is the OWNER!!!
-	constructor(address _tokenAddress) {
+	constructor(address _tokenAddress, string memory initialKey) {
 		require(_tokenAddress != address(0), "Token address cannot be zero");
+
+        // For encrypted admin key
+        _ADMIN_KEY = keccak256(abi.encodePacked(initialKey));
 
         // Ruleset for bussiness logic
         _MIN_AMOUNT_TO_DEPOSIT = 2000 * 10 ** 6; // 2000 USDT
@@ -125,6 +145,12 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 		require(_recipient != address(0), "Direccion invalida");
 		_;
 	}
+
+    modifier verifyAdminKey(string memory key) {
+        require(keccak256(abi.encodePacked(key)) == _ADMIN_KEY, "Palabra clave de administrador no valida");
+        _;
+    }
+
 
     // Checkers
     function checkActiveMember(address _member) public view returns(bool) {
@@ -168,47 +194,142 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         return token.balanceOf(address(this));
     }
 
+    function getMembershipPaymentToBusiness() public view returns (uint128) {
+        return _MEMBERSHIP_PAYMENT_TO_BUSINESS;
+    }
+
+    function getMembershipPaymentToUpline() public view returns (uint128) {
+        return _MEMBERSHIP_PAYMENT_TO_UPLINE;
+    }
+
+    function getCommissionPerFistLevelUpline() public view returns (uint8) {
+        return _COMMISSION_PER_TIER_ONE;
+    }
+
+    function getCommissionPerSecondLevelUpline() public view returns (uint8) {
+        return _COMMISSION_PER_TIER_TWO;
+    }
+
+    function getCommissionPerThirtLevelUpline() public view returns (uint8) {
+        return _COMMISSION_PER_TIER_THREE;
+    }
+
         // Setters
-    function setMinAmountToDeposit(uint128 _newMinAmount) external onlyOwner {
+    function updateAdminKey(
+        string memory newKey
+    )
+        external
+        onlyOwner
+    {
+        _ADMIN_KEY = keccak256(abi.encodePacked(newKey));
+        emit KeyUpdated(msg.sender);
+    }
+    
+    function setMinAmountToDeposit(
+        uint128 _newMinAmount
+    )
+        external
+        onlyOwner
+    {
         require(_newMinAmount > 0, "Minimum amount must be greater than 0");
         require(_newMinAmount < _MAX_CONTRACT_BALANCE, "Min cannot exceed max");
         _MIN_AMOUNT_TO_DEPOSIT = _newMinAmount;
         emit ConfigUpdated("MIN_AMOUNT_TO_DEPOSIT", _newMinAmount, block.timestamp);
     }
 
-    function setMaxContractBalance(uint128 _newMaxBalance) external onlyOwner {
+    function setMaxContractBalance(
+        uint128 _newMaxBalance
+    )
+        external
+        onlyOwner
+    {
         require(_newMaxBalance > _MIN_AMOUNT_TO_DEPOSIT, "Max must exceed min");
         _MAX_CONTRACT_BALANCE = _newMaxBalance;
         emit ConfigUpdated("MAX_CONTRACT_BALANCE", _newMaxBalance, block.timestamp);
     }
 
-    function setDepositMultiple(uint128 _newMultiple) external onlyOwner {
+    function setDepositMultiple(
+        uint128 _newMultiple
+    )
+        external
+        onlyOwner
+    {
         require(_newMultiple > 0, "Multiple must be greater than 0");
         _DEPOSIT_MULTIPLE = _newMultiple;
         emit ConfigUpdated("DEPOSIT_MULTIPLE", _newMultiple, block.timestamp);
     }
 
-    function setMembershipPayments(uint128 _toBusiness, uint128 _toUpline) external onlyOwner {
-        require(_toBusiness > 0 && _toUpline > 0, "Membership payments must be positive");
+    function setMembershipPaymentToBusiness(
+        uint128 _toBusiness
+    )
+        external
+        onlyOwner
+    {
+        require(_toBusiness > 0, "Membership payments must be positive");
+        require(_toBusiness < _MAX_CONTRACT_BALANCE, "Payment to Business cannot exceed max");
         _MEMBERSHIP_PAYMENT_TO_BUSINESS = _toBusiness;
+        emit ConfigUpdated("MEMBERSHIP_PAYMENT_TO_BUSINESS", _toBusiness, block.timestamp);
+    }
+
+    function setMembershipPaymentToUpline(
+        uint128 _toUpline
+    )
+        external
+        onlyOwner
+    {
+        require(_toUpline > 0, "Membership payments must be positive");
+        require(_toUpline < _MAX_CONTRACT_BALANCE, "Payment to Upline cannot exceed max");
         _MEMBERSHIP_PAYMENT_TO_UPLINE = _toUpline;
-        emit ConfigUpdated("MEMBERSHIP_PAYMENTS", _toBusiness + _toUpline, block.timestamp);
+        emit ConfigUpdated("MEMBERSHIP_PAYMENT_TO_UPLINE", _toUpline, block.timestamp);
     }
 
-    function setCommissionRates(uint8 _tier1, uint8 _tier2, uint8 _tier3) external onlyOwner {
-        require(_tier1 + _tier2 + _tier3 <= 100, "Total commission cannot exceed 100%");
+    function setCommissionPerFistLevelUpline(
+        uint8 _tier1
+    )
+        external
+        onlyOwner
+    {
+        require(_tier1 > 0, "Commission payments must be positive");
+        require(_tier1 <= 100, "Commission cannot exceed 100%");
         _COMMISSION_PER_TIER_ONE = _tier1;
-        _COMMISSION_PER_TIER_TWO = _tier2;
-        _COMMISSION_PER_TIER_THREE = _tier3;
-        emit ConfigUpdated("COMMISSION_RATES", _tier1 + _tier2 + _tier3, block.timestamp);
+        emit ConfigUpdated("COMMISSION_PER_FIRST_LEVEL_UPDATED", _tier1, block.timestamp);
     }
 
-    function setBusinessWallet(address payable _newBusinessWallet) external onlyOwner {
+    function setCommissionPerSecondLevelUpline(
+        uint8 _tier2
+    )
+        external
+        onlyOwner
+    {
+        require(_tier2 > 0, "Commission payments must be positive");
+        require(_tier2 <= 100, "Commission cannot exceed 100%");
+        _COMMISSION_PER_TIER_TWO = _tier2;
+        emit ConfigUpdated("COMMISSION_PER_SECOND_LEVEL_UPDATED", _tier2, block.timestamp);
+    }
+
+    function setCommissionPerThirtLevelUpline(
+        uint8 _tier3
+    )
+        external
+        onlyOwner
+    {
+        require(_tier3 > 0, "Commission payments must be positive");
+        require(_tier3 <= 100, "Total commission cannot exceed 100%");
+        _COMMISSION_PER_TIER_THREE = _tier3;
+        emit ConfigUpdated("COMMISSION_PER_THIRT_LEVEL_UPDATED", _tier3, block.timestamp);
+    }
+
+    function setBusinessWallet(
+        address payable _newBusinessWallet
+    ) 
+        external
+        onlyOwner
+    {
         require(_newBusinessWallet != address(0), "Invalid address");
         _businessWallet = _newBusinessWallet;
+        transferOwnership(_newBusinessWallet);
         emit NewBusinessOwner("BUSINESS_WALLET", _businessWallet, _newBusinessWallet, block.timestamp);
     }
-
 
 	function memberEntrance(
         address _uplineAddress,
@@ -228,7 +349,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         _firstDeposit(_amount, _uplineAddress, _secondLevelUpline, _thirtLevelUpline);
     }
 
-	function deposit(uint256 _amount) external onlyOwner() {
+	function deposit(uint256 _amount) external onlyOwner {
         uint256 realBalance = getCurrentContractBalance() + _amount;
         require(realBalance <= _MAX_CONTRACT_BALANCE, "El deposito no puede superar el limite del contrato");
         _deposit(msg.sender, _amount);
@@ -241,26 +362,49 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 
     function paymentCommissions (
         uint256 _paymentAmount,
-        address _memberAddress
-    ) external onlyOwner checkValidAddress(_memberAddress) {
+        address _memberAddress,
+        string memory _adminKey
+    )
+        external 
+        verifyAdminKey(_adminKey)
+        checkValidAddress(_memberAddress)
+    {
         require(getCurrentContractBalance() >= _paymentAmount, "Contrato no cuenta con suficientes fondos");
         _processPayment(_memberAddress, _paymentAmount);
         emit CommissionPaid(_memberAddress, _paymentAmount, block.timestamp);
     }
 
-    // Provitional function for decrease memberfunds, in case to whitdraw in a future
-    function liquidateMemberFunds(
+    function paymentForPulls (
+        uint256 _paymentAmount,
         address _memberAddress,
-        uint _decreaseAmount
-    ) external onlyOwner {
+        string memory _adminKey
+    )
+        external 
+        verifyAdminKey(_adminKey)
+        checkValidAddress(_memberAddress)
+    {
+        require(getCurrentContractBalance() >= _paymentAmount, "Contrato no cuenta con suficientes fondos");
+        _processPayment(_memberAddress, _paymentAmount);
+        emit PullPayment(_memberAddress, _paymentAmount, block.timestamp);
+    }
+
+    function liquidateMemberFunds(
+        uint _paymentAmount,
+        address _memberAddress,
+        string memory _adminKey
+    ) 
+        external
+        verifyAdminKey(_adminKey)
+        checkValidAddress(_memberAddress)
+    {
         Member storage currentMember = members[_memberAddress];
         require(currentMember.isActive, "Miembro no activo");
-        require(currentMember.balance >= _decreaseAmount, "Monto invalido");
+        require(currentMember.balance >= _paymentAmount, "Monto invalido");
 
-        currentMember.balance -= _decreaseAmount;
-        _totalBalance -= _decreaseAmount;
-        _withdraw(_memberAddress, _decreaseAmount);
-        emit WithdrawalMember(_memberAddress, _decreaseAmount, block.timestamp);
+        currentMember.balance -= _paymentAmount;
+        _totalBalance -= _paymentAmount;
+        _withdraw(_memberAddress, _paymentAmount);
+        emit WithdrawalMember(_memberAddress, _paymentAmount, block.timestamp);
     }
 
     function depositMemberFunds(
@@ -348,7 +492,10 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         emit NewSaving(msg.sender, firstDeposit, block.timestamp);
     }
 
-    function _deposit(address _from, uint256 _amount) private {
+    function _deposit(
+        address _from,
+        uint256 _amount
+    ) private {
         require(token.allowance(_from, address(this)) >= _amount, "Insufficient allowance");
         require(_amount <= token.balanceOf(_from), "No cuentas con USDT en tu wallet");
         require(_amount > 0, "Deposito no puede ser vacio");
@@ -356,17 +503,33 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         emit DepositContract(_from, _amount, block.timestamp);
     }
 
-    function _withdraw(address _to, uint256 _amount) private nonReentrant {
+    function _withdraw(
+        address _to,
+        uint256 _amount
+    ) 
+        private
+        nonReentrant
+    {
         require(getCurrentContractBalance() >= _amount, "Contrato no cuenta con suficientes fondos");
         _processPayment(_to, _amount);
         emit WithdrawalContract(msg.sender, _amount, block.timestamp);
     }
 
-    function _calculateCommission(uint256 _amount, uint256 _refundPercent) private pure returns (uint) {
+    function _calculateCommission(
+        uint256 _amount,
+        uint256 _refundPercent
+    )
+        private
+        pure
+        returns (uint)
+    {
         return (_amount * _refundPercent) / 100;
     }
 
-	function _createMember(address payable _newMember) private checkValidAddress(_newMember) {
+	function _createMember(address payable _newMember) 
+        private
+        checkValidAddress(_newMember)
+    {
         members[_newMember] = Member({
             memberWallet: _newMember,
             isActive: true,
@@ -384,6 +547,4 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 	fallback() external payable {
 		revert("Function not supported");
 	}
-
-
 }
