@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   11155111: {
     FFFBusiness: {
-      address: "0xEbd5b020FEF9413CB420fff0C0CAE632315E8DdE",
+      address: "0x384122BDDbb3Cd611CeD9bF2602a5A1726EfE42A",
       abi: [
         {
           inputs: [
@@ -15,6 +15,11 @@ const deployedContracts = {
               internalType: "address",
               name: "_tokenAddress",
               type: "address",
+            },
+            {
+              internalType: "string",
+              name: "initialKey",
+              type: "string",
             },
           ],
           stateMutability: "nonpayable",
@@ -93,6 +98,19 @@ const deployedContracts = {
             },
           ],
           name: "DepositContract",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "updater",
+              type: "address",
+            },
+          ],
+          name: "KeyUpdated",
           type: "event",
         },
         {
@@ -220,6 +238,31 @@ const deployedContracts = {
             {
               indexed: true,
               internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "PullPayment",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
               name: "from",
               type: "address",
             },
@@ -315,24 +358,6 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
-              name: "_memberAddress",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "_decreaseAmount",
-              type: "uint256",
-            },
-          ],
-          name: "decreaseMemberFunds",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
               internalType: "uint256",
               name: "_amount",
               type: "uint256",
@@ -386,12 +411,38 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "getCommissionTimestamp",
+          name: "getCommissionPerFistLevelUpline",
           outputs: [
             {
-              internalType: "uint256",
+              internalType: "uint8",
               name: "",
-              type: "uint256",
+              type: "uint8",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCommissionPerSecondLevelUpline",
+          outputs: [
+            {
+              internalType: "uint8",
+              name: "",
+              type: "uint8",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCommissionPerThirtLevelUpline",
+          outputs: [
+            {
+              internalType: "uint8",
+              name: "",
+              type: "uint8",
             },
           ],
           stateMutability: "view",
@@ -457,7 +508,7 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "getMinAmountToDeposit",
+          name: "getMembershipPaymentToBusiness",
           outputs: [
             {
               internalType: "uint128",
@@ -470,12 +521,25 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "getPytTimestamp",
+          name: "getMembershipPaymentToUpline",
           outputs: [
             {
-              internalType: "uint256",
+              internalType: "uint128",
               name: "",
-              type: "uint256",
+              type: "uint128",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMinAmountToDeposit",
+          outputs: [
+            {
+              internalType: "uint128",
+              name: "",
+              type: "uint128",
             },
           ],
           stateMutability: "view",
@@ -511,6 +575,29 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_paymentAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_memberAddress",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "_adminKey",
+              type: "string",
+            },
+          ],
+          name: "liquidateMemberFunds",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -566,8 +653,36 @@ const deployedContracts = {
               name: "_memberAddress",
               type: "address",
             },
+            {
+              internalType: "string",
+              name: "_adminKey",
+              type: "string",
+            },
           ],
           name: "paymentCommissions",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_paymentAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_memberAddress",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "_adminKey",
+              type: "string",
+            },
+          ],
+          name: "paymentForPulls",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -599,18 +714,34 @@ const deployedContracts = {
               name: "_tier1",
               type: "uint8",
             },
+          ],
+          name: "setCommissionPerFistLevelUpline",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
             {
               internalType: "uint8",
               name: "_tier2",
               type: "uint8",
             },
+          ],
+          name: "setCommissionPerSecondLevelUpline",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
             {
               internalType: "uint8",
               name: "_tier3",
               type: "uint8",
             },
           ],
-          name: "setCommissionRates",
+          name: "setCommissionPerThirtLevelUpline",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -648,13 +779,21 @@ const deployedContracts = {
               name: "_toBusiness",
               type: "uint128",
             },
+          ],
+          name: "setMembershipPaymentToBusiness",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
             {
               internalType: "uint128",
               name: "_toUpline",
               type: "uint128",
             },
           ],
-          name: "setMembershipPayments",
+          name: "setMembershipPaymentToUpline",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -668,24 +807,6 @@ const deployedContracts = {
             },
           ],
           name: "setMinAmountToDeposit",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_pyt",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_commission",
-              type: "uint256",
-            },
-          ],
-          name: "setTimestamps",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -712,6 +833,19 @@ const deployedContracts = {
             },
           ],
           name: "transferOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "newKey",
+              type: "string",
+            },
+          ],
+          name: "updateAdminKey",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",

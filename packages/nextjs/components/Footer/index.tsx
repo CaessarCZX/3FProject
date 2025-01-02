@@ -1,5 +1,5 @@
 import React from "react";
-import { CurrencyDollarIcon } from "@heroicons/react/24/outline";
+import { MdPlayArrow } from "react-icons/md";
 import { useGlobalState } from "~~/services/store/store";
 
 /**
@@ -16,9 +16,11 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row gap-2 pointer-events-auto">
             {mexicanPesoPrice > 0 && (
               <div>
-                <div className="btn bg-gray-300 dark:bg-boxdark-2 btn-sm font-normal gap-1 cursor-auto">
-                  <CurrencyDollarIcon className="h-4 w-4" />
-                  <span>{`USD - MXN ${mexicanPesoPrice.toFixed(2)}`}</span>
+                <div className="flex p-2 rounded-md items-center justify-center bg-gray-300 dark:bg-boxdark-2 btn-sm font-medium gap-1 select-none">
+                  <span>USD</span>
+                  <MdPlayArrow />
+                  <span>MXN</span>
+                  <span>{mexicanPesoPrice.toFixed(2)}</span>
                 </div>
               </div>
             )}
