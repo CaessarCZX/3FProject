@@ -3,8 +3,6 @@ import { Balance } from "./Balance";
 import GlasRainbowCard from "./GlasRainbowCard";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { IoWalletOutline } from "react-icons/io5";
-// import { getAddress } from "viem";
-// import { Address } from "viem";
 import { useAccount } from "wagmi";
 import { CheckCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 
