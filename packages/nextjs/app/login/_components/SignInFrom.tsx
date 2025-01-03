@@ -172,9 +172,10 @@ export const SignInForm = () => {
         </label>
         <div className="mt-1 relative">
           <input
-            type={showpass ? "type" : "password"}
+            type={showpass ? "text" : "password"}
             id="password"
-            autoComplete="current-password"
+            name="password"
+            autoComplete="new-password"
             value={formData.password}
             onChange={handleChange}
             onFocus={() => {
@@ -185,8 +186,8 @@ export const SignInForm = () => {
                 setIsFocused(false);
               }
             }}
-            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Ingresa tu contraseña"
+            className="block w-full pl-4 pr-10 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            placeholder="Ingresa una nueva contraseña"
             required
           />
           <div
@@ -201,13 +202,9 @@ export const SignInForm = () => {
             {!isFocused ? (
               <FiLock className="text-gray-400" />
             ) : showpass ? (
-              <div className="tooltip" data-tip="Ocultar contraseña">
-                <RiEyeLine className="text-gray-600" />
-              </div>
+              <RiEyeLine className="text-gray-600" />
             ) : (
-              <div className="tooltip" data-tip="Mostrar contraseña">
-                <RiEyeCloseLine className="text-gray-600" />
-              </div>
+              <RiEyeCloseLine className="text-gray-600" />
             )}
           </div>
         </div>
