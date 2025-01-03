@@ -13,10 +13,10 @@ type CardItemProps = {
 };
 
 const CardItemComponent: React.FC<CardItemProps> = ({ item }) => (
-  <div className="text-center p-4 md:p-6 bg-white shadow-sm rounded-lg">
+  <>
     <h3 className="text-2xl md:text-4xl font-black mb-2">{item.count}</h3>
     <h5 className="text-md font-medium opacity-80">{item.title}</h5>
-  </div>
+  </>
 );
 
 const HeroExpansion: React.FC = () => {
@@ -51,20 +51,20 @@ const HeroExpansion: React.FC = () => {
   return (
     <section className="mb-8 py-4 bg-white shadow-default rounded-md dark:border-strokedark dark:bg-boxdark text-zinc-900 dark:text-white">
       <div className="container px-4 mx-auto">
-        <div className="flex items-center justify-center text-center max-w-6xl mx-auto space-x-8 mb-4">
+        <div className="flex items-center text-center max-w-6xl mx-auto space-x-8">
           <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 opacity-80 max-w-4xl mx-auto">
             Puedes dar seguimiento a tu organización, verifica el crecimiento de tus afiliados
           </p>
         </div>
-
-        {/* Grid para los items */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        <div className="z-9 grid grid-cols-12 gap-6 max-w-7xl mx-auto text-center mt-4">
           {AffiliatesStats.map((item, i) => (
-            <div className="col-span-1" key={i}>
+            <div className="col-span-12" key={i}>
               <CardItemComponent item={item} />
             </div>
           ))}
         </div>
+
+        {/* <SubscribeForm /> */}
       </div>
     </section>
   );
