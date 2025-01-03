@@ -154,6 +154,7 @@ export const SignUpForm = () => {
     const validation = validateFormData(formData);
     if (Object.values(validation).length > 0) {
       RenderWarningMessages(validation);
+      setIsSubmitting(false);
       return;
     }
 
