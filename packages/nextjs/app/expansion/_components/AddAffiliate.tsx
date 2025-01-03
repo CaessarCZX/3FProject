@@ -70,12 +70,12 @@ const AddAffiliate: React.FC = () => {
     <>
       {/* Campo para referido directo */}
       <div className="pb-6">
-        <div className=" bg-white dark:bg-boxdark dark:border-strokedark shadow-md rounded-lg p-6">
+        <div className="bg-white dark:bg-boxdark dark:border-strokedark shadow-md rounded-lg p-6">
           <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400 mb-4">Añadir prospecto</h2>
           <div>
             <form onSubmit={handleAddAffiliate}>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">Correo</label>
-              <div className="flex max-h-13 gap-8">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
                 <input
                   type="email"
                   name="email"
@@ -87,7 +87,7 @@ const AddAffiliate: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`max-w-55 px-6 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none
+                  className={`max-w-xs sm:max-w-sm px-6 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none 
                     ${loading ? "bg-indigo-400" : "bg-indigo-600 hover:bg-indigo-700"}`}
                 >
                   {loading ? "Registrando..." : "Crear referido"}

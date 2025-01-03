@@ -10,20 +10,26 @@ import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
 import { useGetNotfications } from "~~/hooks/user/useGetNotifications";
 
 const Dashboard = () => {
-  // const { data: currentContract } = useDeployedContractInfo("FFFBusiness");
-
-  // useWatchContractEvent({
-  //   address: currentContract?.address,
-  //   abi: currentContract?.abi,
-  //   eventName: "CommissionPaid",
-  //   onLogs: log => console.log("new log:", log),
-  // });
   useGetNotfications();
   const { memberStatus } = useGetMemberStatus();
 
-  // Chage memberStatus to false to production
-  return <InternalLayout>{!memberStatus ? <FirstDepositScreen /> : <CommonDashboard />}</InternalLayout>;
+  // Cambiar memberStatus a false en producción
+  return (
+    <InternalLayout>
+      {/* Mostrar FirstDepositScreen si el miembro no tiene estado */}
+      {!memberStatus ? (
+        <div className="max-w-full w-full px-4 sm:px-6 md:px-8">
+          <FirstDepositScreen />
+        </div>
+      ) : (
+        <div className="max-w-full w-full px-4 sm:px-6 md:px-8">
+          <CommonDashboard />
+        </div>
+      )}
+    </InternalLayout>
+  );
 };
+
 // Aplica el HOC al export
 export default withAuth(Dashboard);
 

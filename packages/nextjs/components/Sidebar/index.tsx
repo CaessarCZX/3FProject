@@ -1,11 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { PageWalletConnectionBtn } from "../Wallet/WalletInnerConnectionBtn";
 import WalletWidget from "../Wallet/WalletWidget";
 import { projectMenuGoups } from "./SidebarContent";
 import { jwtDecode } from "jwt-decode";
+import { useAccount } from "wagmi";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import ClickOutside from "~~/components/Actions/ClickOutside";
 import SidebarItem from "~~/components/Sidebar/SidebarItem";
@@ -13,22 +15,43 @@ import useLocalStorage from "~~/hooks/common/useLocalStorage";
 import { SidebarProps } from "~~/types/sidebar";
 
 // Función para decodificar el token y obtener `isAdmin`
-const getIsAdminFromToken = (): boolean => {
+interface DecodedToken {
+  isAdmin?: boolean;
+  wallet: string | null;
+}
+
+const getInfoFromToken = (): DecodedToken => {
   const token = localStorage.getItem("token");
-  if (!token) return false;
+  if (!token) return { isAdmin: false, wallet: null };
 
   try {
-    const decoded: { isAdmin?: boolean } = jwtDecode(token);
-    return decoded.isAdmin || false;
+    const decoded: DecodedToken = jwtDecode(token);
+    return {
+      isAdmin: decoded.isAdmin || false,
+      wallet: decoded.wallet || null,
+    };
   } catch (error) {
     console.error("Error decoding token:", error);
-    return false;
+    return { isAdmin: false, wallet: null };
   }
 };
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+  const currentAccount = useAccount();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
-  const isAdmin = getIsAdminFromToken();
+  const { isAdmin, wallet } = getInfoFromToken();
+  const [isWalletApproved, setIsWalletApproved] = useState(false);
+
+  useEffect(() => {
+    if (currentAccount.status === "connected") {
+      setIsWalletApproved(wallet === currentAccount.address);
+    }
+
+    // if (currentUser.status === "disconnected") {
+    //   setFormData(prevData => ({ ...prevData, wallet: "" }));
+    //   setIsWalletConnected(false);
+    // }
+  }, [currentAccount.status, currentAccount.address, wallet]);
 
   // Filtra el menú según el valor de isAdmin
   const filteredMenuGroups = projectMenuGoups.map(group => ({
@@ -65,7 +88,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
         {/* <!-- WALLET WIDGET --> */}
         <div className="mx-4">
-          <WalletWidget />
+          {currentAccount.isConnected && isWalletApproved ? (
+            <WalletWidget />
+          ) : (
+            <PageWalletConnectionBtn enableWallet={isWalletApproved} />
+          )}
         </div>
         {/* <!-- WALLET WIDGET --> */}
 

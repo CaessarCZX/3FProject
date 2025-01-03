@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
-import { RiEyeCloseLine, RiEyeLine, RiInformation2Line } from "react-icons/ri";
+import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { isAddress } from "viem";
 import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
@@ -154,6 +154,7 @@ export const SignUpForm = () => {
     const validation = validateFormData(formData);
     if (Object.values(validation).length > 0) {
       RenderWarningMessages(validation);
+      setIsSubmitting(false);
       return;
     }
 
@@ -300,7 +301,7 @@ export const SignUpForm = () => {
         </label>
         <div className="mt-1 relative">
           <input
-            type={showpass ? "type" : "password"}
+            type={showpass ? "text" : "password"}
             id="password"
             name="password"
             autoComplete="new-password"
@@ -314,7 +315,7 @@ export const SignUpForm = () => {
                 setIsFocused(false);
               }
             }}
-            className="block w-full pr-10 pl-4 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="block w-full pl-4 pr-10 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="Ingresa una nueva contraseña"
             required
           />
@@ -330,13 +331,9 @@ export const SignUpForm = () => {
             {!isFocused ? (
               <FiLock className="text-gray-400" />
             ) : showpass ? (
-              <div className="tooltip" data-tip="Ocultar contraseña">
-                <RiEyeLine className="text-gray-600" />
-              </div>
+              <RiEyeLine className="text-gray-600" />
             ) : (
-              <div className="tooltip" data-tip="Mostrar contraseña">
-                <RiEyeCloseLine className="text-gray-600" />
-              </div>
+              <RiEyeCloseLine className="text-gray-600" />
             )}
           </div>
         </div>
@@ -354,15 +351,10 @@ export const SignUpForm = () => {
 
       {/* Referred Wallet */}
       <div>
-        <div className="flex justify-between items-center">
-          <label htmlFor="referredBy" className="block text-sm font-medium text-gray-700">
-            Wallet de Referido
-          </label>
-          <div className="tooltip" data-tip="Escribe una dirección de wallet">
-            <RiInformation2Line className="text-gray-300 mr-1 hover:cursor-pointer w-4 h-4" />
-          </div>
-        </div>
-        <div className="mt-1 relative flex">
+        <label htmlFor="referredBy" className="block text-sm font-medium text-gray-700">
+          Wallet de Referido
+        </label>
+        <div className="mt-1 relative">
           <input
             autoComplete="none"
             type="text"
@@ -370,7 +362,7 @@ export const SignUpForm = () => {
             name="referredBy"
             value={formData.referredBy}
             onChange={handleChange}
-            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
               isReferrerValid === null ? "bg-transparent" : isReferrerValid === false ? "bg-red-100" : "bg-green-100"
             }`}
             placeholder="0xABC123"
@@ -383,7 +375,7 @@ export const SignUpForm = () => {
       </div>
 
       {/* Login link */}
-      <div className="text-sm text-center mt-4">
+      <div className="text-sm text-center">
         <p>
           ¿Ya tienes una cuenta?{" "}
           <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleLoginClick}>

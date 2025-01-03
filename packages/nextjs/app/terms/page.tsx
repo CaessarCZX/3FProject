@@ -40,18 +40,22 @@ const Terms: NextPage = () => {
           <Info />
         </InternalLayout>
       ) : (
-        <>
-          <div className="m-auto max-w-[1200px]">
-            <div className="my-6 flex flex-col gap-3 sm:flex-row sm:items-center justify-between">
-              <h2 className="text-3xl font-medium text-black dark:text-white">Términos y Condiciones</h2>
-              <Link className="text-primary" href="/login">
-                Anterior
-              </Link>
-            </div>
-            <Info />
-            <p className="text-[10px] text-right mt-12">FREE Friends and Family® Todos los derechos reservados.</p>
+        <div className="m-auto max-w-full px-4">
+          <div className="my-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 className="text-3xl font-medium text-black dark:text-white sm:text-4xl">Términos y Condiciones</h2>
+            <Link className="text-primary sm:text-base sm:ml-auto text-lg" href="/login">
+              Anterior
+            </Link>
           </div>
-        </>
+          <div className="max-w-full overflow-hidden">
+            <div className="w-full max-w-[calc(100%-2rem)] overflow-x-auto">
+              <Info />
+            </div>
+          </div>
+          <p className="text-[10px] sm:text-xs text-right mt-12">
+            FREE Friends and Family® Todos los derechos reservados.
+          </p>
+        </div>
       )}
     </>
   );

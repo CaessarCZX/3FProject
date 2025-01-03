@@ -1,7 +1,4 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
-import "../_css/AdminTableForm.css";
 
 interface User {
   _id: string;
@@ -13,29 +10,23 @@ const WhiteListTableForm = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
+  const [totalPages, setTotalPages] = useState(1); // Total de páginas
 
   const fetchUsers = async (page: number) => {
     setLoading(true);
     setError(null);
 
     try {
-      console.log(`Fetching users from API for page ${page}...`);
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/?page=${page}`);
-
       if (!response.ok) {
         throw new Error("Error al obtener los usuarios");
       }
-
       const data = await response.json();
-      console.log("Datos obtenidos de la API:", data);
-
       setUsers(data.users || []);
       setCurrentPage(data.page || 1);
       setTotalPages(data.pages || 1);
     } catch (err) {
-      console.error("Error al obtener los usuarios:", err);
       setError(err instanceof Error ? err.message : "Error desconocido");
     } finally {
       setLoading(false);
@@ -48,56 +39,42 @@ const WhiteListTableForm = () => {
 
   const handleToggle = async (userId: string, field: "isApproved") => {
     const user = users.find(u => u._id === userId);
-    if (!user) {
-      console.warn("Usuario no encontrado en el estado local:", userId);
-      return;
-    }
+    if (!user) return;
 
     const updatedValue = !user[field];
-    console.log(`Actualizando ${field} para el usuario ${userId}:`, updatedValue);
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/${userId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [field]: updatedValue }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al actualizar el usuario");
+        throw new Error("Error al actualizar el usuario.");
       }
 
-      console.log("Usuario actualizado con éxito.");
       setUsers(prevUsers => prevUsers.map(u => (u._id === userId ? { ...u, [field]: updatedValue } : u)));
     } catch (err) {
-      console.error("Error al actualizar el usuario:", err);
-      alert("Hubo un error al actualizar el usuario. Revisa los logs.");
+      alert("Hubo un error al actualizar el usuario.");
     }
   };
 
   const handleDelete = async (userId: string) => {
-    if (!window.confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
-      return;
-    }
+    if (window.confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/${userId}`, {
+          method: "DELETE",
+        });
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/${userId}`, {
-        method: "DELETE",
-      });
+        if (!response.ok) {
+          throw new Error("Error al eliminar el usuario");
+        }
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al eliminar el usuario");
+        setUsers(prevUsers => prevUsers.filter(user => user._id !== userId));
+      } catch (err) {
+        alert("Hubo un error al eliminar el usuario.");
       }
-
-      console.log("Usuario eliminado con éxito.");
-      setUsers(prevUsers => prevUsers.filter(user => user._id !== userId));
-    } catch (err) {
-      console.error("Error al eliminar el usuario:", err);
-      alert("Hubo un error al eliminar el usuario. Revisa los logs.");
     }
   };
 
@@ -114,71 +91,81 @@ const WhiteListTableForm = () => {
   };
 
   return (
-    <div className="table-container">
-      <h2 className="table-title">Tabla de usuarios</h2>
+    <div className="container mx-auto p-6">
+      <h2 className="text-2xl font-semibold text-gray-700 mb-4">Lista Blanca de Usuarios</h2>
       {loading ? (
-        <p className="loading-text">Cargando usuarios...</p>
+        <p className="text-center text-gray-500">Cargando usuarios...</p>
       ) : error ? (
-        <p className="error-text">{error}</p>
+        <p className="text-center text-red-500">{error}</p>
       ) : (
         <>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Email</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.length > 0 ? (
-                users.map(user => (
-                  <tr key={user._id}>
-                    <td>{user.email}</td>
-                    <td>
-                      <div className="switch-container">
-                        <span className={`status-badge ${user.isApproved ? "active" : "inactive"}`}>
-                          {user.isApproved ? "Activo" : "Inactivo"}
-                        </span>
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={user.isApproved}
-                            onChange={() => handleToggle(user._id, "isApproved")}
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
-                        <button className="delete-button" onClick={() => handleDelete(user._id)}>
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto bg-white shadow-md rounded-lg overflow-hidden">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2 text-left">Email</th>
+                  <th className="px-4 py-2 text-left">Estado</th>
+                  <th className="px-4 py-2 text-left">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.length > 0 ? (
+                  users.map(user => (
+                    <tr key={user._id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-2">{user.email}</td>
+                      <td className="px-4 py-2">
+                        <div className="flex items-center">
+                          <span className={`text-sm ${user.isApproved ? "text-green-500" : "text-red-500"}`}>
+                            {user.isApproved ? "Activo" : "Inactivo"}
+                          </span>
+                          <label className="ml-2 inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={user.isApproved}
+                              onChange={() => handleToggle(user._id, "isApproved")}
+                              className="form-checkbox text-indigo-600"
+                            />
+                          </label>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2">
+                        <button onClick={() => handleDelete(user._id)} className="text-red-500 hover:text-red-700">
                           Eliminar
                         </button>
-                      </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={3} className="text-center text-gray-500 py-4">
+                      No hay usuarios disponibles.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="no-data">
-                    No hay usuarios disponibles.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-          <div className="pagination">
-            <button className="pagination-button" onClick={handlePrevious} disabled={currentPage === 1}>
-              ← Anterior
-            </button>
-            <span className="pagination-info">
+          <div className="flex flex-col md:flex-row justify-between items-center mt-4">
+            <div className="flex justify-center md:justify-start mb-4 md:mb-0">
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:bg-gray-200"
+                onClick={handlePrevious}
+                disabled={currentPage === 1}
+              >
+                ← Anterior
+              </button>
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:bg-gray-200 ml-4"
+                onClick={handleNext}
+                disabled={currentPage === totalPages}
+              >
+                Siguiente →
+              </button>
+            </div>
+            <span className="text-gray-600">
               Página {currentPage} de {totalPages}
             </span>
-            <button className="pagination-button" onClick={handleNext} disabled={currentPage === totalPages}>
-              Siguiente →
-            </button>
           </div>
         </>
       )}

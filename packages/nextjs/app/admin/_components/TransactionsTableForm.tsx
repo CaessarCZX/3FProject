@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "../_css/TransictionsTableForm.css";
 
 const TransactionsTable: React.FC = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -45,92 +44,102 @@ const TransactionsTable: React.FC = () => {
   };
 
   return (
-    <div className="table-container">
-      <h2 className="table-title">Tabla de transacciones agrupadas por usuario</h2>
+    <div className="container mx-auto p-6">
+      <h2 className="text-2xl font-semibold text-gray-700 mb-4">Tabla de transacciones agrupadas por usuario</h2>
 
       {loading ? (
-        <p className="loading-text">Cargando transacciones...</p>
+        <p className="text-center text-gray-500">Cargando transacciones...</p>
       ) : error ? (
-        <p className="error-text">{error}</p>
+        <p className="text-center text-red-500">{error}</p>
       ) : (
-        <table className="table">
-          {/* Encabezados */}
-          <thead>
-            <tr>
-              <th>Usuario (Email)</th>
-              <th>Monto</th>
-              <th>Fecha</th>
-              <th>Primer Trimestre</th>
-              <th>Segundo Trimestre</th>
-              <th>Tercer Trimestre</th>
-              <th>Mes de Bono</th>
-            </tr>
-          </thead>
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto bg-white shadow-md rounded-lg overflow-hidden">
+            {/* Encabezados */}
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 text-left">Usuario (Email)</th>
+                <th className="px-4 py-2 text-left">Monto</th>
+                <th className="px-4 py-2 text-left">Fecha</th>
+                <th className="px-4 py-2 text-left">Primer Trimestre</th>
+                <th className="px-4 py-2 text-left">Segundo Trimestre</th>
+                <th className="px-4 py-2 text-left">Tercer Trimestre</th>
+                <th className="px-4 py-2 text-left">Mes de Bono</th>
+              </tr>
+            </thead>
 
-          {/* Cuerpo de la tabla */}
-          <tbody>
-            {transactions.length > 0 ? (
-              transactions.map(userTransaction => (
-                <tr key={userTransaction.userId}>
-                  {/* Columna Usuario */}
-                  <td>{userTransaction.userDetails[0]?.email || "No disponible"}</td>
+            {/* Cuerpo de la tabla */}
+            <tbody>
+              {transactions.length > 0 ? (
+                transactions.map(userTransaction => (
+                  <tr key={userTransaction.userId} className="border-b hover:bg-gray-50">
+                    {/* Columna Usuario */}
+                    <td className="px-4 py-2">{userTransaction.userDetails[0]?.email || "No disponible"}</td>
 
-                  {/* Columna Monto */}
-                  <td>
-                    {userTransaction.transactions.map((transaction: any) => (
-                      <p key={transaction._id} className="transaction-monto">
-                        ${transaction.amount}
-                      </p>
-                    ))}
-                  </td>
+                    {/* Columna Monto */}
+                    <td className="px-4 py-2">
+                      {userTransaction.transactions.map((transaction: any) => (
+                        <p key={transaction._id} className="transaction-monto text-sm text-gray-700">
+                          ${transaction.amount}
+                        </p>
+                      ))}
+                    </td>
 
-                  {/* Columna Fecha */}
-                  <td>
-                    {userTransaction.transactions.map((transaction: any) => (
-                      <p key={transaction._id} className="transaction-fecha">
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </p>
-                    ))}
-                  </td>
+                    {/* Columna Fecha */}
+                    <td className="px-4 py-2">
+                      {userTransaction.transactions.map((transaction: any) => (
+                        <p key={transaction._id} className="transaction-fecha text-sm text-gray-500">
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </p>
+                      ))}
+                    </td>
 
-                  {/* Columna Primer Trimestre */}
-                  <td>
-                    {userTransaction.transactions.map((transaction: any) => (
-                      <p key={transaction._id}>{getTrimestreDaysLeft(transaction.date, 3)}</p>
-                    ))}
-                  </td>
+                    {/* Columna Primer Trimestre */}
+                    <td className="px-4 py-2">
+                      {userTransaction.transactions.map((transaction: any) => (
+                        <p key={transaction._id} className="text-sm">
+                          {getTrimestreDaysLeft(transaction.date, 3)}
+                        </p>
+                      ))}
+                    </td>
 
-                  {/* Columna Segundo Trimestre */}
-                  <td>
-                    {userTransaction.transactions.map((transaction: any) => (
-                      <p key={transaction._id}>{getTrimestreDaysLeft(transaction.date, 6)}</p>
-                    ))}
-                  </td>
+                    {/* Columna Segundo Trimestre */}
+                    <td className="px-4 py-2">
+                      {userTransaction.transactions.map((transaction: any) => (
+                        <p key={transaction._id} className="text-sm">
+                          {getTrimestreDaysLeft(transaction.date, 6)}
+                        </p>
+                      ))}
+                    </td>
 
-                  {/* Columna Tercer Trimestre */}
-                  <td>
-                    {userTransaction.transactions.map((transaction: any) => (
-                      <p key={transaction._id}>{getTrimestreDaysLeft(transaction.date, 9)}</p>
-                    ))}
-                  </td>
+                    {/* Columna Tercer Trimestre */}
+                    <td className="px-4 py-2">
+                      {userTransaction.transactions.map((transaction: any) => (
+                        <p key={transaction._id} className="text-sm">
+                          {getTrimestreDaysLeft(transaction.date, 9)}
+                        </p>
+                      ))}
+                    </td>
 
-                  {/* Columna Mes de Bono */}
-                  <td>
-                    {userTransaction.transactions.map((transaction: any) => (
-                      <p key={transaction._id}>{getTrimestreDaysLeft(transaction.date, 10)}</p>
-                    ))}
+                    {/* Columna Mes de Bono */}
+                    <td className="px-4 py-2">
+                      {userTransaction.transactions.map((transaction: any) => (
+                        <p key={transaction._id} className="text-sm">
+                          {getTrimestreDaysLeft(transaction.date, 10)}
+                        </p>
+                      ))}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="text-center text-gray-500 py-4">
+                    No hay transacciones disponibles.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="no-data">
-                  No hay transacciones disponibles.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

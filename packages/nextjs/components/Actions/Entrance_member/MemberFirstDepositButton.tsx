@@ -6,9 +6,10 @@ import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
 import { StageTransactionModal } from "~~/components/Actions/Transaction/StageTransactionModal";
-import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
+// import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
 import { useGetMemberSavings } from "~~/hooks/user/useGetMemberSavings";
+import { useGlobalState } from "~~/services/store/store";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { TransactionInfo } from "~~/utils/3FContract/deposit";
 import { DepositErrors as err } from "~~/utils/errors/errors";
@@ -29,11 +30,12 @@ interface UplineMembers {
 }
 
 const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ depositAmount }) => {
+  const setIsActiveMemberStatus = useGlobalState(state => state.setIsActiveMemberStatus);
   const { fetchSavings } = useGetMemberSavings();
   const { writeContractAsync } = useWriteContract();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n); // Deposit for contract
-  const { getCurrentMemberStatus } = useInitializeMemberStatus();
+  // const { getCurrentMemberStatus } = useInitializeMemberStatus();
   const contractAbi = contract?.abi;
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
@@ -268,7 +270,9 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
           await performHealthCheck(amount, depositContractReceiptHash.transactionHash);
 
           setTimeout(() => {
-            getCurrentMemberStatus(); // Actualiza el status de activo del miembro en el contrato para dashboard comun
+            // getCurrentMemberStatus(); // Actualiza el status de activo del miembro en el contrato para dashboard comun
+            // Force member status
+            setIsActiveMemberStatus(true);
             fetchSavings();
           }, 3000);
         } else {
@@ -286,14 +290,27 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   };
   return (
     <>
+      {/* Botón para Web (solo visible en pantallas grandes) */}
       <button
         className={`absolute right-2.5 top-1/2 -translate-y-1/2 py-2.5 px-8 text-white font-bold bg-blue-600 hover:bg-opacity-90 duration-300 z-50 rounded-full ${
           isStarted && "hidden"
-        }`}
+        } hidden sm:block`} // Se oculta en móviles y se muestra en pantallas grandes
         onClick={() => HandleDeposit()}
       >
         {isStarted ? "Pendiente" : "Enviar ahorro"}
       </button>
+
+      {/* Botón para Móvil (solo visible en pantallas pequeñas) */}
+      <button
+        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 py-2.5 px-8 text-white font-bold bg-blue-600 hover:bg-opacity-90 duration-300 z-50 rounded-full w-auto max-w-xs ${
+          isStarted && "hidden"
+        } sm:hidden`} // Se oculta en pantallas grandes y se muestra en móviles
+        onClick={() => HandleDeposit()}
+      >
+        {isStarted ? "Pendiente" : "Ahorro"}
+      </button>
+
+      {/* StageTransactionModal solo se activa cuando "isStarted" es true */}
       {isStarted && (
         <StageTransactionModal
           activate={isHandleModalActivate}

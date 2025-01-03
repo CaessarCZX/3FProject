@@ -3,7 +3,7 @@ import { IoMdArrowRoundForward } from "react-icons/io";
 
 const Info: React.FC = () => {
   return (
-    <div className="shadow-default mx-auto bg-white dark:bg-boxdark dark:border-strokedark rounded-lg p-6 px-12">
+    <div className="shadow-default mx-auto bg-white dark:bg-boxdark dark:border-strokedark rounded-lg p-6 sm:px-8 lg:px-12 max-w-full overflow-hidden">
       <h2 className="text-2xl font-light text-gray-800 dark:text-whiten">I. Introducción</h2>
       <p className="text-sm my-4 mb-8 pl-4">
         Este contrato establece los términos y condiciones (en adelante, &quot;Términos&quot;) aplicables al uso{" "}
@@ -14,23 +14,23 @@ const Info: React.FC = () => {
         acepta cumplir y estar obligado por estos Términos.
       </p>
       <h2 className="text-2xl font-light text-gray-800 dark:text-whiten">II. Definiciones</h2>
-      <ol className="mt-8">
-        <li className="ml-6">
+      <ol className="mt-8 list-inside">
+        <li className="ml-6 text-sm sm:text-base">
           <p className="text-sm">
             1. <i>Aportación</i>: cantidad que realiza el Integrante al fondo común.
           </p>
         </li>
-        <li className="ml-6">
+        <li className="ml-6 text-sm sm:text-base">
           <p className="text-sm">
             2. <i>Fondo de Paz y Tranquilidad (PYT)</i>: el retorno de la aportación.
           </p>
         </li>
-        <li className="ml-6">
+        <li className="ml-6 text-sm sm:text-base">
           <p className="text-sm">
             3. <i>Beneficios</i>: se refiere a sus cantidades generadas después del retorno de la aportación.
           </p>
         </li>
-        <li className="ml-6">
+        <li className="ml-6 text-sm sm:text-base">
           <p className="text-sm">
             4. <i>Bonificación</i>: Compensación monetaria que se asigna al Integrante en los siguientes casos, por la
             afiliación de nuevos Integrantes a 3F, o por cada una de las aportaciones que realicen al fondo común
@@ -46,7 +46,7 @@ const Info: React.FC = () => {
             de las aportaciones del integrante conforme se describe en la cláusula VIII .
           </div>
         </li>
-        <li className="ml-6">
+        <li className="ml-6 text-sm sm:text-base">
           <p className="text-sm">
             5. <i>Integrante</i>: Persona de confianza, sea familia o amigo, que acepta los términos y condiciones
             establecidos en el presente contrato privado.
@@ -54,12 +54,12 @@ const Info: React.FC = () => {
         </li>
       </ol>
       <h2 className="text-2xl font-light text-gray-800 dark:text-whiten">III. Aceptación de los términos</h2>
-      <p className="text-sm my-4 mb-8 pl-4">
+      <p className="text-sm sm:text-base my-4 ml-24">
         Al utilizar las propuestas y herramientas de 3F, el Integrante acepta estos Términos en su totalidad. Si el
         Integrante no acepta estos Términos, debe abstenerse de utilizar el contenido del presente sitio.
       </p>
       <h2 className="text-2xl font-light text-gray-800 dark:text-whiten">IV. Modificación de los términos</h2>
-      <p className="text-sm my-4 mb-8 pl-4">
+      <p className="text-sm sm:text-base my-4 ml-24">
         3F se reserva el derecho a modificar estos Términos en cualquier momento. Los cambios se notificarán al
         Integrante a través del correo electrónico y/o aviso en el sitio web. La continuación en la utilización del
         contenido, sus herramientas y propuestas, tras la notificación de dichos cambios, constituirá la aceptación
@@ -98,7 +98,7 @@ const Info: React.FC = () => {
             <th>Porcentaje</th>
           </tr>
         </thead>
-        <tbody className="text-[12px]">
+        <tbody className="text-[12px] sm:text-sm mt-4 mb-4">
           <tr>
             <td>2,000 - 4,500.00 USDT (ERC20)</td>
             <td>6%</td>
@@ -122,14 +122,14 @@ const Info: React.FC = () => {
         botón de retiro habilitado.
       </p>
       <h2 className="text-2xl font-light text-gray-800 dark:text-whiten">VII. Pagos y beneficios</h2>
-      <p className="text-sm my-4 mb-8 pl-4">
+      <p className="text-sm sm:text-base my-4 ml-24">
         Los beneficios de la aportación se entregarán trimestralmente, los días 1 y 16 de cada mes de acuerdo a la fecha
         de ingreso de la misma. La tasa mensual de los beneficios compuestos variará según la cantidad aportada.
       </p>
       <h2 className="text-2xl font-light text-gray-800 dark:text-whiten">
         VIII. Bonificaciones y pull de organización
       </h2>
-      <ol className="mt-8">
+      <ol className="mt-8 list-inside">
         <li className="ml-12 mb-4">
           <div className="flex">
             <strong className="pr-4 inline-block">1</strong>
@@ -163,7 +163,7 @@ const Info: React.FC = () => {
               de $2,000 USDT en adelante:
             </div>
           </div>
-          <ol className="text-[12px] w-fit mx-auto my-8">
+          <ol className="text-[12px] sm:text-sm mt-4 mb-4 w-fit mx-auto my-8">
             <li>
               <IoMdArrowRoundForward className="inline mr-2" />
               1er Nivel: 4%
@@ -190,7 +190,7 @@ const Info: React.FC = () => {
             <strong className="pr-4 inline-block">i</strong>
             <div>Desarrollar distintas líneas de ingreso respetando un volumen máximo por línea.</div>
           </div>
-          <ol className="text-[12px] w-fit mx-auto my-8">
+          <ol className="text-[12px] sm:text-sm mt-4 mb-4 mx-auto my-8">
             <li>
               <IoMdArrowRoundForward className="inline mr-2" />
               Pulls 1-3: Distribución de montos acumulados: 40%, 30%, 20%, 10%.
@@ -204,7 +204,7 @@ const Info: React.FC = () => {
             <strong className="pr-4 inline-block">ii</strong>
             <div>Bono según niveles del Pull de Organización:</div>
           </div>
-          <ol className="text-[12px] w-fit mx-auto my-8">
+          <ol className="text-[12px] sm:text-sm mt-4 mb-4 mx-auto my-8">
             <li>
               <IoMdArrowRoundForward className="inline mr-2" />
               Pull 1: Volumen: $50,000 USDT; Bono: $500 USDT
@@ -254,7 +254,7 @@ const Info: React.FC = () => {
       <h2 className="text-2xl font-light text-gray-800 dark:text-whiten">
         IX. Responsabilidad y limitación de responsabilidad
       </h2>
-      <p className="text-sm my-4 mb-8 pl-4">
+      <p className="text-sm sm:text-base my-4 ml-24">
         3F no será responsable por daños directos, indirectos, incidentales o consecuentes que surjan en relación a las
         llaves de acceso de los Integrantes, y al contenido de este sitio web. El Integrante asume el riesgo asociado
         las aplicaciones informáticas contenidas en el presente sitio.
@@ -265,7 +265,7 @@ const Info: React.FC = () => {
         protección de datos; y su uso es exclusivo para fines de este contrato privado.
       </p>
       <h2 className="text-2xl font-light text-gray-800 dark:text-whiten">XI. Solución de controversias</h2>
-      <ol className="mt-8">
+      <ol className="mt-8 list-inside">
         <li className="ml-12">
           <div>
             <strong className="pr-4">A</strong>Mediación.
@@ -304,7 +304,7 @@ const Info: React.FC = () => {
           Aceptar
         </button>
       </div>
-      <p className="text-[12px] mt-4 mb-4">
+      <p className="text-[12px] sm:text-sm mt-4 mb-4 mt-4 mb-4">
         Por favor, el Integrante confirma haber leído y aceptado los Términos y Condiciones al registrarse en 3F.
       </p>
     </div>
