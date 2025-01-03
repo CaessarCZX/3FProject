@@ -113,7 +113,15 @@ export const UsdtInput = ({
     <InputBase
       name={name}
       value={displayValue}
-      placeholder={displayCurrenciesMode ? "Ingresa en Pesos" : "Ingresa en USDT"}
+      placeholder={
+        displayCurrenciesMode
+          ? window.innerWidth < 640
+            ? "Pesos"
+            : "Ingresa en Pesos"
+          : window.innerWidth < 640
+          ? "USDT"
+          : "Ingresa en USDT"
+      }
       onChange={handleChangeNumber}
       disabled={disabled}
       reFocus
@@ -132,7 +140,6 @@ export const UsdtInput = ({
           data-tip={isMexicanPesoPriceFetching ? "Recuperando precio" : "No se ha podido fijar el precio"}
         >
           <button
-            // className="btn btn-primary h-[2.2rem] min-h-[2.2rem]"
             className="flex items-center h-full w-full p-2"
             onClick={toggleDisplayCurrenciesMode}
             disabled={!displayCurrenciesMode && !mexicanPesoPrice}
