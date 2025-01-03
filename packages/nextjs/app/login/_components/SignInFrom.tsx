@@ -68,6 +68,8 @@ export const SignInForm = () => {
         if (data.exists) {
           setSuccessMessage("Wallet conectada con éxito.");
           setIsWalletConnected(true);
+          // Iniciar sesión automáticamente con la wallet conectada
+          await handleWalletLogin(formData.wallet);
         } else {
           setErrorMessage("Esta wallet no está registrada.");
           setIsWalletConnected(false);
@@ -83,15 +85,36 @@ export const SignInForm = () => {
     }
   }, [formData.wallet]);
 
+  const handleWalletLogin = async (wallet: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        router.push("/dashboard");
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Error al iniciar sesión.");
+      }
+    } catch (error) {
+      setErrorMessage("No se pudo conectar al servidor.");
+    }
+  };
+
   useEffect(() => {
     if (currentUser.status === "connected") {
       setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
-      const checkConnect = setTimeout(() => handleConnectWallet(), 2000);
-      return () => clearTimeout(checkConnect);
+      handleConnectWallet();
     }
 
     if (currentUser.status === "disconnected") {
       setFormData(prevData => ({ ...prevData, wallet: "" }));
+      setIsWalletConnected(false);
     }
   }, [currentUser.status, currentUser.address, handleConnectWallet]);
 
@@ -100,8 +123,9 @@ export const SignInForm = () => {
     setIsSubmitting(true);
     setErrorMessage("");
 
-    if (!isWalletConnected) {
-      setErrorMessage("No tienes conectada una wallet válida.");
+    // Confirmar que las credenciales de email y password estén completas
+    if (!(formData.email && formData.password)) {
+      setErrorMessage("Debe ingresar un correo y contraseña.");
       setIsSubmitting(false);
       return;
     }
@@ -155,7 +179,7 @@ export const SignInForm = () => {
             id="email"
             autoComplete="username"
             value={formData.email}
-            readOnly
+            onChange={handleChange}
             className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
             required
           />
@@ -172,9 +196,10 @@ export const SignInForm = () => {
         </label>
         <div className="mt-1 relative">
           <input
-            type={showpass ? "type" : "password"}
+            type={showpass ? "text" : "password"}
             id="password"
-            autoComplete="current-password"
+            name="password"
+            autoComplete="new-password"
             value={formData.password}
             onChange={handleChange}
             onFocus={() => {
@@ -185,8 +210,8 @@ export const SignInForm = () => {
                 setIsFocused(false);
               }
             }}
-            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="Ingresa tu contraseña"
+            className="block w-full pl-4 pr-10 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            placeholder="Ingresa una nueva contraseña"
             required
           />
           <div
@@ -201,13 +226,9 @@ export const SignInForm = () => {
             {!isFocused ? (
               <FiLock className="text-gray-400" />
             ) : showpass ? (
-              <div className="tooltip" data-tip="Ocultar contraseña">
-                <RiEyeLine className="text-gray-600" />
-              </div>
+              <RiEyeLine className="text-gray-600" />
             ) : (
-              <div className="tooltip" data-tip="Mostrar contraseña">
-                <RiEyeCloseLine className="text-gray-600" />
-              </div>
+              <RiEyeCloseLine className="text-gray-600" />
             )}
           </div>
         </div>
@@ -236,15 +257,15 @@ export const SignInForm = () => {
       {/* Submit */}
       <button
         type="submit"
-        disabled={isSubmitting || !isWalletConnected}
+        disabled={isSubmitting || !(formData.email && formData.password)}
         className={`w-full py-2 px-4 border border-transparent disabled:bg-gray-300 rounded-md shadow-sm text-sm font-medium text-white ${
-          isSubmitting || !isWalletConnected ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
+          isSubmitting || !(formData.email && formData.password) ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
         }`}
       >
         {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
       </button>
 
-      {/* Register link */}
+      {/* Reset password link */}
       <div className="text-sm text-center">
         <p>
           ¿Olvidaste tu contraseña?{" "}
