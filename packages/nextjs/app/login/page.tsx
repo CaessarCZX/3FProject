@@ -23,9 +23,9 @@ const Login: NextPage = () => {
       ></div>
 
       {/* Sección de contenido */}
-      <div className="w-full md:w-1/2 flex items-center justify-center bg-white bg-opacity-80 md:bg-opacity-100 min-h-screen md:min-h-0">
-        <div className="max-w-md w-full space-y-8 p-6 md:p-0">
-          <h2 className="text-3xl font-bold text-gray-900 text-center">Inicia Sesión</h2>
+      <div className="w-full md:w-1/2 flex items-center justify-center bg-white dark:bg-boxdark-2 bg-opacity-80 md:bg-opacity-100 min-h-screen md:min-h-0">
+        <div className="max-w-md w-full space-y-8 p-8 rounded-lg bg-white dark:bg-boxdark-2 md:p-0">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-whiten text-center">Inicia Sesión</h2>
           <SignInForm />
         </div>
       </div>

@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect } from "wagmi";
 import { ArrowLeftOnRectangleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { CpuChipIcon } from "@heroicons/react/24/solid";
 import { WrongNetworkDropdown } from "~~/components/scaffold-eth/RainbowKitCustomConnectButton/WrongNetworkDropdown";
 import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
@@ -66,7 +67,12 @@ export const WalletConnectionBtn: React.FC<RainbowKitCustomConnectButtonProps> =
               // Not connected
               if (!connected) {
                 return (
-                  <button className={`btn btn-primary ${classBtn ?? ""}`} onClick={openConnectModal} type="button">
+                  <button
+                    className={`btn hover:bg-black bg-primary text-white ${classBtn ?? ""}`}
+                    onClick={openConnectModal}
+                    type="button"
+                  >
+                    <CpuChipIcon className="w-6 h-6" />
                     Conecta tu Wallet
                   </button>
                 );
