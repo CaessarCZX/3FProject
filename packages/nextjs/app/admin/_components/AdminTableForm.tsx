@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "../_css/AdminTableForm.css";
 import UserModal from "../_modal/UserModal";
 import { jwtDecode } from "jwt-decode";
 
@@ -83,13 +82,11 @@ const TableForm = () => {
 
   const openModal = (userId: string) => {
     setSelectedUserId(userId);
-    console.log("Abriendo el modal...");
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setSelectedUserId(null);
-    console.log("Cerrando el modal...");
     setIsModalOpen(false);
   };
 
@@ -106,82 +103,95 @@ const TableForm = () => {
   };
 
   return (
-    <div className="table-container">
-      <h2 className="table-title">Tabla de usuarios</h2>
+    <div className="container mx-auto p-6">
+      <h2 className="text-2xl font-semibold text-gray-700 mb-4">Tabla de usuarios</h2>
       {loading ? (
-        <p className="loading-text">Cargando usuarios...</p>
+        <p className="text-center text-gray-500">Cargando usuarios...</p>
       ) : error ? (
-        <p className="error-text">{error}</p>
+        <p className="text-center text-red-500">{error}</p>
       ) : (
         <>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Estado</th>
-                <th>Rol</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.length > 0 ? (
-                users.map(user => (
-                  <tr key={user._id}>
-                    <td onClick={() => openModal(user._id)} className="clickable">
-                      {user.name}
-                    </td>
-                    <td onClick={() => openModal(user._id)} className="clickable">
-                      {user.email}
-                    </td>
-                    <td>
-                      <div className="switch-container">
-                        <span className={`status-badge ${user.isActive ? "active" : "inactive"}`}>
-                          {user.isActive ? "Activo" : "Inactivo"}
-                        </span>
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={user.isActive}
-                            onChange={() => handleToggle(user._id, "isActive")}
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="switch-container">
-                        {user.isAdmin ? "Admin" : "Usuario"}
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={user.isAdmin}
-                            onChange={() => handleToggle(user._id, "isAdmin")}
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto bg-white shadow-md rounded-lg overflow-hidden">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2 text-left">Nombre</th>
+                  <th className="px-4 py-2 text-left">Email</th>
+                  <th className="px-4 py-2 text-left">Estado</th>
+                  <th className="px-4 py-2 text-left">Rol</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.length > 0 ? (
+                  users.map(user => (
+                    <tr key={user._id} className="border-b hover:bg-gray-50">
+                      <td onClick={() => openModal(user._id)} className="px-4 py-2 cursor-pointer text-blue-600">
+                        {user.name}
+                      </td>
+                      <td onClick={() => openModal(user._id)} className="px-4 py-2 cursor-pointer text-blue-600">
+                        {user.email}
+                      </td>
+                      <td className="px-4 py-2">
+                        <div className="flex items-center">
+                          <span className={`text-sm ${user.isActive ? "text-green-500" : "text-red-500"}`}>
+                            {user.isActive ? "Activo" : "Inactivo"}
+                          </span>
+                          <label className="ml-2 inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={user.isActive}
+                              onChange={() => handleToggle(user._id, "isActive")}
+                              className="form-checkbox text-indigo-600"
+                            />
+                          </label>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2">
+                        <div className="flex items-center">
+                          {user.isAdmin ? "Admin" : "Usuario"}
+                          <label className="ml-2 inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={user.isAdmin}
+                              onChange={() => handleToggle(user._id, "isAdmin")}
+                              className="form-checkbox text-indigo-600"
+                            />
+                          </label>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="text-center text-gray-500 py-4">
+                      No hay usuarios disponibles.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="no-data">
-                    No hay usuarios disponibles.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          <div className="pagination">
-            <button className="pagination-button" onClick={handlePrevious} disabled={currentPage === 1}>
-              ← Anterior
-            </button>
-            <span className="pagination-info">
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex flex-col md:flex-row justify-between items-center mt-4">
+            <div className="flex justify-center md:justify-start mb-4 md:mb-0">
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:bg-gray-200"
+                onClick={handlePrevious}
+                disabled={currentPage === 1}
+              >
+                ← Anterior
+              </button>
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:bg-gray-200 ml-4"
+                onClick={handleNext}
+                disabled={currentPage === totalPages}
+              >
+                Siguiente →
+              </button>
+            </div>
+            <span className="text-gray-600">
               Página {currentPage} de {totalPages}
             </span>
-            <button className="pagination-button" onClick={handleNext} disabled={currentPage === totalPages}>
-              Siguiente →
-            </button>
           </div>
         </>
       )}

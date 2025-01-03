@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "../_css/TransictionsTableForm.css";
 
 const TransactionsAdminTableForm: React.FC = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -26,60 +25,62 @@ const TransactionsAdminTableForm: React.FC = () => {
   }, []);
 
   return (
-    <div className="table-container">
-      <h2 className="table-title">Tabla de transacciones agrupadas por usuario</h2>
+    <div className="container mx-auto p-6">
+      <h2 className="text-2xl font-semibold text-gray-700 mb-4">Tabla de transacciones agrupadas por usuario</h2>
 
       {loading ? (
-        <p className="loading-text">Cargando transacciones...</p>
+        <p className="text-center text-gray-500">Cargando transacciones...</p>
       ) : error ? (
-        <p className="error-text">{error}</p>
+        <p className="text-center text-red-500">{error}</p>
       ) : (
-        <table className="table">
-          {/* Encabezados */}
-          <thead>
-            <tr>
-              <th>Usuario (Email)</th>
-              <th>Monto (92%)</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto bg-white shadow-md rounded-lg overflow-hidden">
+            {/* Encabezados */}
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 text-left">Usuario (Email)</th>
+                <th className="px-4 py-2 text-left">Monto (92%)</th>
+                <th className="px-4 py-2 text-left">Fecha</th>
+              </tr>
+            </thead>
 
-          {/* Cuerpo de la tabla */}
-          <tbody>
-            {transactions.length > 0 ? (
-              transactions.map(userTransaction => (
-                <tr key={userTransaction.userId}>
-                  {/* Columna Usuario */}
-                  <td>{userTransaction.userDetails[0]?.email || "No disponible"}</td>
+            {/* Cuerpo de la tabla */}
+            <tbody>
+              {transactions.length > 0 ? (
+                transactions.map(userTransaction => (
+                  <tr key={userTransaction.userId} className="border-b hover:bg-gray-50">
+                    {/* Columna Usuario */}
+                    <td className="px-4 py-2">{userTransaction.userDetails[0]?.email || "No disponible"}</td>
 
-                  {/* Columna Monto */}
-                  <td>
-                    {userTransaction.transactions.map((transaction: any) => (
-                      <p key={transaction._id} className="transaction-monto">
-                        ${Math.round(transaction.amount * 0.92 * 100) / 100}
-                      </p>
-                    ))}
-                  </td>
+                    {/* Columna Monto (92%) */}
+                    <td className="px-4 py-2">
+                      {userTransaction.transactions.map((transaction: any) => (
+                        <p key={transaction._id} className="transaction-monto text-sm text-gray-700">
+                          ${Math.round(transaction.amount * 0.92 * 100) / 100}
+                        </p>
+                      ))}
+                    </td>
 
-                  {/* Columna Fecha */}
-                  <td>
-                    {userTransaction.transactions.map((transaction: any) => (
-                      <p key={transaction._id} className="transaction-fecha">
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </p>
-                    ))}
+                    {/* Columna Fecha */}
+                    <td className="px-4 py-2">
+                      {userTransaction.transactions.map((transaction: any) => (
+                        <p key={transaction._id} className="transaction-fecha text-sm text-gray-500">
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </p>
+                      ))}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="text-center text-gray-500 py-4">
+                    No hay transacciones disponibles.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="no-data">
-                  No hay transacciones disponibles.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

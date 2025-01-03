@@ -27,29 +27,29 @@ const AdminForm = () => {
   return (
     <div className="container mx-auto rounded-xl overflow-hidden p-4">
       {/* Botones de navegación */}
-      <div className="flex justify-around mb-4">
+      <div className="flex flex-col sm:flex-row justify-around mb-4 space-y-2 sm:space-y-0 sm:space-x-4">
         <button
           onClick={() => setCurrentView("admin")}
-          className={`px-4 py-2 rounded ${currentView === "admin" ? "bg-gray-600 text-white" : "bg-black-200"}`}
+          className={`px-4 py-2 rounded ${currentView === "admin" ? "bg-gray-600 text-white" : "bg-gray-200"}`}
         >
           Admin Table
         </button>
         <button
           onClick={() => setCurrentView("whitelist")}
-          className={`px-4 py-2 rounded ${currentView === "whitelist" ? "bg-gray-600 text-white" : "bg-black-200"}`}
+          className={`px-4 py-2 rounded ${currentView === "whitelist" ? "bg-gray-600 text-white" : "bg-gray-200"}`}
         >
           White List Table
         </button>
         <button
           onClick={() => setCurrentView("transactions")}
-          className={`px-4 py-2 rounded ${currentView === "transactions" ? "bg-gray-600 text-white" : "bg-black-200"}`}
+          className={`px-4 py-2 rounded ${currentView === "transactions" ? "bg-gray-600 text-white" : "bg-gray-200"}`}
         >
           Transactions Table
         </button>
         <button
           onClick={() => setCurrentView("transactionsAdmin")}
           className={`px-4 py-2 rounded ${
-            currentView === "transactionsAdmin" ? "bg-gray-600 text-white" : "bg-black-200"
+            currentView === "transactionsAdmin" ? "bg-gray-600 text-white" : "bg-gray-200"
           }`}
         >
           Transactions Admin Table

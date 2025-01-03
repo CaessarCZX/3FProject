@@ -61,7 +61,7 @@ const UserModal: React.FC<UserModalProps> = ({ userId, isOpen, onClose }) => {
         isOpen ? "block" : "hidden"
       }`}
     >
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md transform transition-all duration-300">
+      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-xl w-full max-w-3xl transform transition-all duration-300">
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Detalles del Usuario</h2>
 
         {/* Cargando y Error */}
@@ -71,31 +71,36 @@ const UserModal: React.FC<UserModalProps> = ({ userId, isOpen, onClose }) => {
         {/* Datos del Usuario */}
         {user ? (
           <div>
-            <p className="text-gray-700">
-              <strong>ID:</strong> {user._id}{" "}
-            </p>
-            <p className="text-gray-700">
-              <strong>Nombre:</strong> {user.name}{" "}
-            </p>
-            <p className="text-gray-700">
-              <strong>Email:</strong> {user.email}{" "}
-            </p>
-            <p className="text-gray-700">
-              <strong>Billetera:</strong> {user.wallet}{" "}
-            </p>
-            <p className="text-gray-700">
-              <strong>Estado:</strong> {renderActiveStatus(user.isActive)}{" "}
-            </p>
-            <p className="text-gray-700">
-              <strong>Administrador:</strong> {renderAdminStatus(user.isAdmin)}{" "}
-            </p>
+            <div className="space-y-4">
+              <p className="text-gray-700">
+                <strong>ID:</strong> {user._id}
+              </p>
+              <p className="text-gray-700">
+                <strong>Nombre:</strong> {user.name}
+              </p>
+              <p className="text-gray-700">
+                <strong>Email:</strong> {user.email}
+              </p>
+              <p className="text-gray-700">
+                <strong>Billetera:</strong>
+                <span className="block sm:inline-block text-sm break-words">{user.wallet}</span>
+              </p>
+              <p className="text-gray-700">
+                <strong>Estado:</strong> {renderActiveStatus(user.isActive)}
+              </p>
+              <p className="text-gray-700">
+                <strong>Administrador:</strong> {renderAdminStatus(user.isAdmin)}
+              </p>
+            </div>
 
             {/* Referencias */}
             <h3 className="mt-6 font-semibold text-lg text-gray-800">Referencias:</h3>
             {user.referrals.length > 0 ? (
               <ul className="list-disc pl-5 space-y-1 text-gray-600">
                 {user.referrals.map((referral, index) => (
-                  <li key={index}>{referral}</li>
+                  <li key={index} className="break-words">
+                    {referral}
+                  </li>
                 ))}
               </ul>
             ) : (
