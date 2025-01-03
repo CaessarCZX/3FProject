@@ -95,7 +95,7 @@ const SettingsForm: React.FC = () => {
         {userInfo ? (
           <div className="mt-6">
             <h3 className="text-lg font-medium text-gray-700">Información Personal</h3>
-            <div className="grid grid-cols-2 gap-6 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Nombre</label>
                 <input
@@ -123,7 +123,7 @@ const SettingsForm: React.FC = () => {
         {/* Formulario para Beneficiario */}
         <div className="mt-8">
           <h3 className="text-lg font-medium text-gray-700">Agregar Beneficiario</h3>
-          <div className="grid grid-cols-2 gap-6 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">Nombre</label>
               <input

@@ -18,8 +18,8 @@ const ResetPassword: React.FC = () => {
   } | null>(null);
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Para mostrar/ocultar contraseña
-  const [showRepeatPassword, setShowRepeatPassword] = useState(false); // Para mostrar/ocultar repetir contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
@@ -103,10 +103,9 @@ const ResetPassword: React.FC = () => {
       <div className="mx-auto bg-white shadow-md rounded-lg p-6">
         <h2 className="text-3xl font-light text-gray-500">Cambiar Contraseña</h2>
 
-        {/* Formulario para cambiar contraseña */}
         <div className="mt-8">
           <h3 className="text-lg font-medium text-gray-700">Nueva Contraseña</h3>
-          <div className="grid grid-cols-2 gap-6 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">Contraseña</label>
               <div className="relative">
@@ -152,6 +151,7 @@ const ResetPassword: React.FC = () => {
               </div>
             </div>
           </div>
+
           <div className="flex justify-end mt-6">
             <button
               onClick={handlePasswordChange}
