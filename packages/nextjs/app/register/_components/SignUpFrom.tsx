@@ -175,6 +175,25 @@ export const SignUpForm = () => {
       });
 
       if (response.ok) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            toEmail: formData.email,
+            userName: formData.name,
+          }),
+        });
+
+        await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/newAffiliate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            affiliateName: formData.name,
+            affiliateEmail: formData.email,
+            referredBy: formData.referredBy,
+          }),
+        });
+
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
         const saveEmail = formData.email;
         setFormData({ name: "", email: "", password: "", wallet: "", referredBy: "" });
