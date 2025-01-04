@@ -56,6 +56,14 @@ export const ResetPassword = () => {
       });
 
       if (response.ok) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/passwordConfirmation`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            toEmail: formData.email,
+          }),
+        });
+
         setSuccessMessage("Contraseña actualizada exitosamente.");
         const saveEmail = formData.email;
         const loginUrl = saveEmail ? `/login?email=${encodeURIComponent(saveEmail)}` : "/login";
