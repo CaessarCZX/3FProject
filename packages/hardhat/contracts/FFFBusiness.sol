@@ -10,6 +10,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 
     //Securty
     bytes32 private _ADMIN_KEY;
+    bytes32 private _ONLY_MEMBER_KEY;
 
 	// USDT
 	IERC20 public token;
@@ -37,7 +38,6 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 	}
 
 	mapping(address => Member) private members;
-	mapping(address => address[]) private enrolled; // Warning! for verification only
 
     // Setup events
     event NewBusinessOwner(
@@ -106,11 +106,14 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
     );
 
 	// Initiallize USDT address && only DEPLOYER wallet is the OWNER!!!
-	constructor(address _tokenAddress, string memory initialKey) {
+	constructor(address _tokenAddress, string memory initialKey, string memory membersKey) {
 		require(_tokenAddress != address(0), "Token address cannot be zero");
 
         // For encrypted admin key
         _ADMIN_KEY = keccak256(abi.encodePacked(initialKey));
+
+        // For encrypted member actions key
+        _ONLY_MEMBER_KEY = keccak256(abi.encodePacked(membersKey));
 
         // Ruleset for bussiness logic
         _MIN_AMOUNT_TO_DEPOSIT = 2000 * 10 ** 6; // 2000 USDT
@@ -140,6 +143,10 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 		require(members[msg.sender].isActive, "Miembro no activo");
 		_;
 	}
+	// modifier onlyActiveMember(string memory key) {
+	// 	require(keccak256(abi.encodePacked(key)) == _ONLY_MEMBER_KEY, "Palabra clave de administrador no valida");
+	// 	_;
+	// }
 
 	modifier checkValidAddress(address _recipient) {
 		require(_recipient != address(0), "Direccion invalida");
@@ -172,10 +179,6 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
 
 	function getMemberBalance(address _currentMember) public view returns(uint) {
         return members[_currentMember].balance;
-    }
-
-    function getTotalAffiliatesPerMember(address _currentMember) public view returns(uint) {
-        return enrolled[_currentMember].length;
     }
 
     function getMinAmountToDeposit() public view returns (uint128) {
@@ -340,11 +343,6 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         if (!members[msg.sender].isActive) {
             _createMember(payable(msg.sender));
         }
-        if (_uplineAddress != address(0)) {
-            enrolled[_uplineAddress].push(msg.sender);
-        } else {
-            enrolled[_businessWallet].push(msg.sender);
-        }
 
         _firstDeposit(_amount, _uplineAddress, _secondLevelUpline, _thirtLevelUpline);
     }
@@ -446,7 +444,7 @@ contract FFFBusiness is Ownable, ReentrancyGuard {
         }
         if (_thirtLevelUpline != address(0)) {
             _processPayment(_thirtLevelUpline, commissionThirtLevel);
-            emit CommissionPaid(_thirtLevelUpline, commissionFirstLevel, block.timestamp);
+            emit CommissionPaid(_thirtLevelUpline, commissionThirtLevel, block.timestamp);
             commissionThirtLevel = 0;
         }
 
