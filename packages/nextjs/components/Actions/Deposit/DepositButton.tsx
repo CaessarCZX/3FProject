@@ -15,6 +15,7 @@ import { notification } from "~~/utils/scaffold-eth";
 
 interface DecodedToken {
   id: string;
+  email: string;
 }
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
@@ -67,6 +68,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
     }
   }, []);
   const [id, setId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   // Deposit Rules
   const minDeposit = parseUnits("2000", 6);
@@ -102,6 +104,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         // Decodifica el JWT para obtener el contenido del payload
         const decoded: DecodedToken = jwtDecode(storedToken);
         setId(decoded.id || null); // Extrae la propiedad id del usuario en el token
+        setEmail(decoded.email || null); // Extrae el email del usuario
       } catch (error) {
         console.error("Error al decodificar el token:", error);
       }
@@ -151,6 +154,15 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
 
         const transactionData = await transactionResponse.json();
         console.log("Transacción creada exitosamente:", transactionData);
+
+        await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/saving`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            toEmail: email,
+            amount: amount,
+          }),
+        });
       } else {
         console.warn("Health check: Problema detectado con el servidor o la base de datos");
       }
