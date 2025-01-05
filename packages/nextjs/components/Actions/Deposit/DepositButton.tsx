@@ -54,7 +54,12 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
       try {
         // Decodifica el JWT para obtener el contenido del payload
         const decoded: DecodedToken = jwtDecode(storedToken);
-        const uplines: string[] = decoded.ReferersCommissions;
+        /**
+         * IMPORTANTT!
+         * @RefererCommissions brings the upline referer from top to bottom
+         * with the direct upline in the last position
+         */
+        const uplines: string[] = decoded.ReferersCommissions.toReversed(); //Copy from ReferersCommmission
         if (uplines) {
           setUplineMembers({
             uplineAddress: uplines[0] || INVALID_ADDRESS, //For direct upline
