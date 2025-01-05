@@ -1,6 +1,7 @@
 "use client";
 
-import { ResetPassword } from "./_components/resetPassword";
+import withAccessControl from "../hoc/withAccessControl";
+import { SendEmailValidate } from "./_components/sendEmailValidate";
 import type { NextPage } from "next";
 
 const validateEmail: NextPage = () => {
@@ -24,12 +25,11 @@ const validateEmail: NextPage = () => {
       {/* Sección de contenido */}
       <div className="w-full md:w-1/2 flex items-center justify-center bg-white bg-opacity-80 md:bg-opacity-100 min-h-screen md:min-h-0">
         <div className="max-w-md w-full space-y-8 p-6 md:p-0">
-          <h2 className="text-3xl font-bold text-gray-900 text-center">Cambiar Contraseña</h2>
-          <ResetPassword />
+          <SendEmailValidate />
         </div>
       </div>
     </div>
   );
 };
 
-export default validateEmail;
+export default withAccessControl(validateEmail);

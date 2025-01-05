@@ -31,11 +31,12 @@ const Dashboard: NextPage = () => {
     args: [currentMember?.address],
   });
 
-  const { data: totalAffiliates } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "getTotalAffiliatesPerMember",
-    args: [currentMember?.address],
-  });
+  // legacy
+  // const { data: totalAffiliates } = useScaffoldReadContract({
+  //   contractName: "FFFBusiness",
+  //   functionName: "getTotalAffiliatesPerMember",
+  //   args: [currentMember?.address],
+  // });
 
   useEffect(() => {
     if (!loadingData && exchangeRatio?.USDT) {
@@ -84,7 +85,7 @@ const Dashboard: NextPage = () => {
                         <UserGroupIcon className="w-6 h-6" />
                         <div className="flex gap-2 items-center">
                           Activos
-                          <div
+                          {/* <div  //LEGACY FUNCTION
                             className={`badge badge-secondary py-3 text-white px-4 ${
                               totalAffiliates != undefined && totalAffiliates > 0
                                 ? "bg-gradient-to-b from-cyan-500 to-blue-500"
@@ -96,7 +97,7 @@ const Dashboard: NextPage = () => {
                             ) : (
                               <p>{Number(totalAffiliates)}</p>
                             )}
-                          </div>
+                          </div> */}
                         </div>
                       </button>
                     </ul>

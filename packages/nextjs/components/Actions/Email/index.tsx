@@ -2,23 +2,22 @@ import { useEffect, useState } from "react";
 import { IoSend } from "react-icons/io5";
 import { notification } from "~~/utils/scaffold-eth";
 
+// Loader para el botón
 const ArrowLoader = () => (
-  <>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="30"
-      height="30"
-      fill="currentColor"
-      className="bi bi-arrow-repeat animate-spin opacity-60 transition-opacity hover:opacity-100"
-      viewBox="0 0 16 16"
-    >
-      <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z" />
-      <path
-        fill-rule="evenodd"
-        d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
-      />
-    </svg>
-  </>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="30"
+    height="30"
+    fill="currentColor"
+    className="bi bi-arrow-repeat animate-spin opacity-60 transition-opacity hover:opacity-100"
+    viewBox="0 0 16 16"
+  >
+    <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z" />
+    <path
+      fillRule="evenodd"
+      d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+    />
+  </svg>
 );
 
 export const SubscribeForm = () => {
@@ -34,6 +33,7 @@ export const SubscribeForm = () => {
     setSuccess(false);
 
     try {
+      // 1. Crear el usuario en la whitelist
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/whiteList/create-white-list`, {
         method: "POST",
         headers: {
@@ -41,7 +41,7 @@ export const SubscribeForm = () => {
         },
         body: JSON.stringify({
           email,
-          isApproved: false,
+          isApproved: false, // Cambia esto según sea necesario
         }),
       });
 
@@ -49,20 +49,41 @@ export const SubscribeForm = () => {
 
       if (!response.ok) {
         if (response.status === 409 && data.redirect) {
-          // Permiti acceso a login y register
           sessionStorage.setItem("allowAccess", "true");
-
-          // Redirige al login con el email
           const url = new URL(data.redirect, window.location.origin);
           url.searchParams.append("email", email);
           window.location.href = url.toString();
           return;
         }
-
         setError(data.message || "Ocurrió un error inesperado");
         return;
       }
 
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/whitelist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          toEmail: email,
+          userEmail: email,
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        console.error("Error sending whitelist email:", emailResponse.statusText);
+      } else {
+        console.log("Whitelist email sent successfully.");
+      }
+
+      const emailData = await emailResponse.json();
+
+      if (!emailResponse.ok) {
+        setError(emailData.message || "No se pudo enviar el correo de bienvenida.");
+        return;
+      }
+
+      // 3. Mostrar éxito
       setSuccess(true);
       setEmail("");
     } catch (err: unknown) {
@@ -78,7 +99,7 @@ export const SubscribeForm = () => {
     setSuccess(false);
   };
 
-  // For messages to UI
+  // Mostrar mensajes de éxito o error
   useEffect(() => {
     if (error !== null) {
       notification.error(error, { position: "top-right", duration: 5000 });

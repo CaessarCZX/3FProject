@@ -59,7 +59,10 @@ export const SignInForm = () => {
 
         if (response.ok) {
           const data = await response.json();
+
           localStorage.setItem("token", data.token);
+          sessionStorage.setItem("sessionToken", data.token);
+
           router.push("/dashboard");
         } else {
           const errorData = await response.json();
@@ -166,7 +169,7 @@ export const SignInForm = () => {
 
   const handleresetPasswordClick = () => {
     const email = formData.email;
-    const registerUrl = email ? `/resetPassword?email=${encodeURIComponent(email)}` : "/resetPassword";
+    const registerUrl = email ? `/sendEmailValidate?email=${encodeURIComponent(email)}` : "/sendEmailValidate";
     sessionStorage.setItem("allowAccess", "true");
     router.push(registerUrl);
   };
@@ -184,6 +187,7 @@ export const SignInForm = () => {
               type="email"
               id="email"
               autoComplete="username"
+              readOnly
               value={formData.email}
               onChange={handleChange}
               className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
