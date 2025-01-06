@@ -147,7 +147,10 @@ export const SignInForm = () => {
 
       if (response.ok) {
         const data = await response.json();
+
         localStorage.setItem("token", data.token);
+        sessionStorage.setItem("sessionToken", data.token);
+
         router.push("/dashboard");
       } else {
         const errorData = await response.json();
