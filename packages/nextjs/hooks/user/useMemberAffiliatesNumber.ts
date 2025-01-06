@@ -1,15 +1,11 @@
-// import { useAccount } from "wagmi";
-// import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-// This hook already not working
+// import { useEffect } from "react";
+// import { useGlobalState } from "~~/services/store/store";
 
 export const useMemberAffiliatesNumber = () => {
-  // const currentMember = useAccount();
-  // const { data: totalAffiliates } = useScaffoldReadContract({
-  //   contractName: "FFFBusiness",
-  //   functionName: "getTotalAffiliatesPerMember",
-  //   args: [currentMember?.address],
-  // });
+  // const initialAffiliate = 0;
 
-  // return totalAffiliates || null;
+  // useEffect(() => {
+
+  // }, []);
   return null;
 };
