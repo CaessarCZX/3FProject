@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FiLock, FiMail, FiUser } from "react-icons/fi";
+import { Tooltip } from "./Tooltip";
+import { FiHelpCircle, FiLock, FiMail, FiUser } from "react-icons/fi";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { isAddress } from "viem";
 import { useAccount } from "wagmi";
@@ -48,12 +49,18 @@ export const SignUpForm = () => {
   // Mensajes a ui
   useEffect(() => {
     if (singleErrorMessage) {
-      notification.error(singleErrorMessage, { position: "bottom-right", duration: 5000 }); // Muestra la notificicacion con el error encontrado
+      notification.error(singleErrorMessage, {
+        position: "bottom-right",
+        duration: 5000,
+      }); // Muestra la notificicacion con el error encontrado
       setSingleErrorMessage(""); // Borra el mensaje de error registrado
     }
 
     if (successMessage) {
-      notification.success(successMessage, { position: "bottom-right", duration: 5000 });
+      notification.success(successMessage, {
+        position: "bottom-right",
+        duration: 5000,
+      });
       setSuccessMessage("");
     }
   }, [singleErrorMessage, successMessage]);
@@ -128,7 +135,10 @@ export const SignUpForm = () => {
     // To validate referred wallet
     if (formData.referredBy.length === ETH_WALLET_LENGTH) {
       if (!isAddress(formData.referredBy)) {
-        notification.error("No es un formato de wallet valido.", { position: "bottom-right", duration: 5000 });
+        notification.error("No es un formato de wallet valido.", {
+          position: "bottom-right",
+          duration: 5000,
+        });
         return;
       }
 
@@ -177,7 +187,13 @@ export const SignUpForm = () => {
       if (response.ok) {
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
         const saveEmail = formData.email;
-        setFormData({ name: "", email: "", password: "", wallet: "", referredBy: "" });
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          wallet: "",
+          referredBy: "",
+        });
         setIsWalletConnected(false);
         setIsReferrerValid(false);
 
@@ -233,7 +249,10 @@ export const SignUpForm = () => {
   // Para obtener direccion automatica de wallet conectada
   useEffect(() => {
     if (currentUser.status === "connected") {
-      setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
+      setFormData(prevData => ({
+        ...prevData,
+        wallet: currentUser.address ?? "",
+      }));
       const checkConnect = setTimeout(() => handleConnectWallet(), 2000);
       return () => clearTimeout(checkConnect);
     }
@@ -335,6 +354,22 @@ export const SignUpForm = () => {
             ) : (
               <RiEyeCloseLine className="text-gray-600" />
             )}
+          </div>
+          <div className="absolute inset-y-0 right-10 pr-3 pt-3 flex items-center">
+            <Tooltip
+              content={
+                <ul>
+                  <li>Al menos 8 caracteres</li>
+                  <li>Al menos una minúscula y una mayúscula</li>
+                  <li>Al menos un número</li>
+                  <li>
+                    Al menos un carácter especial: <span className="font-bold">@ ! # ?</span>
+                  </li>
+                </ul>
+              }
+            >
+              <FiHelpCircle className="text-gray-400 cursor-pointer" />
+            </Tooltip>
           </div>
         </div>
       </div>
