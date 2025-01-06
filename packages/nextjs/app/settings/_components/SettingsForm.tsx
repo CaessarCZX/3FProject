@@ -35,6 +35,8 @@ const SettingsForm: React.FC = () => {
           name_beneficiary: decodedToken.name_beneficiary,
           email_beneficiary: decodedToken.email_beneficiary,
         });
+        // Fetch notifications with the email from the token
+        fetchNotifications(decodedToken.email);
       } catch (error) {
         console.error("Error al decodificar el token", error);
       }
@@ -83,6 +85,32 @@ const SettingsForm: React.FC = () => {
       setError("No se pudo actualizar el beneficiario.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const fetchNotifications = async (email: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/notifications`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          page: 1,
+          limit: 10,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al obtener las notificaciones.");
+      }
+
+      const notifications = await response.json();
+      console.log("Notificaciones recibidas:", notifications);
+    } catch (error) {
+      console.error("Error al obtener las notificaciones:", error);
+      setError("No se pudieron obtener las notificaciones.");
     }
   };
 
