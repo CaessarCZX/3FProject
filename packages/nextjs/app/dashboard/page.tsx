@@ -8,10 +8,12 @@ import InternalLayout from "~~/components/Layouts/InternalLayout";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
 import { useGetNotfications } from "~~/hooks/user/useGetNotifications";
+import { useGetMemberAffiliatesNumber } from "~~/hooks/user/useMemberAffiliatesNumber";
 
 const Dashboard = () => {
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   useGetNotfications();
+  useGetMemberAffiliatesNumber();
 
   useWatchContractEvent({
     address: contract?.address,
