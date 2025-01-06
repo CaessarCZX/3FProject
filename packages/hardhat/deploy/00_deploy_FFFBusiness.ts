@@ -3,7 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 const USDT_TOKEN = process.env.TEST_TOKEN_ADDRESS_FUSDT;
-const ADMIN_KEY = process.env.ADMIN_KEY;
+const MEMBERS_KEY = process.env.INVITATION_MEMBERS_KEY;
 
 const deployFFFBusiness: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
@@ -11,7 +11,7 @@ const deployFFFBusiness: DeployFunction = async function (hre: HardhatRuntimeEnv
 
   const deployment = await deploy("FFFBusiness", {
     from: deployer,
-    args: [USDT_TOKEN, ADMIN_KEY],
+    args: [USDT_TOKEN, MEMBERS_KEY],
     log: true,
     autoMine: true,
   });

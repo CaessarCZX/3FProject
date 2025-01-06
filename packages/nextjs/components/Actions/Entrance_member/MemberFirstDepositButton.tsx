@@ -16,6 +16,7 @@ import { DepositErrors as err } from "~~/utils/errors/errors";
 import { notification } from "~~/utils/scaffold-eth";
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 interface DecodedToken {
@@ -55,8 +56,13 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
       try {
         // Decodifica el JWT para obtener el contenido del payload
         const decoded: DecodedToken = jwtDecode(storedToken);
-        const uplines: string[] = decoded.ReferersCommissions;
         const userId = decoded.id; // Extrae la propiedad id del usuario en el token
+        /**
+         * IMPORTANTT!
+         * @RefererCommissions brings the upline referer from top to bottom
+         * with the direct upline in the last position
+         */
+        const uplines: string[] = decoded.ReferersCommissions.toReversed(); //Copy from ReferersCommmission
 
         if (uplines) {
           setUplineMembers({
@@ -248,6 +254,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
             uplineMembers.secondLevelUpline,
             uplineMembers.thirtLevelUpline,
             allowanceAmount,
+            MEMBERS_KEY,
           ],
         });
 

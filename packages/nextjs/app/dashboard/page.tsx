@@ -2,15 +2,26 @@
 
 import CommonDashboard from "./_components/CommonDashboard";
 import FirstDepositScreen from "./_components/FirstDepositScreen";
-// import { useWatchContractEvent } from "wagmi";
+import { useWatchContractEvent } from "wagmi";
 import withAuth from "~~/app/hoc/withAuth";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
-// import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
 import { useGetNotfications } from "~~/hooks/user/useGetNotifications";
 
 const Dashboard = () => {
+  const { data: contract } = useDeployedContractInfo("FFFBusiness");
   useGetNotfications();
+
+  useWatchContractEvent({
+    address: contract?.address,
+    abi: contract?.abi,
+    eventName: "ProccessPayment",
+    onLogs(logs) {
+      console.log("Payment proccess!", logs);
+    },
+  });
+
   const { memberStatus } = useGetMemberStatus();
 
   // Cambiar memberStatus a false en producción

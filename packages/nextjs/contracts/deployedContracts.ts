@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   11155111: {
     FFFBusiness: {
-      address: "0x384122BDDbb3Cd611CeD9bF2602a5A1726EfE42A",
+      address: "0x81cf0b8E643Dca08DF6A29bf22b468c7241f5F75",
       abi: [
         {
           inputs: [
@@ -18,7 +18,7 @@ const deployedContracts = {
             },
             {
               internalType: "string",
-              name: "initialKey",
+              name: "memberKey",
               type: "string",
             },
           ],
@@ -111,6 +111,25 @@ const deployedContracts = {
             },
           ],
           name: "KeyUpdated",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "message",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "Log",
           type: "event",
         },
         {
@@ -236,6 +255,31 @@ const deployedContracts = {
           anonymous: false,
           inputs: [
             {
+              indexed: false,
+              internalType: "string",
+              name: "message",
+              type: "string",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "ProccessPayment",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
               indexed: true,
               internalType: "address",
               name: "to",
@@ -254,7 +298,82 @@ const deployedContracts = {
               type: "uint256",
             },
           ],
-          name: "PullPayment",
+          name: "PullCommissionPaid",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "previousAdminRole",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "newAdminRole",
+              type: "bytes32",
+            },
+          ],
+          name: "RoleAdminChanged",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "sender",
+              type: "address",
+            },
+          ],
+          name: "RoleGranted",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "sender",
+              type: "address",
+            },
+          ],
+          name: "RoleRevoked",
           type: "event",
         },
         {
@@ -313,6 +432,12 @@ const deployedContracts = {
             {
               indexed: true,
               internalType: "address",
+              name: "member",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
               name: "to",
               type: "address",
             },
@@ -335,6 +460,45 @@ const deployedContracts = {
         {
           stateMutability: "payable",
           type: "fallback",
+        },
+        {
+          inputs: [],
+          name: "ADMIN_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "DEFAULT_ADMIN_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "addAdmin",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
         },
         {
           inputs: [
@@ -466,9 +630,9 @@ const deployedContracts = {
           name: "getDepositMultiple",
           outputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -479,9 +643,9 @@ const deployedContracts = {
           name: "getMaxContractBalance",
           outputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -511,9 +675,9 @@ const deployedContracts = {
           name: "getMembershipPaymentToBusiness",
           outputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -524,9 +688,9 @@ const deployedContracts = {
           name: "getMembershipPaymentToUpline",
           outputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -537,9 +701,9 @@ const deployedContracts = {
           name: "getMinAmountToDeposit",
           outputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -548,17 +712,17 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
-              name: "_currentMember",
-              type: "address",
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
             },
           ],
-          name: "getTotalAffiliatesPerMember",
+          name: "getRoleAdmin",
           outputs: [
             {
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "",
-              type: "uint256",
+              type: "bytes32",
             },
           ],
           stateMutability: "view",
@@ -580,6 +744,48 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "grantRole",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "hasRole",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
               internalType: "uint256",
               name: "_paymentAmount",
               type: "uint256",
@@ -590,9 +796,9 @@ const deployedContracts = {
               type: "address",
             },
             {
-              internalType: "string",
-              name: "_adminKey",
-              type: "string",
+              internalType: "address",
+              name: "_walletToPay",
+              type: "address",
             },
           ],
           name: "liquidateMemberFunds",
@@ -621,6 +827,11 @@ const deployedContracts = {
               internalType: "uint256",
               name: "_amount",
               type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "memberKey",
+              type: "string",
             },
           ],
           name: "memberEntrance",
@@ -654,9 +865,9 @@ const deployedContracts = {
               type: "address",
             },
             {
-              internalType: "string",
-              name: "_adminKey",
-              type: "string",
+              internalType: "bool",
+              name: "_isPullCommission",
+              type: "bool",
             },
           ],
           name: "paymentCommissions",
@@ -667,22 +878,12 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
-              name: "_paymentAmount",
-              type: "uint256",
-            },
-            {
               internalType: "address",
-              name: "_memberAddress",
+              name: "account",
               type: "address",
             },
-            {
-              internalType: "string",
-              name: "_adminKey",
-              type: "string",
-            },
           ],
-          name: "paymentForPulls",
+          name: "removeAdmin",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -690,6 +891,42 @@ const deployedContracts = {
         {
           inputs: [],
           name: "renounceOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "renounceRole",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "revokeRole",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -749,9 +986,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "_newMultiple",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           name: "setDepositMultiple",
@@ -762,9 +999,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "_newMaxBalance",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           name: "setMaxContractBalance",
@@ -775,9 +1012,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "_toBusiness",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           name: "setMembershipPaymentToBusiness",
@@ -788,9 +1025,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "_toUpline",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           name: "setMembershipPaymentToUpline",
@@ -801,14 +1038,33 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint128",
+              internalType: "uint256",
               name: "_newMinAmount",
-              type: "uint128",
+              type: "uint256",
             },
           ],
           name: "setMinAmountToDeposit",
           outputs: [],
           stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes4",
+              name: "interfaceId",
+              type: "bytes4",
+            },
+          ],
+          name: "supportsInterface",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
           type: "function",
         },
         {
@@ -838,19 +1094,6 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [
-            {
-              internalType: "string",
-              name: "newKey",
-              type: "string",
-            },
-          ],
-          name: "updateAdminKey",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
           inputs: [],
           name: "withdraw",
           outputs: [],
@@ -866,6 +1109,13 @@ const deployedContracts = {
         owner: "@openzeppelin/contracts/access/Ownable.sol",
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+        DEFAULT_ADMIN_ROLE: "@openzeppelin/contracts/access/AccessControl.sol",
+        getRoleAdmin: "@openzeppelin/contracts/access/AccessControl.sol",
+        grantRole: "@openzeppelin/contracts/access/AccessControl.sol",
+        hasRole: "@openzeppelin/contracts/access/AccessControl.sol",
+        renounceRole: "@openzeppelin/contracts/access/AccessControl.sol",
+        revokeRole: "@openzeppelin/contracts/access/AccessControl.sol",
+        supportsInterface: "@openzeppelin/contracts/access/AccessControl.sol",
       },
     },
   },
