@@ -16,10 +16,15 @@ const Terms: NextPage = () => {
   const [isActiveMember, setIsActiveMember] = useState(false);
   useEffect(() => {
     const storedToken = window.localStorage.getItem("token");
+    const sessionToken = window.sessionStorage.getItem("sessionToken");
 
     if (storedToken) {
       try {
         const decoded: DecodedToken = jwtDecode(storedToken);
+
+        if (!sessionToken) {
+          return;
+        }
 
         if (!decoded.isActive) {
           return;

@@ -63,7 +63,7 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 	event MembershipPaid(address indexed from, uint amount, uint timestamp);
 
 	//Member events
-	event WithdrawalMember(address indexed to, uint amount, uint timestamp);
+	event WithdrawalMember(address indexed member, address indexed to , uint amount, uint timestamp);
 	event CommissionPaid(address indexed to, uint amount, uint timestamp);
 	event PullCommissionPaid(address indexed to, uint amount, uint timestamp);
 	event NewMember(address indexed member, uint timestamp);
@@ -308,7 +308,8 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 
 	function liquidateMemberFunds(
 		uint256 _paymentAmount,
-		address _memberAddress
+		address _memberAddress,
+		address _walletToPay
 	) external checkValidAddress(_memberAddress) onlyRole(ADMIN_ROLE) {
 		Member storage currentMember = members[_memberAddress];
 		require(currentMember.isActive, "Miembro no activo");
@@ -316,14 +317,17 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 
 		currentMember.balance -= _paymentAmount;
 		_totalBalance -= _paymentAmount;
-		_withdraw(_memberAddress, _paymentAmount);
-		emit WithdrawalMember(_memberAddress, _paymentAmount, block.timestamp);
+		
+		require(_walletToPay != address(0), "Direccion de wallet de destino no valida");
+
+		_withdraw(_walletToPay, _paymentAmount);
+		emit WithdrawalMember(_memberAddress, _walletToPay, _paymentAmount, block.timestamp);
 	}
 
 	function setBusinessWallet(
 		address payable _newBusinessWallet
 	) external onlyOwner {
-		require(_newBusinessWallet != address(0), "Invalid address");
+		require(_newBusinessWallet != address(0), "Direccion de nueva wallet no valida");
 
 		_businessWallet = _newBusinessWallet;
 
