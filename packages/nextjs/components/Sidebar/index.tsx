@@ -58,7 +58,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     ...group,
     menuItems: group.menuItems.filter(
       menuItem =>
-        menuItem.label !== "Admin" || // Ajusta el label según corresponda
+        menuItem.label !== "Administración" || // Ajusta el label según corresponda
         isAdmin,
     ),
   }));
