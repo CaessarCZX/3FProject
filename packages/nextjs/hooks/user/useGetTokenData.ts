@@ -13,6 +13,7 @@ interface DecodedToken {
   name_beneficiary: string;
   balance: number;
   referrals: string[];
+  membership: number;
 }
 
 export const useGetTokenData = () => {
@@ -40,6 +41,7 @@ export const useGetTokenData = () => {
         name_beneficiary: decoded.name_beneficiary,
         balance: decoded.balance,
         referrals: decoded.referrals,
+        membership: decoded.membership,
       });
     } catch (e) {
       console.error("Error obtaining token information: ", e);

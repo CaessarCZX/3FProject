@@ -1,13 +1,7 @@
-import { useScaffoldReadContract } from "../scaffold-eth/useScaffoldReadContract";
-import { useAccount } from "wagmi";
+import { useGetTokenData } from "./useGetTokenData";
 
 export const useMemberBalance = () => {
-  const currentMember = useAccount();
-  const { data: memberBalance } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "getMemberBalance",
-    args: [currentMember?.address],
-  });
+  const { tokenInfo } = useGetTokenData();
 
-  return memberBalance || null;
+  return tokenInfo?.balance || null;
 };

@@ -1,7 +1,5 @@
-// import { useEffect, useState } from "react";
 import { TransactionsTableRow } from "./TransactionsTableRow";
 import { MemberSaving } from "~~/types/transaction/saving";
-import { getDateAndTimeFromTimestamp } from "~~/utils/3FContract/timestampFormatter";
 
 type TransactionTableProps = {
   transactions: MemberSaving[];
@@ -43,16 +41,13 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
 
         <tbody>
           {transactions.map((tx, key) => {
-            const { date, time } = getDateAndTimeFromTimestamp(tx.date);
-            // const value = formatUnits(BigInt(tx.value), 6);
             return (
               <TransactionsTableRow
                 key={tx._id}
                 index={key}
                 hash={tx.hash}
                 value={tx.amount}
-                date={date}
-                time={time}
+                date={tx.date}
                 status={tx.status}
                 lengthData={transactions.length}
               />

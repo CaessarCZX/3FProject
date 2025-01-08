@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   11155111: {
     FFFBusiness: {
-      address: "0x81cf0b8E643Dca08DF6A29bf22b468c7241f5F75",
+      address: "0x6eAa7B3E3D688Eb2BDcBd781a69C7d24Ff1aa6fE",
       abi: [
         {
           inputs: [
@@ -503,25 +503,6 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
-              name: "_member",
-              type: "address",
-            },
-          ],
-          name: "checkActiveMember",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
               internalType: "uint256",
               name: "_amount",
               type: "uint256",
@@ -553,6 +534,11 @@ const deployedContracts = {
               internalType: "address",
               name: "_thirtLevelUpline",
               type: "address",
+            },
+            {
+              internalType: "string",
+              name: "_memberKey",
+              type: "string",
             },
           ],
           name: "depositMemberFunds",
@@ -641,25 +627,6 @@ const deployedContracts = {
         {
           inputs: [],
           name: "getMaxContractBalance",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_currentMember",
-              type: "address",
-            },
-          ],
-          name: "getMemberBalance",
           outputs: [
             {
               internalType: "uint256",
@@ -796,6 +763,11 @@ const deployedContracts = {
               type: "address",
             },
             {
+              internalType: "uint256",
+              name: "_currentMemberBalance",
+              type: "uint256",
+            },
+            {
               internalType: "address",
               name: "_walletToPay",
               type: "address",
@@ -830,7 +802,7 @@ const deployedContracts = {
             },
             {
               internalType: "string",
-              name: "memberKey",
+              name: "_memberKey",
               type: "string",
             },
           ],
