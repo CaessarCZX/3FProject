@@ -19,6 +19,7 @@ interface DecodedToken {
 }
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 interface DecodedToken {
@@ -270,6 +271,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
             uplineMembers.uplineAddress,
             uplineMembers.secondLevelUpline,
             uplineMembers.thirtLevelUpline,
+            MEMBERS_KEY,
           ],
         });
 

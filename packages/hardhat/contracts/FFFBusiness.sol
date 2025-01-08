@@ -31,15 +31,6 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 	uint8 private _COMMISSION_PER_TIER_TWO;
 	uint8 private _COMMISSION_PER_TIER_THREE;
 
-	// Represents every client wallet
-	struct Member {
-		address payable memberWallet;
-		bool isActive;
-		uint256 balance; // Total savings per client
-	}
-
-	mapping(address => Member) private members;
-
 	//Testing events
 	event Log(string message, uint amount);
 	event ProccessPayment(string message, address indexed to, uint amount);
@@ -98,25 +89,20 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 
 		// Balance for total members
 		_totalBalance = 0;
-
-		// Principal wallet is the first member
-		_createMember(_businessWallet);
 	}
 
 	// Modofiers
-	modifier onlyActiveMember() {
-		require(members[msg.sender].isActive, "Miembro no activo");
+	modifier onlyActiveMember(string memory _memberKey) {
+		require(
+			keccak256(abi.encodePacked(_memberKey)) == _MEMBER_KEY,
+			"Codigo de invitacion invalido"
+		);
 		_;
 	}
 
 	modifier checkValidAddress(address _recipient) {
 		require(_recipient != address(0), "Direccion invalida");
 		_;
-	}
-
-	// Checkers
-	function checkActiveMember(address _member) public view returns (bool) {
-		return members[_member].isActive;
 	}
 
 	// Getters for bussiness logic vars
@@ -130,12 +116,6 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 
 	function getTotalMembers() public view returns (uint) {
 		return _totalMembers;
-	}
-
-	function getMemberBalance(
-		address _currentMember
-	) public view returns (uint) {
-		return members[_currentMember].balance;
 	}
 
 	function getMinAmountToDeposit() public view returns (uint256) {
@@ -309,13 +289,12 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 	function liquidateMemberFunds(
 		uint256 _paymentAmount,
 		address _memberAddress,
+		uint256 _currentMemberBalance,
 		address _walletToPay
 	) external checkValidAddress(_memberAddress) onlyRole(ADMIN_ROLE) {
-		Member storage currentMember = members[_memberAddress];
-		require(currentMember.isActive, "Miembro no activo");
-		require(currentMember.balance >= _paymentAmount, "Monto invalido");
+		require(_currentMemberBalance >= _paymentAmount, "Monto invalido");
 
-		currentMember.balance -= _paymentAmount;
+		// Update balance for deposit members in smart Contract
 		_totalBalance -= _paymentAmount;
 		
 		require(_walletToPay != address(0), "Direccion de wallet de destino no valida");
@@ -350,21 +329,17 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 		address _secondLevelUpline,
 		address _thirtLevelUpline,
 		uint256 _amount,
-		string memory memberKey
+		string memory _memberKey
 	) public {
-		require(
-			keccak256(abi.encodePacked(memberKey)) == _MEMBER_KEY,
-			"Codigo de invitacion invalido"
-		);
-		if (!members[msg.sender].isActive) {
-			_createMember(payable(msg.sender));
-		}
+		_totalMembers++;
+		emit NewMember(msg.sender, block.timestamp);
 
 		_firstDeposit(
 			_amount,
 			_uplineAddress,
 			_secondLevelUpline,
-			_thirtLevelUpline
+			_thirtLevelUpline,
+			_memberKey
 		);
 	}
 
@@ -386,8 +361,9 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 		uint256 _amount,
 		address _firstLevelUpline,
 		address _secondLevelUpline,
-		address _thirtLevelUpline
-	) public onlyActiveMember {
+		address _thirtLevelUpline,
+		string memory _memberKey
+	) public onlyActiveMember(_memberKey) {
 		require(
 			_amount >= _MIN_AMOUNT_TO_DEPOSIT,
 			"Deposito no alcanza monto minimo"
@@ -403,7 +379,6 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 
 		_deposit(msg.sender, _amount);
 
-		members[msg.sender].balance += _amount;
 		emit NewSaving(msg.sender, _amount, block.timestamp);
 
 		uint256 commissionFirstLevel = _calculateCommission(
@@ -461,8 +436,9 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 		uint256 _amount,
 		address _uplineAddress,
 		address _secondLevelUpline,
-		address _thirtLevelUpline
-	) private onlyActiveMember {
+		address _thirtLevelUpline,
+		string memory _memberKey
+	) private {
 		uint256 membership = _MEMBERSHIP_PAYMENT_TO_BUSINESS +
 			_MEMBERSHIP_PAYMENT_TO_UPLINE;
 		uint256 firstDeposit = _amount - membership;
@@ -493,7 +469,8 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 			firstDeposit,
 			_uplineAddress,
 			_secondLevelUpline,
-			_thirtLevelUpline
+			_thirtLevelUpline,
+			_memberKey
 		);
 
 		emit NewSaving(msg.sender, firstDeposit, block.timestamp);
@@ -555,19 +532,6 @@ contract FFFBusiness is Ownable, AccessControl, ReentrancyGuard {
 		uint256 _refundPercent
 	) private pure returns (uint) {
 		return (_amount * _refundPercent) / 100;
-	}
-
-	function _createMember(
-		address payable _newMember
-	) private checkValidAddress(_newMember) {
-		members[_newMember] = Member({
-			memberWallet: _newMember,
-			isActive: true,
-			balance: 0
-		});
-
-		_totalMembers++;
-		emit NewMember(_newMember, block.timestamp);
 	}
 
 	receive() external payable {

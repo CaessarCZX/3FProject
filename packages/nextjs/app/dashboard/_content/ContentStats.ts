@@ -1,26 +1,19 @@
-import { formatUnits } from "viem";
-import { useAccount } from "wagmi";
 import { BanknotesIcon, EyeIcon } from "@heroicons/react/24/outline";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useMemberBalance } from "~~/hooks/user/useMemberBalance";
 import { ContentStatsType } from "~~/types/cardstats";
 import { formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 
 const useGetContentStats = () => {
-  const currentMember = useAccount();
-  const { data: memberBalance } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "getMemberBalance",
-    args: [currentMember?.address],
-  });
+  const currentBalance = useMemberBalance();
 
-  const dolarBalance = Number(formatUnits(BigInt(memberBalance || 0), 6));
+  const dolarBalance = Number(currentBalance);
 
   const ContentStats: ContentStatsType[] = [
     {
       icon: EyeIcon,
       title: "Balance",
       total: formatCurrency(dolarBalance) ?? "",
-      rate: "0.43%",
+      rate: "",
       levelUp: true,
       levelDown: false,
     },
@@ -28,7 +21,7 @@ const useGetContentStats = () => {
       icon: BanknotesIcon,
       title: "Total Retirado",
       total: "$0.00",
-      rate: "0.43%",
+      rate: "",
       levelUp: true,
       levelDown: false,
     },

@@ -18,10 +18,12 @@ import { notification } from "~~/utils/scaffold-eth";
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
+const PATCH_MEMBERSHIP_TO_MAIL = 500;
 
 interface DecodedToken {
   ReferersCommissions: string[];
   id: string;
+  email: string;
 }
 
 interface UplineMembers {
@@ -42,6 +44,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   const member = useAccount();
   const memberAddress = member?.address ?? "0x0";
   const [id, setId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [uplineMembers, setUplineMembers] = useState<UplineMembers>({
     uplineAddress: "",
     secondLevelUpline: "",
@@ -57,6 +60,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
         // Decodifica el JWT para obtener el contenido del payload
         const decoded: DecodedToken = jwtDecode(storedToken);
         const userId = decoded.id; // Extrae la propiedad id del usuario en el token
+        const email = decoded.email; // Extraen el email del usuario en el token
         /**
          * IMPORTANTT!
          * @RefererCommissions brings the upline referer from top to bottom
@@ -72,9 +76,8 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
           });
         }
 
-        if (userId) {
-          setId(userId || null); // Ingresa propiedad Id
-        }
+        setId(userId || null); // Ingresa propiedad Id
+        setEmail(email || null);
       } catch (error) {
         console.error("Error al decodificar el token:", error);
       }
@@ -110,6 +113,8 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
   const ShowNotification = (message: string) => {
     notification.error(message, { position: "bottom-right", duration: 5000 });
   };
+
+  // const PathAmountToMail = {};
 
   // const HandleTest = () => {
   //   console.log("Im activate");
@@ -151,6 +156,19 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
 
         const transactionData = await transactionResponse.json();
         console.log("Transacción creada exitosamente:", transactionData);
+
+        // Monto de resguardo en este ahorro
+        const amountToFirstDeposit = amount - PATCH_MEMBERSHIP_TO_MAIL;
+
+        //Envio de email y notificacion en el proceso
+        await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/saving`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            toEmail: email,
+            amount: amountToFirstDeposit,
+          }),
+        });
       } else {
         console.warn("Health check: Problema detectado con el servidor o la base de datos");
       }
@@ -274,6 +292,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
           }));
 
           const amount = parseFloat(depositAmount); // Monto a enviar al servidor convertido a number
+          console.log("Amount to server: ", amount);
           await performHealthCheck(amount, depositContractReceiptHash.transactionHash);
 
           setTimeout(() => {
