@@ -5,6 +5,7 @@ import FirstDepositScreen from "./_components/FirstDepositScreen";
 import { useWatchContractEvent } from "wagmi";
 import withAuth from "~~/app/hoc/withAuth";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
+import { useInitializeMemberBalance } from "~~/hooks/3FProject/useInitializeMemberBalance";
 import { useWalletDisconnect } from "~~/hooks/3FProject/useWalletDisconnect";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
@@ -16,6 +17,7 @@ const Dashboard = () => {
   useGetNotfications();
   useGetMemberAffiliatesNumber();
   useWalletDisconnect();
+  useInitializeMemberBalance();
 
   useWatchContractEvent({
     address: contract?.address,

@@ -34,6 +34,9 @@ type GlobalState = {
   memberAffiliates: {
     count: number;
   };
+  memberBalance: {
+    balance: number;
+  };
 };
 
 type GlobalActions = {
@@ -47,6 +50,7 @@ type GlobalActions = {
   setIsActiveMemberStatus: (newCurrentMemberStatus: boolean) => void;
   setIsMemberStatusFetching: (newIsMemeberStatusFetching: boolean) => void;
   setMemberAffiliatesCount: (newMemberAffiliatesCount: number) => void;
+  setMemberBalance: (newMemberBalance: number) => void;
 };
 
 type GlobalStorage = GlobalState & GlobalActions;
@@ -98,15 +102,21 @@ export const useGlobalState = create<GlobalStorage>()(
       },
       setMemberAffiliatesCount: (newValue: number): void =>
         set(state => ({ memberAffiliates: { ...state.memberAffiliates, count: newValue } })),
+
+      memberBalance: {
+        balance: 0,
+      },
+      setMemberBalance: (newValue: number): void =>
+        set(state => ({ memberBalance: { ...state.memberBalance, balance: newValue } })),
     }),
     {
       name: "global-storage", // nombre único para localStorage
       partialize: state => ({
         nativeCurrency: state.nativeCurrency,
         mexicanPeso: state.mexicanPeso,
-        targetNetwork: state.targetNetwork,
         memberStatus: state.memberStatus,
         memberAffiliates: state.memberAffiliates,
+        memberBalance: state.memberBalance,
       }),
     },
   ),

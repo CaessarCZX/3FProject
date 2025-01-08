@@ -7,12 +7,13 @@ import { fetchMemberSavings } from "~~/utils/Transactions/fetchMemberSavings";
 export const useGetMemberSavings = () => {
   const setIsMemberSavingsFetching = useGlobalState(state => state.setIsMemberSavingsFetching);
   const setMemberSavings = useGlobalState(state => state.setMemberSavings);
+  const setMemberBalance = useGlobalState(state => state.setMemberBalance);
   const [errorRequest, setErrorRequest] = useState("");
 
   const fetchSavings = useCallback(async () => {
     setIsMemberSavingsFetching(true);
 
-    const { memberSavings, error } = await fetchMemberSavings();
+    const { memberSavings, balance, error } = await fetchMemberSavings();
 
     if (error) {
       setIsMemberSavingsFetching(false);
@@ -21,9 +22,10 @@ export const useGetMemberSavings = () => {
     }
 
     if (memberSavings) setMemberSavings(memberSavings);
+    if (balance) setMemberBalance(balance);
 
     setIsMemberSavingsFetching(false);
-  }, [setIsMemberSavingsFetching, setMemberSavings]);
+  }, [setIsMemberSavingsFetching, setMemberBalance, setMemberSavings]);
 
   return { fetchSavings, error: errorRequest };
 };
