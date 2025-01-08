@@ -1,10 +1,10 @@
 import { BanknotesIcon, EyeIcon } from "@heroicons/react/24/outline";
-import { useMemberBalance } from "~~/hooks/user/useMemberBalance";
+import { useGetMemberBalance } from "~~/hooks/user/useMemberBalance";
 import { ContentStatsType } from "~~/types/cardstats";
 import { formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 
 const useGetContentStats = () => {
-  const currentBalance = useMemberBalance();
+  const currentBalance = useGetMemberBalance();
 
   const dolarBalance = Number(currentBalance);
 
