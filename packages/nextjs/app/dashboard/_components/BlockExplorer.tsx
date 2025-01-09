@@ -12,26 +12,26 @@ import { notification } from "~~/utils/scaffold-eth";
 const BlockExplorer = () => {
   const memberTransactions = useGlobalState(state => state.memberSavings.transactions);
   const isLoading = useGlobalState(state => state.memberSavings.isFetching);
-  const isActiveMember = useGlobalState(state => state.memberStatus.active);
+  const withMembership = useGlobalState(state => state.memberStatus.withMembership);
   const { fetchSavings, error } = useGetMemberSavings();
 
   // Obtener las transacciones de los miembros del state global
   useEffect(() => {
     try {
       // Si el miembro esta activo pero surgio un error con la peticion, suelta un error
-      if (isActiveMember && error) {
+      if (withMembership && error) {
         throw new Error();
       }
 
       // Si esta activo, sus transacciones son 0 pero no tiene error, hace peticion
-      if (isActiveMember && !error && memberTransactions.length === 0) {
+      if (withMembership && !error && memberTransactions.length === 0) {
         fetchSavings();
       }
     } catch (e) {
       console.error("Error al intentar traer transacciones");
       notification.error(error);
     }
-  }, [fetchSavings, isActiveMember, error, memberTransactions]);
+  }, [fetchSavings, withMembership, error, memberTransactions]);
 
   return (
     <div className="container mx-auto rounded-xl overflow-hidden">

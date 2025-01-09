@@ -37,7 +37,7 @@ export const TransactionsTableRow = ({ hash, value, date, status, lengthData, in
       }`}
     >
       <td className="flex items-center gap-3 p-2.5 xl:p-5">
-        <p className="hidden font-light text-black dark:text-white sm:block">
+        <p className="hidden font-light text-black dark:text-white sm:block my-2">
           {formatCurrency(Number(value))} <span className="font-black text-xs">USDT</span>
         </p>
       </td>
@@ -47,7 +47,7 @@ export const TransactionsTableRow = ({ hash, value, date, status, lengthData, in
       </td>
 
       <td className="flex items-center justify-center p-2.5 xl:p-5">
-        <p className="text-meta-3 dark:text-white">
+        <p className="text-meta-3 dark:text-green-500 text-sm my-2">
           {new Date(date).toLocaleDateString("es-ES", {
             day: "2-digit",
             month: "2-digit",
@@ -56,7 +56,7 @@ export const TransactionsTableRow = ({ hash, value, date, status, lengthData, in
         </p>
       </td>
 
-      <td className="hidden items-center font-bold justify-center p-2.5 sm:flex xl:p-5">
+      <td className="hidden items-center text-sm font-bold justify-center p-2.5 sm:flex xl:p-5">
         {/* <p className="text-black dark:text-white">{brand.sales}</p> */}
         {/* <WithdrawalCounter date={date} time={time} /> */}
         {getTrimestreDaysLeft(date, 3)}
@@ -65,7 +65,7 @@ export const TransactionsTableRow = ({ hash, value, date, status, lengthData, in
       <td className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
         {/* <p className="text-meta-5">{brand.conversion}%</p> */}
         {/* <p className="text-meta-5">Pendiente</p> */}
-        <p className="text-meta-5">{status && "Completado"}</p>
+        <p className="text-meta-5 text-sm my-2">{status && "Completado"}</p>
       </td>
     </tr>
   );
