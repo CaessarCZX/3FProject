@@ -32,7 +32,7 @@ const Dashboard = () => {
   return (
     <InternalLayout>
       {/* Mostrar FirstDepositScreen si el miembro no tiene estado */}
-      {!memberStatus ? (
+      {memberStatus ? (
         <div className="max-w-full w-full px-4 sm:px-6 md:px-8">
           <FirstDepositScreen />
         </div>
