@@ -26,7 +26,7 @@ const NotificationExplorer: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, page }),
+        body: JSON.stringify({ email, page, limit: 10 }),
         credentials: "include",
       });
 

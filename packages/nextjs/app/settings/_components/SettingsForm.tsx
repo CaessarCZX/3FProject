@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { jwtDecode } from "jwt-decode";
 import { useDisconnect } from "wagmi";
+import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { useGlobalState } from "~~/services/store/store";
 
 interface UserInfo {
@@ -10,10 +10,19 @@ interface UserInfo {
   email: string;
   name_beneficiary?: string;
   email_beneficiary?: string;
+  wallet: string;
 }
 
 const SettingsForm: React.FC = () => {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const { tokenInfo } = useGetTokenData();
+  const userInfo: UserInfo = {
+    id: tokenInfo.id,
+    name: tokenInfo.name,
+    email: tokenInfo.email,
+    name_beneficiary: tokenInfo.name_beneficiary,
+    email_beneficiary: tokenInfo.email_beneficiary,
+    wallet: tokenInfo.wallet,
+  };
   const [beneficiary, setBeneficiary] = useState({
     name: "",
     email: "",
@@ -22,26 +31,6 @@ const SettingsForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { disconnect } = useDisconnect(); // For blockchain
   const router = useRouter();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decodedToken: any = jwtDecode(token);
-        setUserInfo({
-          id: decodedToken.id || "12345",
-          name: decodedToken.name || "Alexis Lopez",
-          email: decodedToken.email || "alexis@example.com",
-          name_beneficiary: decodedToken.name_beneficiary,
-          email_beneficiary: decodedToken.email_beneficiary,
-        });
-        // Fetch notifications with the email from the token
-        fetchNotifications(decodedToken.email);
-      } catch (error) {
-        console.error("Error al decodificar el token", error);
-      }
-    }
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,69 +77,74 @@ const SettingsForm: React.FC = () => {
     }
   };
 
-  const fetchNotifications = async (email: string) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/notifications`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          page: 1,
-          limit: 10,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al obtener las notificaciones.");
-      }
-
-      const notifications = await response.json();
-      console.log("Notificaciones recibidas:", notifications);
-    } catch (error) {
-      console.error("Error al obtener las notificaciones:", error);
-      setError("No se pudieron obtener las notificaciones.");
-    }
-  };
-
   return (
-    <div className="p-6">
-      <div className="mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-3xl font-light text-gray-500">General</h2>
+    <div>
+      <div className="mx-auto bg-white dark:bg-boxdark dark:border-strokedark shadow-default rounded-lg p-6">
+        <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400">General</h2>
 
         {/* Información del Usuario */}
         {userInfo ? (
-          <div className="mt-6">
-            <h3 className="text-lg font-medium text-gray-700">Información Personal</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                <input
-                  type="text"
-                  value={userInfo.name}
-                  readOnly
-                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Correo</label>
-                <input
-                  type="text"
-                  value={userInfo.email}
-                  readOnly
-                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700"
-                />
+          <>
+            <div className="mt-6">
+              <h3 className="text-lg text-right font-medium text-gray-700 dark:text-gray-500">Información Personal</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Nombre</label>
+                  <input
+                    type="text"
+                    value={userInfo.name}
+                    readOnly
+                    className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700 dark:bg-form-strokedark dark:text-whiten cursor-default"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Correo</label>
+                  <input
+                    type="text"
+                    value={userInfo.email}
+                    readOnly
+                    className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700 dark:bg-form-strokedark dark:text-whiten cursor-default"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+
+            {/* Para wallet registrada */}
+            <div className="mt-8">
+              <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400 mb-4">Wallet</h2>
+              <div>
+                <form>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-500 mb-1">
+                    Wallet para retiro
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
+                    <input
+                      type="text"
+                      name="walletRecipient"
+                      value={userInfo?.wallet}
+                      readOnly
+                      placeholder="Correo de nuevo referido"
+                      className="flex-1 block px-4 py-2 border rounded-md bg-gray-100 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten cursor-default"
+                    />
+                    <button
+                      type="submit"
+                      disabled
+                      className={`max-w-xs sm:max-w-sm transition-colors px-6 py-2 bg-gray-400 dark:bg-gray-600 text-white rounded-md shadow-default cursor-not-allowed focus:outline-none `}
+                    >
+                      Confirmar wallet
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </>
         ) : (
           <p className="text-gray-500">Cargando información del usuario...</p>
         )}
 
         {/* Formulario para Beneficiario */}
         <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-700">Agregar Beneficiario</h3>
+          <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400 mb-4">Beneficiario</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">Nombre</label>
@@ -160,7 +154,7 @@ const SettingsForm: React.FC = () => {
                 value={beneficiary.name || userInfo?.name_beneficiary || ""}
                 onChange={handleInputChange}
                 placeholder="Nombre del beneficiario"
-                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
                 readOnly={!!userInfo?.name_beneficiary}
               />
             </div>
@@ -172,7 +166,7 @@ const SettingsForm: React.FC = () => {
                 value={beneficiary.email || userInfo?.email_beneficiary || ""}
                 onChange={handleInputChange}
                 placeholder="Correo del beneficiario"
-                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
                 readOnly={!!userInfo?.email_beneficiary}
               />
             </div>

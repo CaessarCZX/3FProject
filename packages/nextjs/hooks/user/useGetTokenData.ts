@@ -17,7 +17,20 @@ interface DecodedToken {
 }
 
 export const useGetTokenData = () => {
-  const [tokenInfo, setTokenInfo] = useState<DecodedToken>();
+  const [tokenInfo, setTokenInfo] = useState<DecodedToken>({
+    id: "",
+    email: "",
+    name: "",
+    wallet: "",
+    isAdmin: false,
+    isActive: false,
+    ReferersCommissions: [],
+    email_beneficiary: "",
+    name_beneficiary: "",
+    balance: 0,
+    referrals: [],
+    membership: 0,
+  });
 
   useEffect(() => {
     const storedToken = window.localStorage.getItem("token");

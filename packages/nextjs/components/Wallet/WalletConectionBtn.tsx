@@ -8,9 +8,7 @@ import { useAccount, useDisconnect } from "wagmi";
 import { ArrowLeftOnRectangleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { CpuChipIcon } from "@heroicons/react/24/solid";
 import { WrongNetworkDropdown } from "~~/components/scaffold-eth/RainbowKitCustomConnectButton/WrongNetworkDropdown";
-import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
-import { useGlobalState } from "~~/services/store/store";
 
 /**
  * Custom Wagmi Connect Button (watch balance + custom design)
@@ -26,19 +24,6 @@ export const WalletConnectionBtn: React.FC<RainbowKitCustomConnectButtonProps> =
   const { disconnect } = useDisconnect();
   const [delayResponse, setDelayResponse] = useState<boolean>();
   const currentAccount = useAccount();
-  const { getCurrentMemberStatus } = useInitializeMemberStatus();
-  const setMemberStatus = useGlobalState(state => state.setIsActiveMemberStatus); // Para estado global
-
-  // For fetching member status
-  useEffect(() => {
-    if (currentAccount.isConnected) {
-      getCurrentMemberStatus();
-    }
-
-    if (currentAccount.isDisconnected) {
-      setMemberStatus(false); // Elimina el status del miembro en caso de que la wallet se desconecte
-    }
-  }, [currentAccount, getCurrentMemberStatus, setMemberStatus]);
 
   // For connecting state
   useEffect(() => {

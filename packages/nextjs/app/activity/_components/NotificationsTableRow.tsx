@@ -16,10 +16,6 @@ const MESSAGE_HEADERS = {
   "NEW AFFILIATE": "Nuevo Afiliado",
 };
 
-const key: keyof typeof MESSAGE_HEADERS = "COMMISSION PAYMENT";
-MESSAGE_HEADERS[key];
-console.log(MESSAGE_HEADERS[key]);
-
 export const NotificationsTableRow = ({ type, email, message, amount, date }: MemberActivity) => {
   const formatedDate = useDateEs(date);
 

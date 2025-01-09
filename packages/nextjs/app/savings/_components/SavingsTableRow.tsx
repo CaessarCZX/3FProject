@@ -46,7 +46,7 @@ export const SavingsTableRow = ({ hash, value, date, lengthData, index }: Transa
       </td>
 
       <td className="flex items-center justify-center p-2.5 xl:p-5">
-        <p className="text-meta-3">
+        <p className="text-meta-3 dark:text-green-500 text-sm my-2">
           {new Date(date).toLocaleDateString("es-ES", {
             day: "2-digit",
             month: "2-digit",
@@ -55,20 +55,20 @@ export const SavingsTableRow = ({ hash, value, date, lengthData, index }: Transa
         </p>
       </td>
 
-      <td className="flex items-center font-bold justify-center p-2.5 xl:p-5">
-        <p className="text-gray-700">{getTrimestreDaysLeft(date, 3)}</p>
+      <td className="flex items-center font-medium justify-center p-2.5 xl:p-5">
+        <p className="text-gray-700 dark:text-gray-400 text-sm my-2">{getTrimestreDaysLeft(date, 3)}</p>
       </td>
 
-      <td className="hidden items-center font-bold justify-center p-2.5 sm:flex xl:p-5">
-        <p className="text-gray-700">{getTrimestreDaysLeft(date, 6)}</p>
+      <td className="hidden items-center font-medium justify-center p-2.5 sm:flex xl:p-5">
+        <p className="text-gray-700 dark:text-gray-400 text-sm my-2">{getTrimestreDaysLeft(date, 6)}</p>
       </td>
 
-      <td className="hidden items-center font-bold justify-center p-2.5 sm:flex xl:p-5">
-        <p className="text-gray-700">{getTrimestreDaysLeft(date, 9)}</p>
+      <td className="hidden items-center font-medium justify-center p-2.5 sm:flex xl:p-5">
+        <p className="text-gray-700 dark:text-gray-400 text-sm my-2">{getTrimestreDaysLeft(date, 9)}</p>
       </td>
 
-      <td className="hidden items-center font-bold justify-center p-2.5 sm:flex xl:p-5">
-        <p className="text-meta-7">{getTrimestreDaysLeft(date, 10)}</p>
+      <td className="hidden items-center font-medium justify-center p-2.5 sm:flex xl:p-5">
+        <p className="text-meta-7 dark:text-red-700 text-sm my-2">{getTrimestreDaysLeft(date, 10)}</p>
       </td>
     </tr>
   );

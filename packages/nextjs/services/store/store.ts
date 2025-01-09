@@ -28,8 +28,7 @@ type GlobalState = {
     isFetching: boolean;
   };
   memberStatus: {
-    active: boolean;
-    isFetching: boolean;
+    withMembership: boolean | null;
   };
   memberAffiliates: {
     count: number;
@@ -47,8 +46,7 @@ type GlobalActions = {
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
   setMemberSavings: (newMemberSavings: MemberSaving[]) => void;
   setIsMemberSavingsFetching: (newIsMemberSavingsFetching: boolean) => void;
-  setIsActiveMemberStatus: (newCurrentMemberStatus: boolean) => void;
-  setIsMemberStatusFetching: (newIsMemeberStatusFetching: boolean) => void;
+  setIsActiveMemberStatus: (newCurrentMemberStatus: boolean | null) => void;
   setMemberAffiliatesCount: (newMemberAffiliatesCount: number) => void;
   setMemberBalance: (newMemberBalance: number) => void;
 };
@@ -89,13 +87,10 @@ export const useGlobalState = create<GlobalStorage>()(
         set(state => ({ memberSavings: { ...state.memberSavings, isFetching: newValue } })),
 
       memberStatus: {
-        active: false,
-        isFetching: true,
+        withMembership: null,
       },
-      setIsActiveMemberStatus: (newValue: boolean): void =>
-        set(state => ({ memberStatus: { ...state.memberStatus, active: newValue } })),
-      setIsMemberStatusFetching: (newValue: boolean): void =>
-        set(state => ({ memberStatus: { ...state.memberStatus, isFetching: newValue } })),
+      setIsActiveMemberStatus: (newValue: boolean | null): void =>
+        set(state => ({ memberStatus: { ...state.memberStatus, withMembership: newValue } })),
 
       memberAffiliates: {
         count: 0,

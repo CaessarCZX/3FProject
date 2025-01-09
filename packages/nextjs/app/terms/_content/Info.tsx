@@ -298,13 +298,13 @@ const Info: React.FC = () => {
         violencia alguna, por lo que, desde ahora, renuncian a promover su nulidad, por esas causas previstas en el
         legislación Civil aplicable.
       </p>
-      <h2 className="text-2xl font-medium text-gray-800 dark:text-whiten">Firmado</h2>
+      {/* <h2 className="text-2xl font-medium text-gray-800 dark:text-whiten">Firmado</h2>
       <div className="my-4">
         <button className="px-4 py-2 rounded-md bg-primary dark:bg-blue-500 text-whiten font-medium text-base">
           Aceptar
         </button>
-      </div>
-      <p className="text-[12px] sm:text-sm mt-4 mb-4 mt-4 mb-4">
+      </div> */}
+      <p className="text-[12px] sm:text-sm mt-4 mb-4">
         Por favor, el Integrante confirma haber leído y aceptado los Términos y Condiciones al registrarse en 3F.
       </p>
     </div>

@@ -28,14 +28,14 @@ const SidebarItem = ({ item, pageName, setPageName }: any) => {
           href={item.route}
           onClick={handleClick}
           className={`${
-            isItemActive ? "bg-graydark dark:bg-meta-4" : ""
-          } group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4`}
+            isItemActive ? "bg-brand-hover dark:bg-meta-4" : ""
+          } group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out dark:hover:bg-meta-4`}
         >
           {item.icon}
           {item.label}
           {item.children && (
             <svg
-              className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
+              className={`absolute transition-transform right-4 top-1/2 -translate-y-1/2 fill-current ${
                 pageName === item.label.toLowerCase() && "rotate-180"
               }`}
               width="20"
