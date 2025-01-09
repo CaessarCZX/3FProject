@@ -67,21 +67,19 @@ export const Balance = ({ address, className = "", currenciesMode }: BalanceProp
   return (
     <button
       className={`btn btn-sm btn-ghost flex flex-col font-normal items-center hover:bg-transparent p-0 ${className}`}
-      onClick={() => {
-        toggleDisplayCurrenciesMode();
-      }}
+      onClick={toggleDisplayCurrenciesMode}
     >
       <div className="w-full flex items-center justify-center gap-2">
         {displayCurrenciesMode ? (
           <>
-            <span className={`font-light text-whiten ${logngAmount ? "text-sm" : "text-xl tracking-widest"}`}>
+            <span className={`font-light text-white ${logngAmount ? "text-sm" : "text-xl tracking-widest"}`}>
               {displayCurrencyConvertion({ longCurrenci: currentUsdtBalance, exchangeRatio: mexicanPeso })}
             </span>
             <span className={logngAmount ? "text-sm font-bold" : "text-xl font-bold"}>MXN</span>
           </>
         ) : (
           <>
-            <span className={`font-light text-whiten ${logngAmount ? "text-sm" : "text-2xl tracking-widest"}`}>
+            <span className={`font-light text-white ${logngAmount ? "text-sm" : "text-2xl tracking-widest"}`}>
               {formatCurrency(currentUsdtBalance)}
             </span>
             <span className={logngAmount ? "text-sm font-bold" : "text-xl font-bold"}>USDT</span>
