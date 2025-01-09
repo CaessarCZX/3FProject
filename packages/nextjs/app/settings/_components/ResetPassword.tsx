@@ -99,22 +99,22 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-3xl font-light text-gray-500">Cambiar Contraseña</h2>
+    <div className="mt-8">
+      <div className="mx-auto bg-white  dark:bg-boxdark dark:border-strokedark shadow-default rounded-lg p-6">
+        <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400">Cambiar Contraseña</h2>
 
         <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-700">Nueva Contraseña</h3>
+          <h3 className="text-lg font-medium text-gray-700 dark:text-gray-500">Nueva Contraseña</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Contraseña</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Nueva contraseña"
-                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
                 />
                 <div
                   className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
@@ -129,14 +129,14 @@ const ResetPassword: React.FC = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Repetir Contraseña</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Repetir Contraseña</label>
               <div className="relative">
                 <input
                   type={showRepeatPassword ? "text" : "password"}
                   value={repeatPassword}
                   onChange={e => setRepeatPassword(e.target.value)}
                   placeholder="Repite la nueva contraseña"
-                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
                 />
                 <div
                   className="absolute inset-y-0 right-3 flex items-center cursor-pointer"

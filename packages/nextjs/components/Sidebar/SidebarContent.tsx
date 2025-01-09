@@ -25,12 +25,13 @@ export const projectMenuGoups: SidebarMenuGroup[] = [
         route: "#",
         children: [
           { label: "Mi cuenta", route: "/dashboard" },
-          { label: "Detalle de ahorros", route: "/savings" },
+          { label: "Desglose", route: "/savings" },
+          { label: "Actividad", route: "/activity" },
         ],
       },
       {
         icon: <FaPeopleGroup className={defaultSizeIcon} />,
-        label: "Expansion",
+        label: "Expansión",
         route: "/expansion",
       },
       // {
@@ -50,8 +51,12 @@ export const projectMenuGoups: SidebarMenuGroup[] = [
       },
       {
         icon: <UserIcon className={defaultSizeIcon} />,
-        label: "Admin",
-        route: "/admin",
+        label: "Administración",
+        route: "#",
+        children: [
+          { label: "Información", route: "/admin" },
+          { label: "Pagos a miembros", route: "/payment" },
+        ],
       },
       {
         icon: <ScaleIcon className={defaultSizeIcon} />,

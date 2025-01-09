@@ -2,11 +2,13 @@
 
 import React, { useState } from "react";
 import { TbPigMoney } from "react-icons/tb";
+import { useAccount } from "wagmi";
 import DepositButton from "~~/components/Actions/Deposit/DepositButton";
 import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 import CardBox from "~~/components/UI/CardBox";
 
 const DepositContract: React.FC = () => {
+  const currentAccount = useAccount();
   const [deposit, setDeposit] = useState("");
   return (
     <CardBox className="col-span-1 md:col-span-3 lg:col-span-3">
@@ -18,15 +20,23 @@ const DepositContract: React.FC = () => {
         {/* For Icon */}
 
         {/* For title */}
-        <h3 className="font-light text-3xl text-gray-500 dark:text-slate-100">Nuevo Ahorro</h3>
+        <h3 className="font-light text-3xl text-gray-500 dark:text-slate-100">
+          {currentAccount.isDisconnected ? "Conecta una wallet" : "Nuevo Ahorro"}
+        </h3>
         {/* For title */}
       </div>
 
       {/* Input for savings */}
-      <article className="flex space-x-4 w-full">
-        <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
-        <DepositButton depositAmount={deposit} btnText="Depositar" />
-      </article>
+      {currentAccount.isDisconnected ? (
+        <article className="flex justify-center w-full">
+          <p className="text-lg m-0 text-gray-300 dark:text-gray-500">Conecta tu wallet y continua ahorrando</p>
+        </article>
+      ) : (
+        <article className="flex space-x-4 w-full">
+          <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
+          <DepositButton depositAmount={deposit} btnText="Depositar" />
+        </article>
+      )}
       {/* Input for savings */}
     </CardBox>
   );

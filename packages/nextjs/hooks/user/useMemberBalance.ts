@@ -1,13 +1,6 @@
-import { useScaffoldReadContract } from "../scaffold-eth/useScaffoldReadContract";
-import { useAccount } from "wagmi";
+import { useGlobalState } from "~~/services/store/store";
 
-export const useMemberBalance = () => {
-  const currentMember = useAccount();
-  const { data: memberBalance } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "getMemberBalance",
-    args: [currentMember?.address],
-  });
-
-  return memberBalance || null;
+export const useGetMemberBalance = () => {
+  const balance = useGlobalState(state => state.memberBalance.balance);
+  return balance || 0;
 };

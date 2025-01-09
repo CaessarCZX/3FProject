@@ -1,6 +1,5 @@
 import React from "react";
 import { TransactionHash } from "~~/components/Display/TransactionHash";
-import { WithdrawalCounter } from "~~/components/Display/WithdrawalCounter";
 import { formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 
 type TransactionTableRowProps = {
@@ -8,20 +7,29 @@ type TransactionTableRowProps = {
   hash: string;
   value: string;
   date: string;
-  time: string;
   status: string;
   lengthData: number;
 };
 
-export const TransactionsTableRow = ({
-  hash,
-  value,
-  date,
-  time,
-  status,
-  lengthData,
-  index,
-}: TransactionTableRowProps) => {
+export const TransactionsTableRow = ({ hash, value, date, status, lengthData, index }: TransactionTableRowProps) => {
+  const getTrimestreDaysLeft = (date: string, targetMonths: number) => {
+    const transactionDate = new Date(date);
+    const targetDate = new Date(
+      transactionDate.getFullYear(),
+      transactionDate.getMonth() + targetMonths,
+      transactionDate.getDate(),
+    );
+
+    const currentDate = new Date();
+
+    if (currentDate >= targetDate) return "Cumplido";
+
+    const diffInMilliseconds = targetDate.getTime() - currentDate.getTime();
+    const daysLeft = Math.ceil(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+    return `${daysLeft} días restantes`;
+  };
+
   return (
     <tr
       className={`grid grid-cols-3 sm:grid-cols-5 ${
@@ -29,7 +37,7 @@ export const TransactionsTableRow = ({
       }`}
     >
       <td className="flex items-center gap-3 p-2.5 xl:p-5">
-        <p className="hidden font-light text-black dark:text-white sm:block">
+        <p className="hidden font-light text-black dark:text-white sm:block my-2">
           {formatCurrency(Number(value))} <span className="font-black text-xs">USDT</span>
         </p>
       </td>
@@ -39,18 +47,25 @@ export const TransactionsTableRow = ({
       </td>
 
       <td className="flex items-center justify-center p-2.5 xl:p-5">
-        <p className="text-meta-3 dark:text-white">{date}</p>
+        <p className="text-meta-3 dark:text-green-500 text-sm my-2">
+          {new Date(date).toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })}
+        </p>
       </td>
 
-      <td className="hidden items-center font-bold justify-center p-2.5 sm:flex xl:p-5">
+      <td className="hidden items-center text-sm font-bold justify-center p-2.5 sm:flex xl:p-5">
         {/* <p className="text-black dark:text-white">{brand.sales}</p> */}
-        <WithdrawalCounter date={date} time={time} />
+        {/* <WithdrawalCounter date={date} time={time} /> */}
+        {getTrimestreDaysLeft(date, 3)}
       </td>
 
       <td className="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
         {/* <p className="text-meta-5">{brand.conversion}%</p> */}
         {/* <p className="text-meta-5">Pendiente</p> */}
-        <p className="text-meta-5">{status}</p>
+        <p className="text-meta-5 text-sm my-2">{status && "Completado"}</p>
       </td>
     </tr>
   );

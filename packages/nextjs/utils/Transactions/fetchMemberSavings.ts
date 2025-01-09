@@ -5,6 +5,7 @@ export const fetchMemberSavings = async () => {
 
   if (!token) {
     return {
+      balance: 0,
       memberSavings: [],
       error: "No se encontró un token de sesión.",
     };
@@ -23,14 +24,16 @@ export const fetchMemberSavings = async () => {
       throw new Error("No se encontraron transacciones o ocurrió un error.");
     }
 
-    const { transactions } = await response.json();
+    const { transactions, balance } = await response.json();
     return {
+      balance: balance,
       memberSavings: transactions,
       error: "",
     };
   } catch (error) {
     console.error("Error al obtener transacciones:", error);
     return {
+      balance: 0,
       memberSavings: [],
       error: "No se pudieron obtener las transacciones.",
     };

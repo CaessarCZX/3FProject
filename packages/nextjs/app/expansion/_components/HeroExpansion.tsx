@@ -1,7 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
+import { useGlobalState } from "~~/services/store/store";
 
 interface CardItem {
   count: string;
@@ -20,18 +19,11 @@ const CardItemComponent: React.FC<CardItemProps> = ({ item }) => (
 );
 
 const HeroExpansion: React.FC = () => {
-  const currentMember = useAccount();
-  const { data: totalAffiliates } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "getTotalAffiliatesPerMember",
-    args: [currentMember?.address],
-  });
-
-  const affiliates = `${Number(totalAffiliates || 0)}`;
+  const affiliatesNumber = useGlobalState(state => state.memberAffiliates.count);
 
   const AffiliatesStats = [
     {
-      count: affiliates,
+      count: affiliatesNumber.toString(),
       title: "Tus afiliados",
     },
     // {

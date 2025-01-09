@@ -2,12 +2,19 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 import { FiLock, FiMail } from "react-icons/fi";
 import { RiEyeLine } from "react-icons/ri";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
+import { useGlobalState } from "~~/services/store/store";
+// import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
 import { notification } from "~~/utils/scaffold-eth/notification";
+
+interface DecodedToken {
+  membership: number;
+}
 
 export const SignInForm = () => {
   // Show password feature
@@ -20,6 +27,7 @@ export const SignInForm = () => {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
+  const memebershipStatus = useGlobalState(state => state.setIsActiveMemberStatus);
 
   const currentUser = useAccount();
 
@@ -59,7 +67,14 @@ export const SignInForm = () => {
 
         if (response.ok) {
           const data = await response.json();
+
           localStorage.setItem("token", data.token);
+          sessionStorage.setItem("sessionToken", data.token);
+
+          // Update membership status
+          const token: DecodedToken = jwtDecode(data.token);
+          if (token.membership !== 0) memebershipStatus(true);
+
           router.push("/dashboard");
         } else {
           const errorData = await response.json();
@@ -69,7 +84,7 @@ export const SignInForm = () => {
         setErrorMessage("No se pudo conectar al servidor.");
       }
     },
-    [router],
+    [memebershipStatus, router],
   );
 
   const handleConnectWallet = useCallback(async () => {
@@ -144,7 +159,14 @@ export const SignInForm = () => {
 
       if (response.ok) {
         const data = await response.json();
+
         localStorage.setItem("token", data.token);
+        sessionStorage.setItem("sessionToken", data.token);
+
+        // Update membership status
+        const token: DecodedToken = jwtDecode(data.token);
+        if (token.membership !== 0) memebershipStatus(true);
+
         router.push("/dashboard");
       } else {
         const errorData = await response.json();

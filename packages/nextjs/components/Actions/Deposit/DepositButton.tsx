@@ -15,9 +15,11 @@ import { notification } from "~~/utils/scaffold-eth";
 
 interface DecodedToken {
   id: string;
+  email: string;
 }
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 interface DecodedToken {
@@ -53,7 +55,12 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
       try {
         // Decodifica el JWT para obtener el contenido del payload
         const decoded: DecodedToken = jwtDecode(storedToken);
-        const uplines: string[] = decoded.ReferersCommissions;
+        /**
+         * IMPORTANTT!
+         * @RefererCommissions brings the upline referer from top to bottom
+         * with the direct upline in the last position
+         */
+        const uplines: string[] = decoded.ReferersCommissions.toReversed(); //Copy from ReferersCommmission
         if (uplines) {
           setUplineMembers({
             uplineAddress: uplines[0] || INVALID_ADDRESS, //For direct upline
@@ -67,6 +74,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
     }
   }, []);
   const [id, setId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   // Deposit Rules
   const minDeposit = parseUnits("2000", 6);
@@ -102,6 +110,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         // Decodifica el JWT para obtener el contenido del payload
         const decoded: DecodedToken = jwtDecode(storedToken);
         setId(decoded.id || null); // Extrae la propiedad id del usuario en el token
+        setEmail(decoded.email || null); // Extrae el email del usuario
       } catch (error) {
         console.error("Error al decodificar el token:", error);
       }
@@ -151,6 +160,15 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
 
         const transactionData = await transactionResponse.json();
         console.log("Transacción creada exitosamente:", transactionData);
+
+        await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/saving`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            toEmail: email,
+            amount: amount,
+          }),
+        });
       } else {
         console.warn("Health check: Problema detectado con el servidor o la base de datos");
       }
@@ -253,6 +271,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
             uplineMembers.uplineAddress,
             uplineMembers.secondLevelUpline,
             uplineMembers.thirtLevelUpline,
+            MEMBERS_KEY,
           ],
         });
 

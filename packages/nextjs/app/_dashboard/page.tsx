@@ -1,48 +1,52 @@
 "use client";
 
 import React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BlockExplorer from "./_components/BlockExplorer";
 import type { NextPage } from "next";
-import { formatUnits } from "viem";
-import { useAccount } from "wagmi";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 import DepositButton from "~~/components/Actions/Deposit/DepositButton";
 import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 import { useDateEs } from "~~/hooks/3FProject/useDateEs";
 import { useExchangeRatios } from "~~/hooks/3FProject/useExchangeRatios";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-import { formatCurrency, parseCurrency, parseThreeDecimals } from "~~/utils/3FContract/currencyConvertion";
+
+// legacy
+// import { useAccount } from "wagmi";
+// import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+// import { formatCurrency, parseCurrency, parseThreeDecimals } from "~~/utils/3FContract/currencyConvertion";
 
 // import ProtectedRoute from "~~/services/Auth/ProtectedRoute";
 
 const Dashboard: NextPage = () => {
-  const currentMember = useAccount();
+  // const currentMember = useAccount();
   const [deposit, setDeposit] = useState("");
   const [currencyType, setCurrencyType] = useState<string>("USDT");
   const { exchangeRatio, loadingData } = useExchangeRatios("ETH");
-  const { exchangeRatio: exchangeUSD, loadingData: loadingUSD } = useExchangeRatios("USD");
-  const [dollarBalance, setDollarBalance] = useState(0);
+  // const { exchangeRatio: exchangeUSD, loadingData: loadingUSD } = useExchangeRatios("USD");
+  // const [dollarBalance, setDollarBalance] = useState(0);
   const currentDate = useDateEs();
 
-  const { data: memberBalance } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "getMemberBalance",
-    args: [currentMember?.address],
-  });
+  // legacy
+  // const { data: memberBalance } = useScaffoldReadContract({
+  //   contractName: "FFFBusiness",
+  //   functionName: "getMemberBalance",
+  //   args: [currentMember?.address],
+  // });
 
-  const { data: totalAffiliates } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "getTotalAffiliatesPerMember",
-    args: [currentMember?.address],
-  });
+  // legacy
+  // const { data: totalAffiliates } = useScaffoldReadContract({
+  //   contractName: "FFFBusiness",
+  //   functionName: "getTotalAffiliatesPerMember",
+  //   args: [currentMember?.address],
+  // });
 
-  useEffect(() => {
-    if (!loadingData && exchangeRatio?.USDT) {
-      const currentDollarBalance = Number(formatUnits(BigInt(memberBalance || 0), 6));
-      setDollarBalance(currentDollarBalance);
-    }
-  }, [loadingData, exchangeRatio, memberBalance]);
+  // legacy for balance
+  // useEffect(() => {
+  //   if (!loadingData && exchangeRatio?.USDT) {
+  //     const currentDollarBalance = Number(formatUnits(BigInt(memberBalance || 0), 6));
+  //     setDollarBalance(currentDollarBalance);
+  //   }
+  // }, [loadingData, exchangeRatio, memberBalance]);
 
   return (
     <>
@@ -57,14 +61,14 @@ const Dashboard: NextPage = () => {
                     {loadingData ? (
                       <span className="loading loading-dots loading-lg"></span>
                     ) : exchangeRatio && exchangeRatio.USDT ? (
-                      <p className="text-4xl font-bold m-0">{formatCurrency(dollarBalance)}</p>
+                      <p className="text-4xl font-bold m-0">0</p>
                     ) : (
                       <p className="text-xl font-semibold m-0">No disponible</p>
                     )}
                     <span className="text-slate-500">USDT</span>
                   </article>
                   <span>
-                    {loadingUSD ? (
+                    {/* {loadingUSD ? (
                       <span className="loading loading-spinner text-accent"></span>
                     ) : exchangeUSD && exchangeUSD.MXN && dollarBalance ? (
                       <span className="text-cyan-600 font-light">
@@ -74,7 +78,7 @@ const Dashboard: NextPage = () => {
                       </span>
                     ) : (
                       <p className="text-xl font-semibold m-0">No disponible</p>
-                    )}
+                    )} */}
                   </span>
                   <p className="text-sm text-slate-500">{currentDate}</p>
                   <div className="w-full">
@@ -84,7 +88,7 @@ const Dashboard: NextPage = () => {
                         <UserGroupIcon className="w-6 h-6" />
                         <div className="flex gap-2 items-center">
                           Activos
-                          <div
+                          {/* <div  //LEGACY FUNCTION
                             className={`badge badge-secondary py-3 text-white px-4 ${
                               totalAffiliates != undefined && totalAffiliates > 0
                                 ? "bg-gradient-to-b from-cyan-500 to-blue-500"
@@ -96,7 +100,7 @@ const Dashboard: NextPage = () => {
                             ) : (
                               <p>{Number(totalAffiliates)}</p>
                             )}
-                          </div>
+                          </div> */}
                         </div>
                       </button>
                     </ul>

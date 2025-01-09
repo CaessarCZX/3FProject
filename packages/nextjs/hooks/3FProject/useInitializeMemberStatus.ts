@@ -1,23 +1,12 @@
-import { useScaffoldReadContract } from "../scaffold-eth";
-import { useAccount } from "wagmi";
+import { useGetTokenData } from "../user/useGetTokenData";
 import { useGlobalState } from "~~/services/store/store";
 
 export const useInitializeMemberStatus = () => {
-  const currentAccount = useAccount();
-  const memberAddress = currentAccount.address ?? "0x0";
+  const { tokenInfo } = useGetTokenData();
   const setIsActiveMemberStatus = useGlobalState(state => state.setIsActiveMemberStatus);
-  const setIsMemberStatusFetching = useGlobalState(state => state.setIsMemberStatusFetching);
-
-  const { data: checkActiveMember } = useScaffoldReadContract({
-    contractName: "FFFBusiness",
-    functionName: "checkActiveMember",
-    args: [memberAddress],
-  });
 
   const getCurrentMemberStatus = () => {
-    setIsMemberStatusFetching(true);
-    if (checkActiveMember && memberAddress !== "0x0") setIsActiveMemberStatus(true);
-    setIsMemberStatusFetching(false);
+    if (tokenInfo?.membership !== 0) setIsActiveMemberStatus(true);
   };
 
   return {
