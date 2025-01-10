@@ -175,7 +175,7 @@ const SettingsForm: React.FC = () => {
             <button
               onClick={handleSaveBeneficiary}
               disabled={isSaving || !!userInfo?.email_beneficiary}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 focus:outline-none"
+              className="px-6 py-2 bg-brand-default hover:bg-brand-hover dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-md shadow focus:outline-none"
             >
               {isSaving ? "Guardando..." : "Guardar Beneficiario"}
             </button>

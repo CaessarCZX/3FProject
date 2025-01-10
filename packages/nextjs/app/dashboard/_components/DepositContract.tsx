@@ -15,7 +15,7 @@ const DepositContract: React.FC = () => {
       <div className="flex items-center space-x-4 mb-4">
         {/* For Icon */}
         <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-          <TbPigMoney className="w-6 h-6 text-primary dark:text-white" />
+          <TbPigMoney className="w-6 h-6 text-brand-default dark:text-white" />
         </div>
         {/* For Icon */}
 

@@ -17,7 +17,7 @@ const Shapes = () => (
     </svg>
 
     <svg
-      className="absolute bottom-0 right-1/2 translate-x-1/2 md:right-12 md:translate-x-0 text-[#FFFBEF] dark:text-slate-800 dark:text-opacity-30 -z-10"
+      className="absolute bottom-0 right-1/2 translate-x-1/2 md:right-12 md:translate-x-0 text-[#CDD4D3] dark:text-slate-800 dark:text-opacity-30 -z-10"
       width="710"
       height="458"
       viewBox="0 0 710 458"
@@ -39,11 +39,13 @@ const FirstDepositScreen: React.FC = () => {
   return (
     <>
       <section className="bg-white dark:bg-[#0b1727] shadow-default text-zinc-900 dark:text-white relative overflow-hidden z-10">
-        <div className="container mx-auto pl-4">
+        <div className="mx-auto">
+          {/* container */}
           <Shapes />
-          <div className="flex text-center md:text-start max-w-7xl">
+          <div className="flex text-center md:text-start">
+            {/* max-w-7xl */}
             <div className="py-18 px-12">
-              <h1 className="text-3xl font-bold leading-[1.1] mb-2 md:text-[47px]">
+              <h1 className="text-3xl font-bold leading-[1.1] mb-2 md:text-[37px]">
                 Gracias por ser parte de Friends & Family
               </h1>
               <p className="text-[22px] leading-snug opacity-80 my-6 md:max-w-95">Inicia tu primer ahorro.</p>
@@ -53,7 +55,7 @@ const FirstDepositScreen: React.FC = () => {
             </div>
             <div>
               <Image
-                className="hidden md:block md:min-w-[375px]"
+                className="hidden xl:block md:min-w-[375px] contrast-75 dark:grayscale dark:contrast-50"
                 width={400}
                 height={400}
                 src="/vision-images/7.png"
