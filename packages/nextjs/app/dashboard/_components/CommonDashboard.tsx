@@ -16,7 +16,7 @@ const CommonDashboard: React.FC = () => {
         <DepositContract />
         {ContentStats.map((statInfo, statIndex) => (
           <CardDataStats key={statIndex} title={statInfo.title} total={statInfo.total} rate={statInfo.rate}>
-            <statInfo.icon className="w-6 h-6 text-primary dark:text-white" />
+            <statInfo.icon className="w-6 h-6 text-brand-default dark:text-white" />
           </CardDataStats>
         ))}
       </div>

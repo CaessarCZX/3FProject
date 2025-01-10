@@ -157,7 +157,9 @@ const ResetPassword: React.FC = () => {
               onClick={handlePasswordChange}
               disabled={isSaving}
               className={`px-6 py-2 ${
-                isSaving ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"
+                isSaving
+                  ? "bg-gray-400"
+                  : "bg-brand-default hover:bg-brand-hover dark:bg-blue-600 dark:hover:bg-blue-700"
               } text-white rounded-md shadow focus:outline-none`}
             >
               {isSaving ? "Guardando..." : "Cambiar Contraseña"}

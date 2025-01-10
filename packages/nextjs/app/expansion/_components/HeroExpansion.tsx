@@ -41,24 +41,18 @@ const HeroExpansion: React.FC = () => {
   ];
 
   return (
-    <section className="mb-8 py-4 bg-white shadow-default rounded-md dark:border-strokedark dark:bg-boxdark text-zinc-900 dark:text-white">
-      <div className="container px-4 mx-auto">
-        <div className="flex items-center text-center max-w-6xl mx-auto space-x-8">
-          <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 opacity-80 max-w-4xl mx-auto">
-            Puedes dar seguimiento a tu organización, verifica el crecimiento de tus afiliados
-          </p>
-        </div>
-        <div className="z-9 grid grid-cols-12 gap-6 max-w-7xl mx-auto text-center mt-4">
+    <div className="pb-6 col-span-1 flex">
+      <section className="w-full py-4 bg-white shadow-default rounded-md dark:border-strokedark dark:bg-boxdark text-zinc-900 dark:text-white">
+        <div className="z-9 grid grid-cols-12 text-center mt-4">
           {AffiliatesStats.map((item, i) => (
             <div className="col-span-12" key={i}>
               <CardItemComponent item={item} />
             </div>
           ))}
         </div>
-
-        {/* <SubscribeForm /> */}
-      </div>
-    </section>
+        <p className="mb-1 text-[12px] text-gray-400 font-light text-center">Referidos directos</p>
+      </section>
+    </div>
   );
 };
 

@@ -38,7 +38,7 @@ const FirstDepositForm: React.FC = () => {
                 onChange={amount => setDeposit(amount)}
               />
             </div>
-            <div className="mt-20 sm:mt-0 w-full sm:w-auto flex justify-center px-4">
+            <div className="mt-0 w-full sm:w-auto flex justify-center px-4">
               <MemberFirstDepositButton depositAmount={deposit} />
             </div>
           </div>
