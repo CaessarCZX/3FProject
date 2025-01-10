@@ -15,19 +15,11 @@ import { notification } from "~~/utils/scaffold-eth/notification";
 
 const ETH_WALLET_LENGTH = 42;
 
-interface FormData {
-  name: string;
-  email: string;
-  password: string;
-  wallet: string;
-  referredBy: string;
-}
-
 export const SignUpForm = () => {
   // Show password feature
   const [showpass, setShowpass] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
