@@ -5,6 +5,7 @@ import {
   CloudArrowDownIcon,
   CogIcon,
   CommandLineIcon,
+  HomeIcon,
   KeyIcon,
   ScaleIcon,
   Squares2X2Icon,
@@ -20,11 +21,16 @@ export const projectMenuGoups: SidebarMenuGroup[] = [
     name: "MENÚ",
     menuItems: [
       {
+        icon: <HomeIcon className={defaultSizeIcon} />,
+        label: "Inicio",
+        route: "/home",
+      },
+      {
         icon: <Squares2X2Icon className={defaultSizeIcon} />,
-        label: "Panel de control",
+        label: "Mi cuenta",
         route: "#",
         children: [
-          { label: "Mi cuenta", route: "/dashboard" },
+          { label: "Panel de control", route: "/dashboard" },
           { label: "Desglose", route: "/savings" },
           { label: "Actividad", route: "/activity" },
         ],
