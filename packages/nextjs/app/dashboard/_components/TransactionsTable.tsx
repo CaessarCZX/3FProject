@@ -20,21 +20,21 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
 
       <table className="flex flex-col">
         <thead>
-          <tr className="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
+          <tr className="grid grid-cols-5 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
             <td className="p-2.5 xl:p-5">
-              <h5 className="text-xs font-bold xsm:text-base">Ahorro</h5>
+              <h5 className="text-sm sm:text-base font-bold ">Ahorro</h5>
             </td>
             <td className="p-2.5 text-center xl:p-5">
-              <h5 className="text-xs font-bold xsm:text-base">Hash</h5>
+              <h5 className="text-sm sm:text-base font-bold">Hash</h5>
             </td>
             <td className="p-2.5 text-center xl:p-5">
-              <h5 className="text-xs font-bold xsm:text-base">Fecha</h5>
+              <h5 className="text-sm sm:text-base font-bold">Fecha</h5>
             </td>
-            <td className="hidden p-2.5 text-center sm:block xl:p-5">
-              <h5 className="text-xs font-bold xsm:text-base">Proximo pago</h5>
+            <td className=" p-2.5 text-center sm:block xl:p-5">
+              <h5 className="text-[12px] sm:text-base font-bold">Proximo pago</h5>
             </td>
-            <td className="hidden p-2.5 text-center sm:block xl:p-5">
-              <h5 className="text-sm font-bold xsm:text-base">Estatus</h5>
+            <td className=" p-2.5 text-center sm:block xl:p-5">
+              <h5 className="text-sm sm:text-base font-bold">Estatus</h5>
             </td>
           </tr>
         </thead>

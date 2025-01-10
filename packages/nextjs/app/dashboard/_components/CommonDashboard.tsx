@@ -12,7 +12,7 @@ const CommonDashboard: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Panel de control" />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4 xl:grid-cols-5 2xl:gap-7.5">
+      <div className="grid grid-cols-2 gap-4 md:gap-4 xl:grid-cols-5 2xl:gap-7.5">
         <DepositContract />
         {ContentStats.map((statInfo, statIndex) => (
           <CardDataStats key={statIndex} title={statInfo.title} total={statInfo.total} rate={statInfo.rate}>

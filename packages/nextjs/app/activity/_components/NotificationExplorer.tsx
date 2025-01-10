@@ -49,7 +49,7 @@ const NotificationExplorer: React.FC = () => {
   }, [currentPage, tokenInfo?.email]);
 
   return (
-    <div className="container mx-auto rounded-xl overflow-hidden">
+    <div className="mx-auto rounded-xl overflow-hidden">
       {loading ? <p>Cargando datos</p> : <NotificationsTable activities={userActivity} />}
       {error && <p>No hay datos disponibles para mostrar</p>}
       <PaginationButton currentPage={currentPage} totalItems={Number(totalPages)} setCurrentPage={setCurrentPage} />
