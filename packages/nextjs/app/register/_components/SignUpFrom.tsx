@@ -19,6 +19,7 @@ export const SignUpForm = () => {
   // Show password feature
   const [showpass, setShowpass] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [passwordCriteriaModalVisible, setPasswordCriteriaModalVisible] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -53,6 +54,25 @@ export const SignUpForm = () => {
   const currentUser = useAccount();
 
   const router = useRouter();
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (passwordInputRef.current && !passwordInputRef.current.contains(event.target as Node)) {
+        setPasswordCriteriaModalVisible(false);
+      }
+    };
+
+    if (passwordCriteriaModalVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [passwordCriteriaModalVisible]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -419,7 +439,7 @@ export const SignUpForm = () => {
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
           Contraseña
         </label>
-        <div className="mt-1 relative">
+        <div className="mt-1 relative" ref={passwordInputRef}>
           <input
             type={showpass ? "text" : "password"}
             id="password"
@@ -429,10 +449,12 @@ export const SignUpForm = () => {
             onChange={handleChange}
             onFocus={() => {
               setIsFocused(true);
+              setPasswordCriteriaModalVisible(true);
             }}
             onBlur={() => {
               if (!formData.password) {
                 setIsFocused(false);
+                setPasswordCriteriaModalVisible(false);
               }
             }}
             className={`block w-full pl-4 pr-10 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
@@ -474,49 +496,53 @@ export const SignUpForm = () => {
               <FiHelpCircle className="text-gray-400 cursor-pointer" />
             </Tooltip>
           </div>
-        </div>
-        {/* Password Criteria Feedback */}
-        <div className="mt-1 ml-4 flex flex-col space-y-1 text-sm">
-          <div className="flex items-center">
-            {passwordCriteria.hasMinLength ? (
-              <BsCheckCircleFill className="text-green-500 mr-1" />
-            ) : (
-              <BsXCircleFill className="text-red-500 mr-1" />
-            )}
-            <p className="text-[14px] ">Al menos 8 caracteres</p>
-          </div>
-          <div className="flex items-center">
-            {passwordCriteria.hasLowercase ? (
-              <BsCheckCircleFill className="text-green-500 mr-1" />
-            ) : (
-              <BsXCircleFill className="text-red-500 mr-1" />
-            )}
-            <p className="text-[14px] ">Al menos una minúscula</p>
-          </div>
-          <div className="flex items-center">
-            {passwordCriteria.hasUppercase ? (
-              <BsCheckCircleFill className="text-green-500 mr-1" />
-            ) : (
-              <BsXCircleFill className="text-red-500 mr-1" />
-            )}
-            <p className="text-[14px] ">Al menos una mayúscula</p>
-          </div>
-          <div className="flex items-center">
-            {passwordCriteria.hasNumber ? (
-              <BsCheckCircleFill className="text-green-500 mr-1" />
-            ) : (
-              <BsXCircleFill className="text-red-500 mr-1" />
-            )}
-            <p className="text-[14px] ">Al menos un número</p>
-          </div>
-          <div className="flex items-center">
-            {passwordCriteria.hasSpecialChar ? (
-              <BsCheckCircleFill className="text-green-500 mr-1" />
-            ) : (
-              <BsXCircleFill className="text-red-500 mr-1" />
-            )}
-            <p className="text-[14px] ">Al menos un carácter especial: @ ! # ?</p>
-          </div>
+          {/* Password Criteria Feedback */}
+          {passwordCriteriaModalVisible && (
+            <div className="absolute mt-2 w-[250px] bg-white dark:bg-gray-800  border dark:border-gray-700 rounded-md shadow-md z-10">
+              <div className="ml-4 flex flex-col space-y-1 text-sm p-2">
+                <div className="flex items-center">
+                  {passwordCriteria.hasMinLength ? (
+                    <BsCheckCircleFill className="text-green-500 mr-1" />
+                  ) : (
+                    <BsXCircleFill className="text-red-500 mr-1" />
+                  )}
+                  <p className="text-[14px] ">Al menos 8 caracteres</p>
+                </div>
+                <div className="flex items-center">
+                  {passwordCriteria.hasLowercase ? (
+                    <BsCheckCircleFill className="text-green-500 mr-1" />
+                  ) : (
+                    <BsXCircleFill className="text-red-500 mr-1" />
+                  )}
+                  <p className="text-[14px] ">Al menos una minúscula</p>
+                </div>
+                <div className="flex items-center">
+                  {passwordCriteria.hasUppercase ? (
+                    <BsCheckCircleFill className="text-green-500 mr-1" />
+                  ) : (
+                    <BsXCircleFill className="text-red-500 mr-1" />
+                  )}
+                  <p className="text-[14px] ">Al menos una mayúscula</p>
+                </div>
+                <div className="flex items-center">
+                  {passwordCriteria.hasNumber ? (
+                    <BsCheckCircleFill className="text-green-500 mr-1" />
+                  ) : (
+                    <BsXCircleFill className="text-red-500 mr-1" />
+                  )}
+                  <p className="text-[14px] ">Al menos un número</p>
+                </div>
+                <div className="flex items-center">
+                  {passwordCriteria.hasSpecialChar ? (
+                    <BsCheckCircleFill className="text-green-500 mr-1" />
+                  ) : (
+                    <BsXCircleFill className="text-red-500 mr-1" />
+                  )}
+                  <p className="text-[14px] ">Al menos un carácter especial: @ ! # ?</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         {fieldErrors.password && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.password}</p>}
       </div>
