@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Helper } from "./Helper";
+import { PasswordCriteriaFeedback } from "./PasswordCriteriaFeedback";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { isAddress } from "viem";
@@ -17,6 +19,7 @@ export const SignUpForm = () => {
   // Show password feature
   const [showpass, setShowpass] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [passwordCriteriaModalVisible, setPasswordCriteriaModalVisible] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,17 +28,51 @@ export const SignUpForm = () => {
     referredBy: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isWalletConnected, setIsWalletConnected] = useState(false); // Validacion de wallet
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   // Validador de referido
   const [isReferrerValid, setIsReferrerValid] = useState<boolean | null>(null);
   // Mensajes
   const [successMessage, setSuccessMessage] = useState("");
   const [singleErrorMessage, setSingleErrorMessage] = useState("");
-
+  // Password criteria states
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    hasMinLength: false,
+    hasLowercase: false,
+    hasUppercase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
+  // Error states for each field
+  const [fieldErrors, setFieldErrors] = useState({
+    name: "",
+    email: "",
+    password: "",
+    wallet: "",
+    referredBy: "",
+  });
   //For blockchain
   const currentUser = useAccount();
 
   const router = useRouter();
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (passwordInputRef.current && !passwordInputRef.current.contains(event.target as Node)) {
+        setPasswordCriteriaModalVisible(false);
+      }
+    };
+
+    if (passwordCriteriaModalVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [passwordCriteriaModalVisible]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -48,12 +85,18 @@ export const SignUpForm = () => {
   // Mensajes a ui
   useEffect(() => {
     if (singleErrorMessage) {
-      notification.error(singleErrorMessage, { position: "bottom-right", duration: 5000 }); // Muestra la notificicacion con el error encontrado
-      setSingleErrorMessage(""); // Borra el mensaje de error registrado
+      notification.error(singleErrorMessage, {
+        position: "bottom-right",
+        duration: 5000,
+      });
+      setSingleErrorMessage("");
     }
 
     if (successMessage) {
-      notification.success(successMessage, { position: "bottom-right", duration: 5000 });
+      notification.success(successMessage, {
+        position: "bottom-right",
+        duration: 5000,
+      });
       setSuccessMessage("");
     }
   }, [singleErrorMessage, successMessage]);
@@ -62,11 +105,19 @@ export const SignUpForm = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
+    // Password validation on change
+    if (name === "password") {
+      validatePasswordCriteria(value);
+      // Clear password error message
+      setFieldErrors(prev => ({ ...prev, password: "" }));
+    }
+
     // Reset validation when "wallet" changes
     if (name === "wallet") {
       setIsWalletConnected(false);
       setSingleErrorMessage("");
       setSuccessMessage("");
+      setFieldErrors(prev => ({ ...prev, wallet: "" }));
     }
 
     // Reset validation when "referredBy" changes
@@ -74,7 +125,18 @@ export const SignUpForm = () => {
       setIsReferrerValid(false);
       setSingleErrorMessage("");
       setSuccessMessage("");
+      setFieldErrors(prev => ({ ...prev, referredBy: "" }));
     }
+  };
+
+  const validatePasswordCriteria = (password: string) => {
+    setPasswordCriteria({
+      hasMinLength: password.length >= 8,
+      hasLowercase: /[a-z]/.test(password),
+      hasUppercase: /[A-Z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[@!#?]/.test(password),
+    });
   };
 
   // Limitador para llamadas a la API
@@ -86,6 +148,8 @@ export const SignUpForm = () => {
 
     if (!formData.referredBy) {
       setSingleErrorMessage("Por favor, introduce una wallet de referido.");
+      setFieldErrors(prev => ({ ...prev, referredBy: "Por favor, introduce una wallet de referido." }));
+
       return;
     }
 
@@ -105,18 +169,26 @@ export const SignUpForm = () => {
           if (data.exists) {
             setSuccessMessage("Wallet de referido válida.");
             setIsReferrerValid(true);
+            setFieldErrors(prev => ({ ...prev, referredBy: "" }));
           } else {
             setSingleErrorMessage("La wallet de referido no está registrada.");
             setIsReferrerValid(false);
+            setFieldErrors(prev => ({ ...prev, referredBy: "La wallet de referido no está registrada." }));
           }
         } else {
           const errorData = await response.json();
           setSingleErrorMessage(errorData.message || "Error al validar la wallet de referido.");
           setIsReferrerValid(false);
+          setFieldErrors(prev => ({
+            ...prev,
+            referredBy: errorData.message || "Error al validar la wallet de referido.",
+          }));
         }
       });
     } catch (error) {
       setSingleErrorMessage("No se pudo conectar con el servidor.");
+      setFieldErrors(prev => ({ ...prev, referredBy: "No se pudo conectar con el servidor." }));
+
       setIsReferrerValid(false);
     }
   }, [formData.referredBy]);
@@ -128,7 +200,10 @@ export const SignUpForm = () => {
     // To validate referred wallet
     if (formData.referredBy.length === ETH_WALLET_LENGTH) {
       if (!isAddress(formData.referredBy)) {
-        notification.error("No es un formato de wallet valido.", { position: "bottom-right", duration: 5000 });
+        notification.error("No es un formato de wallet valido.", {
+          position: "bottom-right",
+          duration: 5000,
+        });
         return;
       }
 
@@ -136,6 +211,44 @@ export const SignUpForm = () => {
       handleValidateReferrer();
     }
   }, [formData.referredBy, handleValidateReferrer]);
+
+  const sendRegisterEmail = async (email: string, name: string) => {
+    await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toEmail: email,
+        userName: name,
+      }),
+    });
+  };
+  const sendAffiliateEmail = async (affiliateName: string, affiliateEmail: string, referredBy: string) => {
+    await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/newAffiliate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        affiliateName: affiliateName,
+        affiliateEmail: affiliateEmail,
+        referredBy: referredBy,
+      }),
+    });
+  };
+
+  const createUser = async (formData: typeof SignUpForm.prototype.formData) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...formData,
+        isAdmin: false,
+        isActive: true,
+      }),
+      credentials: "include",
+    });
+    return response;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,6 +259,8 @@ export const SignUpForm = () => {
     //For wallet connection
     if (!isWalletConnected) {
       setSingleErrorMessage("No tienes conectada una wallet");
+      setFieldErrors(prev => ({ ...prev, wallet: "No tienes conectada una wallet" }));
+
       setIsSubmitting(true);
       return;
     }
@@ -155,50 +270,43 @@ export const SignUpForm = () => {
     if (Object.values(validation).length > 0) {
       RenderWarningMessages(validation);
       setIsSubmitting(false);
+      setFieldErrors(prev => ({ ...prev, ...validation }));
+
       return;
     }
 
     try {
-      const dataToSend = {
-        ...formData,
-        isAdmin: false,
-        isActive: true,
-      };
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend),
-        credentials: "include",
-      });
+      const response = await createUser(formData);
 
       if (response.ok) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            toEmail: formData.email,
-            userName: formData.name,
-          }),
-        });
-
-        await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/newAffiliate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            affiliateName: formData.name,
-            affiliateEmail: formData.email,
-            referredBy: formData.referredBy,
-          }),
-        });
+        await sendRegisterEmail(formData.email, formData.name);
+        await sendAffiliateEmail(formData.name, formData.email, formData.referredBy);
 
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
         const saveEmail = formData.email;
-        setFormData({ name: "", email: "", password: "", wallet: "", referredBy: "" });
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          wallet: "",
+          referredBy: "",
+        });
         setIsWalletConnected(false);
         setIsReferrerValid(false);
+        setPasswordCriteria({
+          hasMinLength: false,
+          hasLowercase: false,
+          hasUppercase: false,
+          hasNumber: false,
+          hasSpecialChar: false,
+        });
+        setFieldErrors({
+          name: "",
+          email: "",
+          password: "",
+          wallet: "",
+          referredBy: "",
+        });
 
         const loginUrl = saveEmail ? `/login?email=${encodeURIComponent(saveEmail)}` : "/login";
         sessionStorage.setItem("allowAccess", "true");
@@ -233,18 +341,22 @@ export const SignUpForm = () => {
 
         if (data.exists) {
           setSingleErrorMessage("Esta wallet ya está registrada.");
-          setIsWalletConnected(false); // Deshabilitar el registro si la wallet está registrada
+          setFieldErrors(prev => ({ ...prev, wallet: "Esta wallet ya está registrada." }));
+          setIsWalletConnected(false);
         } else {
           setSuccessMessage("Wallet conectada con éxito.");
-          setIsWalletConnected(true); // Habilitar el registro
+          setIsWalletConnected(true);
+          setFieldErrors(prev => ({ ...prev, wallet: "" }));
         }
       } else {
         const errorData = await response.json();
+        setFieldErrors(prev => ({ ...prev, wallet: errorData.message || "Error al verificar la wallet." }));
         setSingleErrorMessage(errorData.message || "Error al verificar la wallet.");
-        setIsWalletConnected(false); // Deshabilitar registro si ocurre un error con la wallet
+        setIsWalletConnected(false);
       }
     } catch (error) {
       setSingleErrorMessage("No se pudo conectar con el servidor.");
+      setFieldErrors(prev => ({ ...prev, wallet: "No se pudo conectar con el servidor." }));
       setIsWalletConnected(false);
     }
   }, [formData.wallet]);
@@ -252,7 +364,10 @@ export const SignUpForm = () => {
   // Para obtener direccion automatica de wallet conectada
   useEffect(() => {
     if (currentUser.status === "connected") {
-      setFormData(prevData => ({ ...prevData, wallet: currentUser.address ?? "" }));
+      setFormData(prevData => ({
+        ...prevData,
+        wallet: currentUser.address ?? "",
+      }));
       const checkConnect = setTimeout(() => handleConnectWallet(), 2000);
       return () => clearTimeout(checkConnect);
     }
@@ -282,7 +397,9 @@ export const SignUpForm = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="block w-full pr-10 pl-4 font-light text-gray-700 dark:text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`block w-full pr-10 pl-4 font-light text-gray-700 dark:text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+              fieldErrors.name ? "border-red-500" : ""
+            }`}
             placeholder="Ingresa tu nombre"
             required
           />
@@ -290,6 +407,7 @@ export const SignUpForm = () => {
             <FiUser />
           </div>
         </div>
+        {fieldErrors.name && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.name}</p>}
       </div>
 
       {/* Email */}
@@ -305,20 +423,26 @@ export const SignUpForm = () => {
             autoComplete="new-username"
             value={formData.email}
             readOnly
-            className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
+            className={`block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm ${
+              fieldErrors.email ? "border-red-500" : ""
+            }`}
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
             <FiMail />
           </div>
         </div>
+        {fieldErrors.email && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.email}</p>}
       </div>
 
       {/* Password */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Contraseña
-        </label>
-        <div className="mt-1 relative">
+        <div className="flex justify-between items-center mr-3">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            Contraseña
+          </label>
+          <Helper />
+        </div>
+        <div className="mt-1 relative" ref={passwordInputRef}>
           <input
             type={showpass ? "text" : "password"}
             id="password"
@@ -328,13 +452,17 @@ export const SignUpForm = () => {
             onChange={handleChange}
             onFocus={() => {
               setIsFocused(true);
+              setPasswordCriteriaModalVisible(true);
             }}
             onBlur={() => {
               if (!formData.password) {
                 setIsFocused(false);
+                setPasswordCriteriaModalVisible(false);
               }
             }}
-            className="block w-full pl-4 pr-10 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`block w-full pl-4 pr-10 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+              fieldErrors.password ? "border-red-500" : ""
+            }`}
             placeholder="Ingresa una nueva contraseña"
             required
           />
@@ -355,7 +483,10 @@ export const SignUpForm = () => {
               <RiEyeCloseLine className="text-gray-600" />
             )}
           </div>
+          {/* Password Criteria Feedback */}
+          {passwordCriteriaModalVisible && <PasswordCriteriaFeedback passwordCriteria={passwordCriteria} />}
         </div>
+        {fieldErrors.password && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.password}</p>}
       </div>
 
       {/* Wallet */}
@@ -366,6 +497,7 @@ export const SignUpForm = () => {
         <div className="mt-1 relative flex">
           <WalletConnectionBtn enableWallet={isWalletConnected} classBtn="w-full rounded-md" />
         </div>
+        {fieldErrors.wallet && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.wallet}</p>}
       </div>
 
       {/* Referred Wallet */}
@@ -382,11 +514,16 @@ export const SignUpForm = () => {
             value={formData.referredBy}
             onChange={handleChange}
             className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-              isReferrerValid === null ? "bg-transparent" : isReferrerValid === false ? "bg-red-100" : "bg-green-100"
-            }`}
+              isReferrerValid === null
+                ? "bg-transparent"
+                : isReferrerValid === false
+                ? "border-red-500"
+                : "border-green-500"
+            } ${fieldErrors.referredBy ? "border-red-500" : ""}`}
             placeholder="0xABC123"
             required
           />
+          {fieldErrors.referredBy && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.referredBy}</p>}
           {isReferrerValid === false && (
             <p className="m-0 absolute text-[12px] text-center w-full translate-y-10 text-red-500">Wallet invalida</p>
           )}
@@ -406,9 +543,13 @@ export const SignUpForm = () => {
       {/* Submit */}
       <button
         type="submit"
-        disabled={isSubmitting || !isWalletConnected || !isReferrerValid}
-        className={`w-full py-2 px-4 border border-transparent disabled:bg-gray-300 rounded-md shadow-sm text-sm font-medium text-white ${
-          isSubmitting || !isWalletConnected || !isReferrerValid ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
+        disabled={
+          isSubmitting || !isWalletConnected || !isReferrerValid || !Object.values(passwordCriteria).every(Boolean)
+        }
+        className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed ${
+          isSubmitting || !isWalletConnected || !isReferrerValid || !Object.values(passwordCriteria).every(Boolean)
+            ? "bg-gray-500"
+            : "bg-gray-900 hover:bg-gray-700"
         }`}
       >
         {isSubmitting ? "Registrando..." : "Registrar"}
