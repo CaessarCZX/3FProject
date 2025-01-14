@@ -17,6 +17,7 @@ interface DecodedToken {
 }
 
 export const useGetTokenData = () => {
+  const [tokenError, setTokenError] = useState<boolean>(false);
   const [tokenInfo, setTokenInfo] = useState<DecodedToken>({
     id: "",
     email: "",
@@ -57,9 +58,10 @@ export const useGetTokenData = () => {
         membership: decoded.membership,
       });
     } catch (e) {
-      console.error("Error obtaining token information: ", e);
+      console.error("Decode Token Error: ", e);
+      setTokenError(true);
     }
   }, []);
 
-  return { tokenInfo };
+  return { tokenInfo, tokenError };
 };
