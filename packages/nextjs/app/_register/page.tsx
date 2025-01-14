@@ -4,11 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import userIcon from "../../public/userIcon.svg";
 import type { NextPage } from "next";
-import MemberEntranceButton from "~~/components/Actions/Entrance_member/_MemberEntranceButton";
 import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 import { AddressInput } from "~~/components/scaffold-eth";
-
-const defaultAddress = process.env.NEXT_PUBLIC_FIRST_CONTRACT_MEMBER || "0x";
 
 const Register: NextPage = () => {
   // const { address: connectedAddress } = useAccount();
@@ -59,11 +56,6 @@ const Register: NextPage = () => {
                     <p className="mb-2 text-xs font-light text-slate-600">Deposito minimo de 2000 USDT</p>
                   </div>
                 </div>
-                <MemberEntranceButton
-                  uplineAddress={!hasUpline ? defaultAddress : address}
-                  depositAmount={deposit}
-                  btnText="Entrar"
-                />
               </div>
             </div>
           </div>

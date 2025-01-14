@@ -5,7 +5,7 @@ import DepositContract from "./DepositContract";
 import Breadcrumb from "~~/components/Breadcumbs";
 import CardDataStats from "~~/components/UI/CardDataStats";
 
-const CommonDashboard: React.FC = () => {
+const MemberDashboard: React.FC = () => {
   const ContentStats = useGetContentStats();
   // md:grid-cols-2
 
@@ -29,4 +29,4 @@ const CommonDashboard: React.FC = () => {
   );
 };
 
-export default CommonDashboard;
+export default MemberDashboard;

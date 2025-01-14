@@ -8,6 +8,7 @@ import { erc20Abi } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
 import { useGetMemberSavings } from "~~/hooks/user/useGetMemberSavings";
+import { useGlobalState } from "~~/services/store/store";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { TransactionInfo } from "~~/utils/3FContract/deposit";
 import { DepositErrors as err } from "~~/utils/errors/errors";
@@ -16,6 +17,7 @@ import { notification } from "~~/utils/scaffold-eth";
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
+const PATCH_MEMBERSHIP_TO_MAIL = 500;
 
 interface UplineMembers {
   uplineAddress: string;
@@ -23,7 +25,8 @@ interface UplineMembers {
   thirtLevelUpline: string;
 }
 
-const useDepositContract = () => {
+const useFirstDepositContract = () => {
+  const setIsActiveMemberStatus = useGlobalState(state => state.setIsActiveMemberStatus);
   const { tokenInfo, tokenError } = useGetTokenData();
   const { fetchSavings } = useGetMemberSavings();
   const { writeContractAsync } = useWriteContract();
@@ -32,32 +35,29 @@ const useDepositContract = () => {
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
   const memberAddress = member?.address ?? "0x0";
-  // Current wallet balance
   const { data: walletBalance } = useWatchBalance({ address: memberAddress });
-  // Upline members for commissions
+  const [id, setId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [uplineMembers, setUplineMembers] = useState<UplineMembers>({
     uplineAddress: "",
     secondLevelUpline: "",
     thirtLevelUpline: "",
   });
-  // For transaction data
-  const [id, setId] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  // Deposit Rules
-  const minDeposit = parseUnits("2000", 6);
-  const depositMultiple = parseUnits("500", 6);
-  // Transaction steps
   const [transaction, setTransaction] = useState<TransactionInfo>({
     allowanceHash: "",
     allowanceReceiptHash: "",
     depositContractHash: "",
     depositContractReceiptHash: "",
   });
-  // External controllers for deposit
+
   const [isStarted, setIsStarted] = useState(false);
   const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
   const [error, setError] = useState<string | null>();
+  // Deposit Rules
+  const minDeposit = parseUnits("2500", 6); // Solo para primer deposito
+  const depositMultiple = parseUnits("500", 6);
 
+  // Get upline referrals for commission and user id
   useEffect(() => {
     if (!tokenError) {
       try {
@@ -100,6 +100,12 @@ const useDepositContract = () => {
     notification.error(message, { position: "bottom-right", duration: 5000 });
   };
 
+  // const HandleTest = () => {
+  //   console.log("Im activate");
+  //   setIsStarted(true);
+  //   setIsHandleModalActivate(true);
+  // };
+
   //Validar el servidor y bd funcionando
   const performHealthCheck = async (amount: number, hash: string) => {
     try {
@@ -135,12 +141,16 @@ const useDepositContract = () => {
         const transactionData = await transactionResponse.json();
         console.log("Transacción creada exitosamente:", transactionData);
 
+        // Monto de resguardo en este ahorro
+        const amountToFirstDeposit = amount - PATCH_MEMBERSHIP_TO_MAIL;
+
+        //Envio de email y notificacion en el proceso
         await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/saving`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             toEmail: email,
-            amount: amount,
+            amount: amountToFirstDeposit,
           }),
         });
       } else {
@@ -200,7 +210,8 @@ const useDepositContract = () => {
         args: [memberAddress, currentContract],
       });
 
-      console.log("currentAllowance: ", currentAllowance); //For debug
+      console.log("currentAllowance: ", currentAllowance);
+      console.log(typeof currentAllowance); //For debug
 
       // To patch previous allowance
       if (currentAllowance === allowanceAmount) {
@@ -212,7 +223,7 @@ const useDepositContract = () => {
 
       if (currentAllowance < allowanceAmount) {
         const allowanceRequest = allowanceAmount - currentAllowance;
-        console.log("currentAllowance: ", allowanceRequest); //For debug
+        console.log(allowanceRequest);
 
         const allowanceHash = await writeContractAsync({
           abi: erc20Abi,
@@ -238,7 +249,7 @@ const useDepositContract = () => {
         }));
 
         /**
-         * "depositMemberFunds" function ere sort params for right execution according to ABI encoder
+         * "memberEntrance" function ere sort params for right execution according to ABI encoder
          */
         console.log(
           //For debug only
@@ -251,12 +262,12 @@ const useDepositContract = () => {
         const depositContractHash = await writeContractAsync({
           abi: contractAbi as Abi,
           address: currentContract,
-          functionName: "depositMemberFunds",
+          functionName: "memberEntrance",
           args: [
-            allowanceAmount,
             uplineMembers.uplineAddress,
             uplineMembers.secondLevelUpline,
             uplineMembers.thirtLevelUpline,
+            allowanceAmount,
             MEMBERS_KEY,
           ],
         });
@@ -280,6 +291,9 @@ const useDepositContract = () => {
           await performHealthCheck(amount, depositContractReceiptHash.transactionHash);
 
           setTimeout(() => {
+            // Actualiza el status de activo del miembro en el contrato
+            // Force member status
+            setIsActiveMemberStatus(true);
             fetchSavings();
           }, 3000);
         } else {
@@ -298,7 +312,6 @@ const useDepositContract = () => {
       resetFlags();
     }
   };
-
   return {
     isHandleModalActivate,
     isStarted,
@@ -308,4 +321,4 @@ const useDepositContract = () => {
   };
 };
 
-export default useDepositContract;
+export default useFirstDepositContract;
