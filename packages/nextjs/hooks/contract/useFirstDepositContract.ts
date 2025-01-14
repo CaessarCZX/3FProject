@@ -151,6 +151,10 @@ const useFirstDepositContract = () => {
           body: JSON.stringify({
             toEmail: email,
             amount: amountToFirstDeposit,
+            walletFirstLevel: uplineMembers.uplineAddress,
+            walletSecondLevel: uplineMembers.secondLevelUpline,
+            walletThirtLevel: uplineMembers.thirtLevelUpline,
+            isFirstSaving: true,
           }),
         });
       } else {
