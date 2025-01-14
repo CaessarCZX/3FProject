@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import MemberFirstDepositButton from "~~/components/Actions/Entrance_member/MemberFirstDepositButton";
+import CommonDepositButton from "./CommonDepositButton";
+import FirstDepositButton from "./FirstDepositButton";
 import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 
-const FirstDepositForm: React.FC = () => {
+const DepositForm: React.FC<{ memberStatus: boolean | null }> = ({ memberStatus }) => {
   const [deposit, setDeposit] = useState("");
 
   return (
@@ -21,7 +22,11 @@ const FirstDepositForm: React.FC = () => {
                 onChange={amount => setDeposit(amount)}
               />
             </div>
-            <MemberFirstDepositButton depositAmount={deposit} />
+            {!memberStatus ? (
+              <FirstDepositButton depositAmount={deposit} />
+            ) : (
+              <CommonDepositButton depositAmount={deposit} />
+            )}
           </div>
         </div>
       </article>
@@ -39,7 +44,11 @@ const FirstDepositForm: React.FC = () => {
               />
             </div>
             <div className="mt-0 w-full sm:w-auto flex justify-center px-4">
-              <MemberFirstDepositButton depositAmount={deposit} />
+              {!memberStatus ? (
+                <FirstDepositButton depositAmount={deposit} />
+              ) : (
+                <CommonDepositButton depositAmount={deposit} />
+              )}
             </div>
           </div>
         </div>
@@ -48,4 +57,4 @@ const FirstDepositForm: React.FC = () => {
   );
 };
 
-export default FirstDepositForm;
+export default DepositForm;

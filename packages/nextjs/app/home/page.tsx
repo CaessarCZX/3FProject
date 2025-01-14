@@ -3,8 +3,11 @@
 import withAuth from "../hoc/withAuth";
 import HeroHome from "./_components/HeroHome";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
+import { useGetNotfications } from "~~/hooks/user/useGetNotifications";
 
-const Activity = () => {
+const HomePage = () => {
+  useGetNotfications();
+
   return (
     <InternalLayout>
       <HeroHome />
@@ -12,4 +15,4 @@ const Activity = () => {
   );
 };
 
-export default withAuth(Activity);
+export default withAuth(HomePage);

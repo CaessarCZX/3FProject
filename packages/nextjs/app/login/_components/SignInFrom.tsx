@@ -9,7 +9,6 @@ import { RiEyeCloseLine } from "react-icons/ri";
 import { useAccount } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import { useGlobalState } from "~~/services/store/store";
-// import { useInitializeMemberStatus } from "~~/hooks/3FProject/useInitializeMemberStatus";
 import { notification } from "~~/utils/scaffold-eth/notification";
 
 interface DecodedToken {
@@ -75,7 +74,7 @@ export const SignInForm = () => {
           const token: DecodedToken = jwtDecode(data.token);
           if (token.membership !== 0) memebershipStatus(true);
 
-          router.push("/dashboard");
+          router.push("/home");
         } else {
           const errorData = await response.json();
           setErrorMessage(errorData.message || "Error al iniciar sesión.");
@@ -167,7 +166,7 @@ export const SignInForm = () => {
         const token: DecodedToken = jwtDecode(data.token);
         if (token.membership !== 0) memebershipStatus(true);
 
-        router.push("/dashboard");
+        router.push("/home");
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Error al iniciar sesión.");
