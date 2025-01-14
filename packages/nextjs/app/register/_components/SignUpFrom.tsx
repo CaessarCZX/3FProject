@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Helper } from "./Helper";
 import { PasswordCriteriaFeedback } from "./PasswordCriteriaFeedback";
@@ -26,6 +27,7 @@ export const SignUpForm = () => {
     password: "",
     wallet: "",
     referredBy: "",
+    terms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -49,6 +51,7 @@ export const SignUpForm = () => {
     password: "",
     wallet: "",
     referredBy: "",
+    terms: "",
   });
   //For blockchain
   const currentUser = useAccount();
@@ -101,9 +104,13 @@ export const SignUpForm = () => {
     }
   }, [singleErrorMessage, successMessage]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, type, value } = e.target;
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+    }));
 
     // Password validation on change
     if (name === "password") {
@@ -126,6 +133,11 @@ export const SignUpForm = () => {
       setSingleErrorMessage("");
       setSuccessMessage("");
       setFieldErrors(prev => ({ ...prev, referredBy: "" }));
+    }
+
+    // Clear terms error
+    if (name === "terms") {
+      setFieldErrors(prev => ({ ...prev, terms: "" }));
     }
   };
 
@@ -267,11 +279,16 @@ export const SignUpForm = () => {
 
     // For validations
     const validation = validateFormData(formData);
-    if (Object.values(validation).length > 0) {
+
+    if (Object.keys(validation).length > 0) {
       RenderWarningMessages(validation);
       setIsSubmitting(false);
       setFieldErrors(prev => ({ ...prev, ...validation }));
-
+      return;
+    }
+    if (!formData.terms) {
+      setFieldErrors(prev => ({ ...prev, terms: "Debes aceptar los términos y condiciones" }));
+      setIsSubmitting(false);
       return;
     }
 
@@ -290,6 +307,7 @@ export const SignUpForm = () => {
           password: "",
           wallet: "",
           referredBy: "",
+          terms: false,
         });
         setIsWalletConnected(false);
         setIsReferrerValid(false);
@@ -306,6 +324,7 @@ export const SignUpForm = () => {
           password: "",
           wallet: "",
           referredBy: "",
+          terms: "",
         });
 
         const loginUrl = saveEmail ? `/login?email=${encodeURIComponent(saveEmail)}` : "/login";
@@ -529,6 +548,27 @@ export const SignUpForm = () => {
           )}
         </div>
       </div>
+      {/* Terms and Conditions */}
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          id="terms"
+          name="terms"
+          checked={formData.terms}
+          onChange={handleChange}
+          className={`mr-2 h-4 w-4 rounded focus:ring-blue-500 border-gray-300  ${
+            fieldErrors.terms ? "border-red-500" : ""
+          }`}
+          required
+        />
+        <label htmlFor="terms" className="text-sm font-medium text-gray-700">
+          Acepto los{" "}
+          <Link href="/terms" className="text-blue-500 hover:underline">
+            Términos y condiciones
+          </Link>
+        </label>
+      </div>
+      {fieldErrors.terms && <p className="text-red-500 text-sm mt-1 ml-5">{fieldErrors.terms}</p>}
 
       {/* Login link */}
       <div className="text-sm text-center">
@@ -544,10 +584,18 @@ export const SignUpForm = () => {
       <button
         type="submit"
         disabled={
-          isSubmitting || !isWalletConnected || !isReferrerValid || !Object.values(passwordCriteria).every(Boolean)
+          isSubmitting ||
+          !isWalletConnected ||
+          !isReferrerValid ||
+          !Object.values(passwordCriteria).every(Boolean) ||
+          !formData.terms
         }
         className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed ${
-          isSubmitting || !isWalletConnected || !isReferrerValid || !Object.values(passwordCriteria).every(Boolean)
+          isSubmitting ||
+          !isWalletConnected ||
+          !isReferrerValid ||
+          !Object.values(passwordCriteria).every(Boolean) ||
+          !formData.terms
             ? "bg-gray-500"
             : "bg-gray-900 hover:bg-gray-700"
         }`}

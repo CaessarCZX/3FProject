@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDeployedContractInfo } from "../scaffold-eth/useDeployedContractInfo";
-import { jwtDecode } from "jwt-decode";
+import { useGetTokenData } from "./useGetTokenData";
 import { createPublicClient, formatUnits, http } from "viem";
 import { sepolia } from "viem/chains";
 import { useAccount } from "wagmi";
@@ -12,10 +12,6 @@ const client = createPublicClient({
   transport: http(getAlchemyHttpUrl(sepolia.id)),
   pollingInterval: scaffoldConfig.pollingInterval,
 });
-
-interface DecodedToken {
-  isAdmin: boolean;
-}
 
 type BlockchainLogToken = {
   amount?: string | bigint;
@@ -102,101 +98,8 @@ const ParseBlockchainCommissionEvent = (log: BlockchainLogToken) => {
   );
 };
 
-async function listenToCommissions(userAddress: string, contractAddress: string) {
-  // console.log("Escuchando eventos...");
-
-  client.watchEvent({
-    address: contractAddress,
-    event: {
-      name: "CommissionPaid",
-      type: "event",
-      inputs: [
-        { indexed: true, name: "to", type: "address" },
-        { indexed: false, name: "amount", type: "uint256" },
-        { indexed: false, name: "timestamp", type: "uint256" },
-      ],
-    },
-    args: {
-      to: userAddress, // Filtra por la dirección del usuario conectado
-    },
-    onLogs: logs => {
-      logs.forEach(log => {
-        ParseBlockchainCommissionEvent(log.args);
-      });
-    },
-  });
-}
-
-async function listenToTransferBusiness(contractAddress: string) {
-  // console.log("Escuchando eventos...");
-
-  client.watchEvent({
-    address: contractAddress,
-    event: {
-      name: "TransferBusiness",
-      type: "event",
-      inputs: [
-        { indexed: true, name: "from", type: "address" },
-        { indexed: false, name: "amount", type: "uint256" },
-        { indexed: false, name: "timestamp", type: "uint256" },
-      ],
-    },
-    onLogs: logs => {
-      logs.forEach(log => {
-        ParseBlockchainRecieverEvent(log.args);
-      });
-    },
-  });
-}
-
-async function listenToMembershipPaid(contractAddress: string) {
-  // console.log("Escuchando eventos...");
-
-  client.watchEvent({
-    address: contractAddress,
-    event: {
-      name: "MembershipPaid",
-      type: "event",
-      inputs: [
-        { indexed: true, name: "from", type: "address" },
-        { indexed: false, name: "amount", type: "uint256" },
-        { indexed: false, name: "timestamp", type: "uint256" },
-      ],
-    },
-    onLogs: logs => {
-      logs.forEach(log => {
-        ParseBlockchainRecieverEvent(log.args, true);
-      });
-    },
-  });
-}
-
-async function listenToNewSavings(userAddress: string, contractAddress: string) {
-  // console.log("Escuchando eventos...");
-
-  client.watchEvent({
-    address: contractAddress,
-    event: {
-      name: "NewSaving",
-      type: "event",
-      inputs: [
-        { indexed: true, name: "member", type: "address" },
-        { indexed: false, name: "amount", type: "uint256" },
-        { indexed: false, name: "timestamp", type: "uint256" },
-      ],
-    },
-    args: {
-      member: userAddress,
-    },
-    onLogs: logs => {
-      logs.forEach(log => {
-        ParseBlockchainNewSavingEvent(log.args);
-      });
-    },
-  });
-}
-
 export const useGetNotfications = () => {
+  const { tokenInfo, tokenError } = useGetTokenData();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const currentContract = contract?.address ?? "0x";
   const [isAdmin, setIsAdmin] = useState<boolean>(true);
@@ -204,35 +107,125 @@ export const useGetNotfications = () => {
   const { address, isConnected } = useAccount();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    if (tokenError) return;
 
-    if (token) {
-      try {
-        // Decodifica el JWT
-        const decoded: DecodedToken = jwtDecode(token);
-
-        // Verifica si el token es válido y si el usuario es administrador
-        if (!decoded.isAdmin) {
-          setIsAdmin(false);
-        }
-      } catch (error) {
-        console.error("Error al decodificar el token:", error);
-      }
+    if (!tokenInfo.isAdmin) {
+      setIsAdmin(false);
     }
-  }, []);
+  }, [tokenError, tokenInfo.isAdmin]);
+
+  const listenToMembershipPaid = useCallback(async () => {
+    client.watchEvent({
+      address: currentContract,
+      event: {
+        name: "MembershipPaid",
+        type: "event",
+        inputs: [
+          { indexed: true, name: "from", type: "address" },
+          { indexed: false, name: "amount", type: "uint256" },
+          { indexed: false, name: "timestamp", type: "uint256" },
+        ],
+      },
+      onLogs: logs => {
+        if (logs.length > 0) {
+          const lastLog = logs[logs.length - 1];
+          ParseBlockchainRecieverEvent(lastLog.args, true);
+        }
+      },
+    });
+  }, [currentContract]);
+
+  const listenToTransferBusiness = useCallback(async () => {
+    client.watchEvent({
+      address: currentContract,
+      event: {
+        name: "TransferBusiness",
+        type: "event",
+        inputs: [
+          { indexed: true, name: "from", type: "address" },
+          { indexed: false, name: "amount", type: "uint256" },
+          { indexed: false, name: "timestamp", type: "uint256" },
+        ],
+      },
+      onLogs: logs => {
+        if (logs.length > 0) {
+          const lastLog = logs[logs.length - 1];
+          ParseBlockchainRecieverEvent(lastLog.args);
+        }
+      },
+    });
+  }, [currentContract]);
+
+  const listenToNewSavings = useCallback(async () => {
+    client.watchEvent({
+      address: currentContract,
+      event: {
+        name: "NewSaving",
+        type: "event",
+        inputs: [
+          { indexed: true, name: "member", type: "address" },
+          { indexed: false, name: "amount", type: "uint256" },
+          { indexed: false, name: "timestamp", type: "uint256" },
+        ],
+      },
+      args: {
+        member: address,
+      },
+      onLogs: logs => {
+        console.log(logs);
+        if (logs.length > 0) {
+          const lastLog = logs[logs.length - 1];
+          ParseBlockchainNewSavingEvent(lastLog.args);
+        }
+      },
+    });
+  }, [address, currentContract]);
+
+  const listenToCommissions = useCallback(async () => {
+    client.watchEvent({
+      address: currentContract,
+      event: {
+        name: "CommissionPaid",
+        type: "event",
+        inputs: [
+          { indexed: true, name: "to", type: "address" },
+          { indexed: false, name: "amount", type: "uint256" },
+          { indexed: false, name: "timestamp", type: "uint256" },
+        ],
+      },
+      args: {
+        to: address, // Filtra por la dirección del usuario conectado
+      },
+      onLogs: logs => {
+        if (logs.length > 0) {
+          const lastLog = logs[logs.length - 1];
+          ParseBlockchainCommissionEvent(lastLog.args);
+        }
+      },
+    });
+  }, [address, currentContract]);
 
   useEffect(() => {
+    console.log("Instanciacion de escucha de eventos");
     if (isConnected && address) {
-      listenToCommissions(address, currentContract); // Pasa la dirección conectada al filtro
+      listenToCommissions();
     }
 
     if (isConnected && address) {
-      listenToNewSavings(address, currentContract);
+      listenToNewSavings();
     }
 
     if (isConnected && address && isAdmin) {
-      listenToTransferBusiness(currentContract);
-      listenToMembershipPaid(currentContract);
+      listenToTransferBusiness();
+      listenToMembershipPaid();
     }
-  }, [isConnected, address, currentContract, isAdmin]);
+  }, [
+    address,
+    isAdmin,
+    isConnected,
+    listenToCommissions,
+    listenToMembershipPaid,
+    listenToNewSavings,
+    listenToTransferBusiness,
+  ]);
 };

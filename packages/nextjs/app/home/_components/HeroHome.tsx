@@ -1,9 +1,11 @@
 import React from "react";
 import Image from "next/image";
-import FirstDepositForm from "./FirstDepositForm";
+import DepositForm from "./DepositForm";
 import Shapes from "./Shapes";
+import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
 
 const HeroHome: React.FC = () => {
+  const { memberStatus } = useGetMemberStatus();
   return (
     <>
       <section className="bg-white dark:bg-[#0b1727] shadow-default text-zinc-900 dark:text-white relative overflow-hidden z-10">
@@ -14,9 +16,11 @@ const HeroHome: React.FC = () => {
               <h1 className="text-3xl font-bold leading-[1.1] mb-2 md:text-[37px]">
                 Gracias por ser parte de Friends & Family
               </h1>
-              <p className="text-[22px] leading-snug opacity-80 my-6 md:max-w-95">Inicia tu primer ahorro.</p>
+              <p className="text-[22px] leading-snug opacity-80 my-6 md:max-w-95">
+                {!memberStatus ? "Inicia tu primer ahorro." : "Inicia un nuevo ahorro."}
+              </p>
               <div>
-                <FirstDepositForm />
+                <DepositForm memberStatus={memberStatus} />
               </div>
             </div>
             <div>

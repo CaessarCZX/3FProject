@@ -1,30 +1,23 @@
 import { useEffect, useState } from "react";
+import { useWatchBalance } from "../scaffold-eth/useWatchBalance";
+import { useGetTokenData } from "../user/useGetTokenData";
 import { readContract, waitForTransactionReceipt } from "@wagmi/core";
 import { Abi } from "abitype";
-import { jwtDecode } from "jwt-decode";
 import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
-import { StageTransactionModal } from "~~/components/Actions/Transaction/StageTransactionModal";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
 import { useGetMemberSavings } from "~~/hooks/user/useGetMemberSavings";
+import { useGlobalState } from "~~/services/store/store";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
-import { DepositBtnProps, TransactionInfo } from "~~/utils/3FContract/deposit";
+import { TransactionInfo } from "~~/utils/3FContract/deposit";
 import { DepositErrors as err } from "~~/utils/errors/errors";
 import { notification } from "~~/utils/scaffold-eth";
-
-interface DecodedToken {
-  id: string;
-  email: string;
-}
 
 const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
-
-interface DecodedToken {
-  ReferersCommissions: string[];
-}
+const PATCH_MEMBERSHIP_TO_MAIL = 500;
 
 interface UplineMembers {
   uplineAddress: string;
@@ -32,35 +25,52 @@ interface UplineMembers {
   thirtLevelUpline: string;
 }
 
-const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
+const useFirstDepositContract = () => {
+  const setIsActiveMemberStatus = useGlobalState(state => state.setIsActiveMemberStatus);
+  const { tokenInfo, tokenError } = useGetTokenData();
   const { fetchSavings } = useGetMemberSavings();
   const { writeContractAsync } = useWriteContract();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
-  const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n); // Deposit for contract
   const contractAbi = contract?.abi;
   const currentContract = contract?.address ?? "0x";
   const member = useAccount();
   const memberAddress = member?.address ?? "0x0";
+  const { data: walletBalance } = useWatchBalance({ address: memberAddress });
+  const [id, setId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [uplineMembers, setUplineMembers] = useState<UplineMembers>({
     uplineAddress: "",
     secondLevelUpline: "",
     thirtLevelUpline: "",
   });
+  const [transaction, setTransaction] = useState<TransactionInfo>({
+    allowanceHash: "",
+    allowanceReceiptHash: "",
+    depositContractHash: "",
+    depositContractReceiptHash: "",
+  });
 
-  // Get upline referrals for commission
+  const [isStarted, setIsStarted] = useState(false);
+  const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
+  const [error, setError] = useState<string | null>();
+  // Deposit Rules
+  const minDeposit = parseUnits("2500", 6); // Solo para primer deposito
+  const depositMultiple = parseUnits("500", 6);
+
+  // Get upline referrals for commission and user id
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-
-    if (storedToken) {
+    if (!tokenError) {
       try {
-        // Decodifica el JWT para obtener el contenido del payload
-        const decoded: DecodedToken = jwtDecode(storedToken);
+        // Get data for sending transaction to DB
+        setId(tokenInfo.id || null);
+        setEmail(tokenInfo.email || null);
+        // Get upline referrals for commission
         /**
          * IMPORTANTT!
          * @RefererCommissions brings the upline referer from top to bottom
          * with the direct upline in the last position
          */
-        const uplines: string[] = decoded.ReferersCommissions.toReversed(); //Copy from ReferersCommmission
+        const uplines: string[] = tokenInfo.ReferersCommissions.toReversed(); //Copy from ReferersCommmission
         if (uplines) {
           setUplineMembers({
             uplineAddress: uplines[0] || INVALID_ADDRESS, //For direct upline
@@ -72,23 +82,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         console.error("Error al decodificar el token:", error);
       }
     }
-  }, []);
-  const [id, setId] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-
-  // Deposit Rules
-  const minDeposit = parseUnits("2000", 6);
-  const depositMultiple = parseUnits("500", 6);
-
-  const [transaction, setTransaction] = useState<TransactionInfo>({
-    allowanceHash: "",
-    allowanceReceiptHash: "",
-    depositContractHash: "",
-    depositContractReceiptHash: "",
-  });
-
-  const [isStarted, setIsStarted] = useState(false);
-  const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
+  }, [tokenError, tokenInfo.ReferersCommissions, tokenInfo.email, tokenInfo.id]);
 
   const resetFlags = () => {
     setIsStarted(false);
@@ -102,26 +96,12 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
     }));
   };
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-
-    if (storedToken) {
-      try {
-        // Decodifica el JWT para obtener el contenido del payload
-        const decoded: DecodedToken = jwtDecode(storedToken);
-        setId(decoded.id || null); // Extrae la propiedad id del usuario en el token
-        setEmail(decoded.email || null); // Extrae el email del usuario
-      } catch (error) {
-        console.error("Error al decodificar el token:", error);
-      }
-    }
-  }, []);
-
   const ShowNotification = (message: string) => {
     notification.error(message, { position: "bottom-right", duration: 5000 });
   };
 
   // const HandleTest = () => {
+  //   console.log("Im activate");
   //   setIsStarted(true);
   //   setIsHandleModalActivate(true);
   // };
@@ -161,12 +141,16 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         const transactionData = await transactionResponse.json();
         console.log("Transacción creada exitosamente:", transactionData);
 
+        // Monto de resguardo en este ahorro
+        const amountToFirstDeposit = amount - PATCH_MEMBERSHIP_TO_MAIL;
+
+        //Envio de email y notificacion en el proceso
         await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/sendgrid/saving`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             toEmail: email,
-            amount: amount,
+            amount: amountToFirstDeposit,
           }),
         });
       } else {
@@ -181,16 +165,27 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
     }
   };
 
-  const HandleDeposit = async () => {
+  const HandleDeposit = async ({ depositAmount }: { depositAmount: string | null }) => {
+    const allowanceAmount = depositAmount ? parseUnits(depositAmount, 6) : BigInt(0n); // Deposit for contract
+    const currentWalletBalance = walletBalance?.value || BigInt(0n);
+
     if (!depositAmount || depositAmount === "0") {
       ShowNotification(err.nonDeposit);
+      setError(err.nonDeposit);
       resetFlags();
       return;
     }
 
     if (allowanceAmount < minDeposit || allowanceAmount % depositMultiple !== 0n) {
       ShowNotification(err.deposit);
+      setError(err.deposit);
       resetFlags();
+      return;
+    }
+
+    if (allowanceAmount > currentWalletBalance) {
+      ShowNotification(err.balance);
+      setError(err.balance);
       return;
     }
 
@@ -200,6 +195,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
 
       if (isStarted === true || !tokenUsdt || !currentContract) {
         ShowNotification(err.general);
+        setError(err.general);
         resetFlags();
         return;
       }
@@ -214,7 +210,8 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         args: [memberAddress, currentContract],
       });
 
-      console.log("currentAllowance: ", currentAllowance); //For debug
+      console.log("currentAllowance: ", currentAllowance);
+      console.log(typeof currentAllowance); //For debug
 
       // To patch previous allowance
       if (currentAllowance === allowanceAmount) {
@@ -226,7 +223,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
 
       if (currentAllowance < allowanceAmount) {
         const allowanceRequest = allowanceAmount - currentAllowance;
-        console.log("currentAllowance: ", allowanceRequest); //For debug
+        console.log(allowanceRequest);
 
         const allowanceHash = await writeContractAsync({
           abi: erc20Abi,
@@ -252,7 +249,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         }));
 
         /**
-         * "depositMemberFunds" function ere sort params for right execution according to ABI encoder
+         * "memberEntrance" function ere sort params for right execution according to ABI encoder
          */
         console.log(
           //For debug only
@@ -265,12 +262,12 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
         const depositContractHash = await writeContractAsync({
           abi: contractAbi as Abi,
           address: currentContract,
-          functionName: "depositMemberFunds",
+          functionName: "memberEntrance",
           args: [
-            allowanceAmount,
             uplineMembers.uplineAddress,
             uplineMembers.secondLevelUpline,
             uplineMembers.thirtLevelUpline,
+            allowanceAmount,
             MEMBERS_KEY,
           ],
         });
@@ -294,42 +291,34 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
           await performHealthCheck(amount, depositContractReceiptHash.transactionHash);
 
           setTimeout(() => {
+            // Actualiza el status de activo del miembro en el contrato
+            // Force member status
+            setIsActiveMemberStatus(true);
             fetchSavings(1);
           }, 3000);
         } else {
           ShowNotification(err.onTransaction);
+          setError(err.onTransaction);
         }
       } else {
         ShowNotification(err.allowance);
+        setError(err.allowance);
       }
     } catch (e: any) {
       ShowNotification(err.general);
+      setError(err.general);
       console.error(e.message);
     } finally {
       resetFlags();
     }
   };
-
-  return (
-    <>
-      {!isStarted && (
-        <button
-          type="button"
-          className="text-white bg-brand-default disabled:bg-slate-500 hover:bg-brand-hover focus:ring-4 focus:outline-none font-medium rounded-md text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700"
-          onClick={() => HandleDeposit()}
-        >
-          {isStarted ? "Pendiente" : btnText}
-        </button>
-      )}
-      {isStarted && (
-        <StageTransactionModal
-          activate={isHandleModalActivate}
-          transaction={transaction}
-          transactionDescription="Deposito Exitoso"
-        />
-      )}
-    </>
-  );
+  return {
+    isHandleModalActivate,
+    isStarted,
+    error,
+    transaction,
+    HandleDeposit,
+  };
 };
 
-export default DepositButton;
+export default useFirstDepositContract;
