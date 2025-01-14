@@ -21,7 +21,7 @@ const NotificationsTable: React.FC<NotificationsTableProps> = ({ activities }) =
                 type={ac.type || ""}
                 email={ac.email}
                 date={ac.date}
-                message={ac.message}
+                message_ui={ac.message_ui}
                 amount={ac.amount}
               />
             );

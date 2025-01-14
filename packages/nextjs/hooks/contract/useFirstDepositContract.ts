@@ -294,7 +294,7 @@ const useFirstDepositContract = () => {
             // Actualiza el status de activo del miembro en el contrato
             // Force member status
             setIsActiveMemberStatus(true);
-            fetchSavings();
+            fetchSavings(1);
           }, 3000);
         } else {
           ShowNotification(err.onTransaction);

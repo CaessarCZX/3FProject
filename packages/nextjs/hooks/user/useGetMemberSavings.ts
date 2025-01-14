@@ -9,23 +9,30 @@ export const useGetMemberSavings = () => {
   const setMemberSavings = useGlobalState(state => state.setMemberSavings);
   const setMemberBalance = useGlobalState(state => state.setMemberBalance);
   const [errorRequest, setErrorRequest] = useState("");
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
 
-  const fetchSavings = useCallback(async () => {
-    setIsMemberSavingsFetching(true);
+  const fetchSavings = useCallback(
+    async (currentPage: number) => {
+      setIsMemberSavingsFetching(true);
 
-    const { memberSavings, balance, error } = await fetchMemberSavings();
+      const { page, pages, memberSavings, balance, error } = await fetchMemberSavings(currentPage);
 
-    if (error) {
+      if (error) {
+        setIsMemberSavingsFetching(false);
+        setErrorRequest(error);
+        return;
+      }
+
+      if (page) setPage(page);
+      if (pages) setPages(pages);
+      if (memberSavings) setMemberSavings(memberSavings);
+      if (balance) setMemberBalance(balance);
+
       setIsMemberSavingsFetching(false);
-      setErrorRequest(error);
-      return;
-    }
+    },
+    [setIsMemberSavingsFetching, setMemberBalance, setMemberSavings],
+  );
 
-    if (memberSavings) setMemberSavings(memberSavings);
-    if (balance) setMemberBalance(balance);
-
-    setIsMemberSavingsFetching(false);
-  }, [setIsMemberSavingsFetching, setMemberBalance, setMemberSavings]);
-
-  return { fetchSavings, error: errorRequest };
+  return { page, pages, fetchSavings, error: errorRequest };
 };

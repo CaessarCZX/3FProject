@@ -16,7 +16,7 @@ const MESSAGE_HEADERS = {
   "NEW AFFILIATE": "Nuevo Afiliado",
 };
 
-export const NotificationsTableRow = ({ type, email, message, amount, date }: MemberActivity) => {
+export const NotificationsTableRow = ({ type, email, message_ui, amount, date }: MemberActivity) => {
   const formatedDate = useDateEs(date);
 
   return (
@@ -45,7 +45,7 @@ export const NotificationsTableRow = ({ type, email, message, amount, date }: Me
               <RiMailSendLine className="ml-1 text-meta-10 dark:text-green-400" />
               <p className="font-light text-[11px] text-gray-400 ml-4">{email}</p>
             </div>
-            <p className="text-sm font-light text-gray-600 dark:text-gray-100 leading-none mt-1">{message}</p>
+            <p className="text-sm font-light text-gray-600 dark:text-gray-100 leading-none mt-1">{message_ui}</p>
             <p className="font-medium text-[12px] text-meta-5 m-0">{formatedDate}</p>
           </div>
         </div>

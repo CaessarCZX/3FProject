@@ -98,75 +98,6 @@ const ParseBlockchainCommissionEvent = (log: BlockchainLogToken) => {
   );
 };
 
-export async function listenToCommissions(userAddress: string, contractAddress: string) {
-  console.log("Escuchando eventos de comision...");
-
-  client.watchEvent({
-    address: contractAddress,
-    event: {
-      name: "CommissionPaid",
-      type: "event",
-      inputs: [
-        { indexed: true, name: "to", type: "address" },
-        { indexed: false, name: "amount", type: "uint256" },
-        { indexed: false, name: "timestamp", type: "uint256" },
-      ],
-    },
-    args: {
-      to: userAddress, // Filtra por la dirección del usuario conectado
-    },
-    onLogs: logs => {
-      logs.forEach(log => {
-        ParseBlockchainCommissionEvent(log.args);
-      });
-    },
-  });
-}
-
-export async function listenToTransferBusiness(contractAddress: string) {
-  // console.log("Escuchando eventos...");
-
-  client.watchEvent({
-    address: contractAddress,
-    event: {
-      name: "TransferBusiness",
-      type: "event",
-      inputs: [
-        { indexed: true, name: "from", type: "address" },
-        { indexed: false, name: "amount", type: "uint256" },
-        { indexed: false, name: "timestamp", type: "uint256" },
-      ],
-    },
-    onLogs: logs => {
-      logs.forEach(log => {
-        ParseBlockchainRecieverEvent(log.args);
-      });
-    },
-  });
-}
-
-export async function listenToMembershipPaid(contractAddress: string) {
-  // console.log("Escuchando eventos...");
-
-  client.watchEvent({
-    address: contractAddress,
-    event: {
-      name: "MembershipPaid",
-      type: "event",
-      inputs: [
-        { indexed: true, name: "from", type: "address" },
-        { indexed: false, name: "amount", type: "uint256" },
-        { indexed: false, name: "timestamp", type: "uint256" },
-      ],
-    },
-    onLogs: logs => {
-      logs.forEach(log => {
-        ParseBlockchainRecieverEvent(log.args, true);
-      });
-    },
-  });
-}
-
 export const useGetNotfications = () => {
   const { tokenInfo, tokenError } = useGetTokenData();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
@@ -183,10 +114,49 @@ export const useGetNotfications = () => {
     }
   }, [tokenError, tokenInfo.isAdmin]);
 
+  const listenToMembershipPaid = useCallback(async () => {
+    client.watchEvent({
+      address: currentContract,
+      event: {
+        name: "MembershipPaid",
+        type: "event",
+        inputs: [
+          { indexed: true, name: "from", type: "address" },
+          { indexed: false, name: "amount", type: "uint256" },
+          { indexed: false, name: "timestamp", type: "uint256" },
+        ],
+      },
+      onLogs: logs => {
+        if (logs.length > 0) {
+          const lastLog = logs[logs.length - 1];
+          ParseBlockchainRecieverEvent(lastLog.args, true);
+        }
+      },
+    });
+  }, [currentContract]);
+
+  const listenToTransferBusiness = useCallback(async () => {
+    client.watchEvent({
+      address: currentContract,
+      event: {
+        name: "TransferBusiness",
+        type: "event",
+        inputs: [
+          { indexed: true, name: "from", type: "address" },
+          { indexed: false, name: "amount", type: "uint256" },
+          { indexed: false, name: "timestamp", type: "uint256" },
+        ],
+      },
+      onLogs: logs => {
+        if (logs.length > 0) {
+          const lastLog = logs[logs.length - 1];
+          ParseBlockchainRecieverEvent(lastLog.args);
+        }
+      },
+    });
+  }, [currentContract]);
+
   const listenToNewSavings = useCallback(async () => {
-    if (!(isConnected && address)) return;
-    console.log("Funcion de escucha de eventos");
-    console.log(isAdmin);
     client.watchEvent({
       address: currentContract,
       event: {
@@ -209,23 +179,53 @@ export const useGetNotfications = () => {
         }
       },
     });
-  }, [address, currentContract, isAdmin, isConnected]);
+  }, [address, currentContract]);
+
+  const listenToCommissions = useCallback(async () => {
+    client.watchEvent({
+      address: currentContract,
+      event: {
+        name: "CommissionPaid",
+        type: "event",
+        inputs: [
+          { indexed: true, name: "to", type: "address" },
+          { indexed: false, name: "amount", type: "uint256" },
+          { indexed: false, name: "timestamp", type: "uint256" },
+        ],
+      },
+      args: {
+        to: address, // Filtra por la dirección del usuario conectado
+      },
+      onLogs: logs => {
+        if (logs.length > 0) {
+          const lastLog = logs[logs.length - 1];
+          ParseBlockchainCommissionEvent(lastLog.args);
+        }
+      },
+    });
+  }, [address, currentContract]);
 
   useEffect(() => {
     console.log("Instanciacion de escucha de eventos");
-    // if (isConnected && address) {
-    //   listenToCommissions(address, currentContract); // Pasa la dirección conectada al filtro
-    // }
+    if (isConnected && address) {
+      listenToCommissions();
+    }
 
-    // if (isConnected && address) {
-    //   listenToNewSavings();
-    // }
-    listenToNewSavings();
+    if (isConnected && address) {
+      listenToNewSavings();
+    }
 
-    // if (isConnected && address && isAdmin) {
-    //   listenToTransferBusiness(currentContract);
-    //   listenToMembershipPaid(currentContract);
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (isConnected && address && isAdmin) {
+      listenToTransferBusiness();
+      listenToMembershipPaid();
+    }
+  }, [
+    address,
+    isAdmin,
+    isConnected,
+    listenToCommissions,
+    listenToMembershipPaid,
+    listenToNewSavings,
+    listenToTransferBusiness,
+  ]);
 };
