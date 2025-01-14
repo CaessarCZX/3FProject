@@ -294,7 +294,7 @@ const DepositButton = ({ depositAmount, btnText }: DepositBtnProps) => {
           await performHealthCheck(amount, depositContractReceiptHash.transactionHash);
 
           setTimeout(() => {
-            fetchSavings();
+            fetchSavings(1);
           }, 3000);
         } else {
           ShowNotification(err.onTransaction);

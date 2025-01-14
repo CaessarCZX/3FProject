@@ -299,7 +299,7 @@ const MemberFirstDepositButton: React.FC<{ depositAmount: string }> = ({ deposit
             // getCurrentMemberStatus(); // Actualiza el status de activo del miembro en el contrato para dashboard comun
             // Force member status
             setIsActiveMemberStatus(true);
-            fetchSavings();
+            fetchSavings(1);
           }, 3000);
         } else {
           ShowNotification(err.onTransaction);
