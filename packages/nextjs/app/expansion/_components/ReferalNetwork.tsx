@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import ReactFlow, { Background, Controls, Edge, Node } from "reactflow";
 import "reactflow/dist/style.css";
+import { useGlobalState } from "~~/services/store/store";
 
 interface Referral {
   wallet: string;
@@ -22,6 +23,8 @@ const ReferralNetwork: React.FC = () => {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // For getting current affiliates number
+  const setAffiliatesNumber = useGlobalState(state => state.setMemberAffiliatesCount);
 
   useEffect(() => {
     const fetchReferersCommissions = async () => {
@@ -86,6 +89,9 @@ const ReferralNetwork: React.FC = () => {
       });
 
       let yOffset = 125;
+
+      // Get direct affiliates number
+      setAffiliatesNumber(referersCommissions[0].referrals.length || 0);
 
       referersCommissions.forEach(level => {
         const levelYOffset = yOffset; // Offset inicial por nivel

@@ -1,6 +1,6 @@
 import AddAffiliate from "./_components/AddAffiliate";
 import HeroExpansion from "./_components/HeroExpansion";
-import TableForm from "./_components/TableForm";
+import ReferalNetwork from "./_components/ReferalNetwork";
 import { NextPage } from "next";
 import Breadcrumb from "~~/components/Breadcumbs";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
@@ -18,7 +18,7 @@ const Expansion: NextPage = () => {
       </div>
       <div className="h-[500px] min-h-[500px] w-full rounded-sm border border-stroke bg-white px-7.5 py-6 shadow-default dark:border-strokedark dark:bg-boxdark">
         <h4 className="mb-2 text-3xl font-light text-black dark:text-white">Tu organización</h4>
-        <TableForm />
+        <ReferalNetwork />
       </div>
     </InternalLayout>
   );

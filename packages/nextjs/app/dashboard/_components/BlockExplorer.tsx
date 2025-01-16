@@ -39,19 +39,12 @@ const BlockExplorer = () => {
   }, [fetchSavings, withMembership, error, memberTransactions, currentPage, page, pages]);
 
   return (
-    //   <div className="container mx-auto rounded-xl overflow-hidden">
-    //     {isLoading ? (
-    //       <p>Cargando los datos</p>
-    //     ) : memberTransactions.length === 0 ? (
-    //       <p> No hay datos disponibles para mostrar </p>
-    //     ) : (
-    //       <TransactionsTable transactions={memberTransactions} />
-    //     )}
-    //     <PaginationButton currentPage={currentPage} totalItems={Number(totalPages)} setCurrentPage={setCurrentPage} />
-    //   </div>
-    // );
     <div className="container mx-auto rounded-xl overflow-hidden">
-      {isLoading ? <p>Cargando los datos</p> : <TransactionsTable transactions={memberTransactions} />}
+      {isLoading ? (
+        <p className="my-12 font-bold text-xl">Cargando los datos ...</p>
+      ) : (
+        <TransactionsTable transactions={memberTransactions} />
+      )}
       <PaginationButton currentPage={currentPage} totalItems={Number(totalPages)} setCurrentPage={setCurrentPage} />
     </div>
   );
