@@ -1,5 +1,8 @@
 import React from "react";
+import Image from "next/image";
 import { NotificationsTableRow } from "./NotificationsTableRow";
+import mailD from "~~/public/common/mail_dark.svg";
+import mailW from "~~/public/common/mail_white.svg";
 import { MemberActivity } from "~~/types/activity/activity";
 
 type NotificationsTableProps = {
@@ -13,6 +16,13 @@ const NotificationsTable: React.FC<NotificationsTableProps> = ({ activities }) =
 
       <table className="flex flex-col">
         <tbody className="space-y-4">
+          {activities.length === 0 && (
+            <div className="flex flex-col-reverse p-4 items-center">
+              <p className="text-center font-light text-xl text-gray-400">No se cuentan con contransacciones</p>
+              <Image width={150} className="dark:hidden" src={mailW} alt="activity image" />
+              <Image width={150} className="hidden dark:block" src={mailD} alt="activity image" />
+            </div>
+          )}
           {activities.map(ac => {
             // const value = formatUnits(BigInt(tx.value), 6);
             return (

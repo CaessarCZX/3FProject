@@ -15,6 +15,6 @@ export const Helper = () => (
       </ul>
     }
   >
-    <FiHelpCircle className="text-gray-300 cursor-pointer" />
+    <FiHelpCircle className="text-gray-300 dark:text-gray-600 cursor-pointer" />
   </Tooltip>
 );

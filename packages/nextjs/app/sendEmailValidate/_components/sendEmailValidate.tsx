@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export const SendEmailValidate = () => {
   const [message, setMessage] = useState("Enviando enlace de recuperación...");
   const [email, setEmail] = useState("");
   const isEmailSent = useRef(false);
+  const router = useRouter();
 
   useEffect(() => {
     console.log("useEffect ejecutado");
@@ -51,18 +53,34 @@ export const SendEmailValidate = () => {
     }
   }, []);
 
+  // Función para manejar el clic en el enlace de registro
+  const handleLoginClick = () => {
+    const loginUrl = email ? `/login?email=${encodeURIComponent(email)}` : "/login";
+    sessionStorage.setItem("allowAccess", "true");
+    router.push(loginUrl);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-screen px-4">
-      <h1 className="text-lg font-semibold text-gray-800">Validación de correo</h1>
-      <p className="mt-2 text-sm text-gray-600">{message}</p>
+      <h1 className="text-2xl font-semibold text-gray-800 dark:text-whiten">Validación de correo</h1>
+      <p className="mt-2 text-base md:text-sm text-gray-600 dark:text-gray-400">{message}</p>
       {/* Muestra el mensaje solo si el correo fue enviado con éxito */}
       {message === "Correo enviado con éxito." && email && (
         <center>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
             Revisa tu bandeja de entrada en <strong>{email}</strong>.
           </p>
         </center>
       )}
+
+      {/* Login link */}
+      <div className="text-sm text-center">
+        <p>
+          <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleLoginClick}>
+            Regresar a la pagina anterior
+          </a>
+        </p>
+      </div>
     </div>
   );
 };

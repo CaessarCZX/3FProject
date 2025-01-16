@@ -197,7 +197,7 @@ export const SignInForm = () => {
       <form className="space-y-6" onSubmit={handleSubmit}>
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
             Email
           </label>
           <div className="mt-1 relative">
@@ -208,7 +208,7 @@ export const SignInForm = () => {
               readOnly
               value={formData.email}
               onChange={handleChange}
-              className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm"
+              className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm dark:bg-form-strokedark dark:text-whiten"
               required
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -219,7 +219,7 @@ export const SignInForm = () => {
 
         {/* Password */}
         <div className="pb-6">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
             Contraseña
           </label>
           <div className="mt-1 relative">
@@ -238,7 +238,7 @@ export const SignInForm = () => {
                   setIsFocused(false);
                 }
               }}
-              className="block w-full pl-4 pr-10 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full pl-4 pr-10 py-2 font-light text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten"
               placeholder="Ingresa una nueva contraseña"
               required
             />
@@ -254,9 +254,9 @@ export const SignInForm = () => {
               {!isFocused ? (
                 <FiLock className="text-gray-400" />
               ) : showpass ? (
-                <RiEyeLine className="text-gray-600" />
+                <RiEyeLine className="text-gray-600 dark:text-gray-200" />
               ) : (
-                <RiEyeCloseLine className="text-gray-600" />
+                <RiEyeCloseLine className="text-gray-600 dark:text-gray-200" />
               )}
             </div>
           </div>
@@ -264,8 +264,10 @@ export const SignInForm = () => {
           <button
             type="submit"
             disabled={isSubmitting || !(formData.email && formData.password)}
-            className={`w-full mt-8 py-2 px-4 border border-transparent disabled:bg-gray-300 rounded-md shadow-sm text-sm font-medium text-white ${
-              isSubmitting || !(formData.email && formData.password) ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-700"
+            className={`w-full mt-8 py-2 px-4 border border-transparent transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-500 disabled:cursor-not-allowed rounded-md shadow-sm text-base font-medium text-white ${
+              isSubmitting || !(formData.email && formData.password)
+                ? "bg-gray-500 dark:bg-gray-900"
+                : "bg-gray-900 hover:bg-gray-700 dark:bg-blue-600 dark:hover:bg-blue-900"
             }`}
           >
             {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
@@ -275,14 +277,14 @@ export const SignInForm = () => {
 
       <div className="relative">
         <hr className="my-8 border-t border-gray-300" />
-        <span className="px-2 text-[12px] max-w-34 text-center text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white">
+        <span className="px-2 text-[12px] max-w-34 text-center text-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-boxdark-2">
           O accede con tu wallet
         </span>
       </div>
 
       {/* Wallet connection */}
       <div>
-        <label htmlFor="wallet" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="wallet" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
           Wallet
         </label>
         <div className="mt-1 relative flex">
