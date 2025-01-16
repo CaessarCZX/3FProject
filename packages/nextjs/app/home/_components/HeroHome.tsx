@@ -36,9 +36,9 @@ const HeroHome: React.FC = () => {
         </div>
       </section>
       <section className="bg-white dark:bg-[#0b1727] shadow-default text-zinc-900 dark:text-white overflow-hidden mt-8">
-        <div className="p-18">
+        <div className="p-10 xsm:p-12 sm:p-15 xl:p-18">
           <h2 className="text-3xl md:text-[40px] font-bold">Compartir la riqueza es nuestro valor</h2>
-          <article className="mt-10 font-normal text-brand-hover text-base text-justify">
+          <article className="mt-10 font-normal text-brand-hover dark:text-gray-400 text-base text-justify">
             <p>
               Somos parte de un ecosistema cerrado donde colaboramos con una organización global de traders como
               aliados, quienes con su metodología, estrategia y tecnología en los criptomercados han sostenido un
