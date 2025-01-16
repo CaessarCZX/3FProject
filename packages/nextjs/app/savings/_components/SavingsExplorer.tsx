@@ -13,7 +13,7 @@ const SavingsExplorer: React.FC = () => {
     }
   }, [savings]);
   return (
-    <div className="container mx-auto rounded-xl overflow-hidden">
+    <div className="mx-auto rounded-xl overflow-hidden">
       {savings.length === 0 ? <p> No hay datos disponibles para mostrar </p> : <SavingsTable transactions={savings} />}
       {/* <PaginationButton currentPage={currentPage} totalItems={Number(totalBlocks)} setCurrentPage={setCurrentPage} /> */}
     </div>

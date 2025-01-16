@@ -34,10 +34,10 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
               <td className="p-2.5 text-center xl:p-5">
                 <h5 className="text-sm sm:text-base font-bold">Fecha</h5>
               </td>
-              <td className=" p-2.5 text-center sm:block xl:p-5">
+              <td className="p-2.5 text-center xl:p-5">
                 <h5 className="text-[12px] sm:text-base font-bold">Proximo pago</h5>
               </td>
-              <td className=" p-2.5 text-center sm:block xl:p-5">
+              <td className="p-2.5 text-center xl:p-5">
                 <h5 className="text-sm sm:text-base font-bold">Estatus</h5>
               </td>
             </tr>
@@ -46,11 +46,13 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
 
         <tbody>
           {transactions.length === 0 && (
-            <div className="flex flex-col-reverse p-4 items-center">
-              <p className="text-center font-light text-xl text-gray-400">No se cuentan con contransacciones</p>
-              <Image width={150} className="dark:hidden" src={savingW} alt="saving image" />
-              <Image width={150} className="hidden dark:block" src={savingD} alt="saving image" />
-            </div>
+            <tr className="p-4 w-full grid grid-cols-1">
+              <td className="flex flex-col-reverse items-center m-auto">
+                <p className="text-center font-light text-xl text-gray-400">No se cuentan con contransacciones</p>
+                <Image width={150} className="dark:hidden" src={savingW} alt="saving image" />
+                <Image width={150} className="hidden dark:block" src={savingD} alt="saving image" />
+              </td>
+            </tr>
           )}
           {transactions.map((tx, key) => {
             return (
@@ -60,6 +62,7 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                 hash={tx.hash}
                 value={tx.amount}
                 date={tx.date}
+                pyt={tx.pyt}
                 status={tx.status}
                 lengthData={transactions.length}
               />

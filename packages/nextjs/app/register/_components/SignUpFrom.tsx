@@ -406,7 +406,7 @@ export const SignUpForm = () => {
     <form className="space-y-6" onSubmit={handleSubmit}>
       {/* Name */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
           Nombre
         </label>
         <div className="mt-1 relative">
@@ -416,7 +416,7 @@ export const SignUpForm = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className={`block w-full pr-10 pl-4 font-light text-gray-700 dark:text-white py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+            className={`block w-full pr-10 pl-4 font-light text-gray-700 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten ${
               fieldErrors.name ? "border-red-500" : ""
             }`}
             placeholder="Ingresa tu nombre"
@@ -431,7 +431,7 @@ export const SignUpForm = () => {
 
       {/* Email */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
           Email
         </label>
         <div className="mt-1 relative">
@@ -442,7 +442,7 @@ export const SignUpForm = () => {
             autoComplete="new-username"
             value={formData.email}
             readOnly
-            className={`block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm ${
+            className={`block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm dark:bg-form-strokedark dark:text-whiten${
               fieldErrors.email ? "border-red-500" : ""
             }`}
           />
@@ -456,7 +456,7 @@ export const SignUpForm = () => {
       {/* Password */}
       <div>
         <div className="flex justify-between items-center mr-3">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
             Contraseña
           </label>
           <Helper />
@@ -479,7 +479,7 @@ export const SignUpForm = () => {
                 setPasswordCriteriaModalVisible(false);
               }
             }}
-            className={`block w-full pl-4 pr-10 py-2 font-light text-gray-700 dark:text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+            className={`block w-full pl-4 pr-10 py-2 font-light text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten ${
               fieldErrors.password ? "border-red-500" : ""
             }`}
             placeholder="Ingresa una nueva contraseña"
@@ -510,7 +510,7 @@ export const SignUpForm = () => {
 
       {/* Wallet */}
       <div>
-        <label htmlFor="wallet" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="wallet" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
           Wallet
         </label>
         <div className="mt-1 relative flex">
@@ -521,7 +521,7 @@ export const SignUpForm = () => {
 
       {/* Referred Wallet */}
       <div>
-        <label htmlFor="referredBy" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="referredBy" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
           Wallet de Referido
         </label>
         <div className="mt-1 relative">
@@ -532,7 +532,7 @@ export const SignUpForm = () => {
             name="referredBy"
             value={formData.referredBy}
             onChange={handleChange}
-            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten${
               isReferrerValid === null
                 ? "bg-transparent"
                 : isReferrerValid === false
@@ -561,7 +561,7 @@ export const SignUpForm = () => {
           }`}
           required
         />
-        <label htmlFor="terms" className="text-sm font-medium text-gray-700">
+        <label htmlFor="terms" className="text-sm font-medium text-gray-700 dark:text-gray-400">
           Acepto los{" "}
           <Link href="/terms" className="text-blue-500 hover:underline">
             Términos y condiciones

@@ -1,5 +1,6 @@
 import React from "react";
 import { TransactionHash } from "~~/components/Display/TransactionHash";
+import { PYT } from "~~/types/transaction/saving";
 import { formatCurrency } from "~~/utils/3FContract/currencyConvertion";
 
 type TransactionTableRowProps = {
@@ -7,28 +8,57 @@ type TransactionTableRowProps = {
   hash: string;
   value: string;
   date: string;
+  pyt: PYT[];
   status: string;
   lengthData: number;
 };
 
-export const TransactionsTableRow = ({ hash, value, date, status, lengthData, index }: TransactionTableRowProps) => {
-  const getTrimestreDaysLeft = (date: string, targetMonths: number) => {
-    const transactionDate = new Date(date);
-    const targetDate = new Date(
-      transactionDate.getFullYear(),
-      transactionDate.getMonth() + targetMonths,
-      transactionDate.getDate(),
-    );
+export const TransactionsTableRow = ({
+  hash,
+  value,
+  date,
+  pyt,
+  status,
+  lengthData,
+  index,
+}: TransactionTableRowProps) => {
+  // const getTrimestreDaysLeft = (date: string, targetMonths: number) => {
+  //   const transactionDate = new Date(date);
+  //   const targetDate = new Date(
+  //     transactionDate.getFullYear(),
+  //     transactionDate.getMonth() + targetMonths,
+  //     transactionDate.getDate(),
+  //   );
 
+  //   const currentDate = new Date();
+
+  //   if (currentDate >= targetDate) return "Cumplido";
+
+  //   const diffInMilliseconds = targetDate.getTime() - currentDate.getTime();
+  //   const daysLeft = Math.ceil(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+  //   return `${daysLeft} días restantes`;
+  // };
+
+  function getRemainingDays(targetDate: string) {
+    // Crear copia de la fecha actual
     const currentDate = new Date();
 
-    if (currentDate >= targetDate) return "Cumplido";
+    // Resetear las horas, minutos y segundos para comparar solo días
+    currentDate.setHours(0, 0, 0, 0);
 
-    const diffInMilliseconds = targetDate.getTime() - currentDate.getTime();
-    const daysLeft = Math.ceil(diffInMilliseconds / (1000 * 60 * 60 * 24));
+    // Crear copia de la fecha objetivo y resetear tiempo
+    const target = new Date(targetDate);
+    target.setHours(0, 0, 0, 0);
 
-    return `${daysLeft} días restantes`;
-  };
+    // Calcular la diferencia en milisegundos
+    const diffTime = target.getTime() - currentDate.getTime();
+
+    // Convertir a días
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return `${diffDays} días restantes`;
+  }
 
   return (
     <tr
@@ -62,15 +92,11 @@ export const TransactionsTableRow = ({ hash, value, date, status, lengthData, in
       </td>
 
       <td className="text-[9px] sm:text-sm xl:text-base items-center font-bold justify-center p-2.5 flex xl:p-5">
-        {/* <p className="text-black dark:text-white">{brand.sales}</p> */}
-        {/* <WithdrawalCounter date={date} time={time} /> */}
-        {getTrimestreDaysLeft(date, 3)}
+        {getRemainingDays(pyt[0].paymentDay)}
       </td>
 
       <td className="items-center justify-center p-2.5 flex xl:p-5">
-        {/* <p className="text-meta-5">{brand.conversion}%</p> */}
-        {/* <p className="text-meta-5">Pendiente</p> */}
-        <p className="text-[10px] sm:text-sm text-meta-5 my-2">{status && "Completado"}</p>
+        <p className="text-[10px] sm:text-sm text-meta-5 my-2">{status}</p>
       </td>
     </tr>
   );

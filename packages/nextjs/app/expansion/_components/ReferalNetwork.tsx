@@ -19,12 +19,13 @@ interface ReferersCommissions {
 }
 
 const ReferralNetwork: React.FC = () => {
+  // For getting current affiliates number
+  const setAffiliatesNumber = useGlobalState(state => state.setMemberAffiliatesCount);
+  // const [affiliatesCount, setAffiliatesCount] = useState(0);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // For getting current affiliates number
-  const setAffiliatesNumber = useGlobalState(state => state.setMemberAffiliatesCount);
 
   useEffect(() => {
     const fetchReferersCommissions = async () => {
@@ -56,7 +57,9 @@ const ReferralNetwork: React.FC = () => {
 
         const data = await response.json();
 
+        // setAffiliatesCount(data.ReferersCommissions.length);
         if (Array.isArray(data.ReferersCommissions)) {
+          setAffiliatesNumber(!data.ReferersCommissions.length ? 0 : data.ReferersCommissions[0].referrals.length);
           buildGraph(data.ReferersCommissions, userWallet);
         } else {
           setError("Los datos de comisiones no son válidos.");
@@ -89,9 +92,6 @@ const ReferralNetwork: React.FC = () => {
       });
 
       let yOffset = 125;
-
-      // Get direct affiliates number
-      setAffiliatesNumber(referersCommissions[0].referrals.length || 0);
 
       referersCommissions.forEach(level => {
         const levelYOffset = yOffset; // Offset inicial por nivel
