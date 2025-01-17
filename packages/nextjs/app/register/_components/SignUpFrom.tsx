@@ -528,11 +528,11 @@ export const SignUpForm = () => {
           <input
             autoComplete="none"
             type="text"
-            id="referredBy"
+            id="referredBy-item"
             name="referredBy"
             value={formData.referredBy}
             onChange={handleChange}
-            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten${
+            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten ${
               isReferrerValid === null
                 ? "bg-transparent"
                 : isReferrerValid === false
