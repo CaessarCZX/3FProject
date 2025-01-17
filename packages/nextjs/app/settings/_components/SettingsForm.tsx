@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDisconnect } from "wagmi";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
@@ -23,18 +23,31 @@ const SettingsForm: React.FC = () => {
     email_beneficiary: tokenInfo.email_beneficiary,
     wallet: tokenInfo.wallet,
   };
+
   const [beneficiary, setBeneficiary] = useState({
-    name: "",
-    email: "",
+    name: userInfo.name_beneficiary || "",
+    email: userInfo.email_beneficiary || "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditingBeneficiary, setIsEditingBeneficiary] = useState(false);
   const { disconnect } = useDisconnect(); // For blockchain
   const router = useRouter();
+
+  useEffect(() => {
+    setBeneficiary({
+      name: userInfo.name_beneficiary || "",
+      email: userInfo.email_beneficiary || "",
+    });
+  }, [userInfo]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setBeneficiary(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditBeneficiary = () => {
+    setIsEditingBeneficiary(true);
   };
 
   const handleSaveBeneficiary = async () => {
@@ -46,10 +59,6 @@ const SettingsForm: React.FC = () => {
     setIsSaving(true);
 
     try {
-      if (!userInfo) {
-        throw new Error("No se encontró el usuario.");
-      }
-
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/${userInfo.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -74,6 +83,7 @@ const SettingsForm: React.FC = () => {
       setError("No se pudo actualizar el beneficiario.");
     } finally {
       setIsSaving(false);
+      setIsEditingBeneficiary(false);
     }
   };
 
@@ -151,11 +161,12 @@ const SettingsForm: React.FC = () => {
               <input
                 type="text"
                 name="name"
-                value={beneficiary.name || userInfo?.name_beneficiary || ""}
+                value={beneficiary.name}
                 onChange={handleInputChange}
                 placeholder="Nombre del beneficiario"
-                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
-                readOnly={!!userInfo?.name_beneficiary}
+                className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
+                  isEditingBeneficiary ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
+                }`}
               />
             </div>
             <div>
@@ -163,21 +174,29 @@ const SettingsForm: React.FC = () => {
               <input
                 type="email"
                 name="email"
-                value={beneficiary.email || userInfo?.email_beneficiary || ""}
+                value={beneficiary.email}
                 onChange={handleInputChange}
                 placeholder="Correo del beneficiario"
-                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
-                readOnly={!!userInfo?.email_beneficiary}
+                className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
+                  isEditingBeneficiary ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
+                }`}
               />
             </div>
           </div>
           <div className="flex justify-end mt-6">
             <button
               onClick={handleSaveBeneficiary}
-              disabled={isSaving || !!userInfo?.email_beneficiary}
+              disabled={isSaving || !isEditingBeneficiary}
               className="px-6 py-2 bg-brand-default hover:bg-brand-hover dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-md shadow focus:outline-none"
             >
               {isSaving ? "Guardando..." : "Guardar Beneficiario"}
+            </button>
+            <button
+              onClick={handleEditBeneficiary}
+              disabled={isSaving}
+              className="ml-4 px-6 py-2 bg-gray-400 dark:bg-gray-600 text-white rounded-md shadow focus:outline-none"
+            >
+              Modificar
             </button>
           </div>
         </div>
