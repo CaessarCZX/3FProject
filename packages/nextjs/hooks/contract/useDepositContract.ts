@@ -141,6 +141,9 @@ const useDepositContract = () => {
           body: JSON.stringify({
             toEmail: email,
             amount: amount,
+            walletFirstLevel: uplineMembers.uplineAddress,
+            walletSecondLevel: uplineMembers.secondLevelUpline,
+            walletThirtLevel: uplineMembers.thirtLevelUpline,
           }),
         });
       } else {

@@ -50,8 +50,12 @@ const NotificationExplorer: React.FC = () => {
 
   return (
     <div className="mx-auto rounded-xl overflow-hidden">
-      {loading ? <p>Cargando datos</p> : <NotificationsTable activities={userActivity} />}
-      {error && <p>No hay datos disponibles para mostrar</p>}
+      {loading ? (
+        <p className="my-12 font-bold text-xl">Cargando datos</p>
+      ) : (
+        <NotificationsTable activities={userActivity} />
+      )}
+      {error && <p className="text-sm font-light text-gray-400">No hay datos disponibles para mostrar</p>}
       <PaginationButton currentPage={currentPage} totalItems={Number(totalPages)} setCurrentPage={setCurrentPage} />
     </div>
   );

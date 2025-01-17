@@ -75,7 +75,7 @@ const AddAffiliate: React.FC = () => {
           <Image
             width={150}
             height={150}
-            className="contrast-75"
+            className="contrast-75 dark:grayscale dark:contrast-50"
             src="/vision-images/3-2.png"
             alt="Expansion team FREE"
           />

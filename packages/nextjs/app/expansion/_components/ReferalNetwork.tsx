@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import ReactFlow, { Background, Controls, Edge, Node } from "reactflow";
 import "reactflow/dist/style.css";
+import { useGlobalState } from "~~/services/store/store";
 
 interface Referral {
   wallet: string;
@@ -18,6 +19,9 @@ interface ReferersCommissions {
 }
 
 const ReferralNetwork: React.FC = () => {
+  // For getting current affiliates number
+  const setAffiliatesNumber = useGlobalState(state => state.setMemberAffiliatesCount);
+  // const [affiliatesCount, setAffiliatesCount] = useState(0);
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,7 +57,9 @@ const ReferralNetwork: React.FC = () => {
 
         const data = await response.json();
 
+        // setAffiliatesCount(data.ReferersCommissions.length);
         if (Array.isArray(data.ReferersCommissions)) {
+          setAffiliatesNumber(!data.ReferersCommissions.length ? 0 : data.ReferersCommissions[0].referrals.length);
           buildGraph(data.ReferersCommissions, userWallet);
         } else {
           setError("Los datos de comisiones no son válidos.");

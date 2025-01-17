@@ -13,27 +13,27 @@ const SavingsTable: React.FC<SavingsTableProps> = ({ transactions }) => {
 
       <table className="flex flex-col">
         <thead>
-          <tr className="grid rounded-sm bg-gray-2 dark:bg-meta-4 grid-cols-7">
+          <tr className="grid place-items-center rounded-sm bg-gray-2 dark:bg-meta-4 grid-cols-7">
             <td className="p-2.5 xl:p-5">
-              <h5 className="text-xs font-bold xsm:text-base">Ahorro</h5>
+              <h5 className="text-xs md:text-sm xl:text-base font-bold ">Ahorro</h5>
             </td>
             <td className="p-2.5 text-center xl:p-5">
-              <h5 className="text-xs font-bold xsm:text-base">Hash</h5>
+              <h5 className="text-xs md:text-sm xl:text-base font-bold ">Hash</h5>
             </td>
             <td className="p-2.5 text-center xl:p-5">
-              <h5 className="text-xs font-bold xsm:text-base">Fecha</h5>
+              <h5 className="text-xs md:text-sm xl:text-base font-bold ">Fecha</h5>
             </td>
-            <td className="hidden p-2.5 text-center sm:block xl:p-5">
-              <h5 className="text-xs font-medium xsm:text-base">Bono primer trimestre</h5>
+            <td className="p-2.5 text-center xl:p-5">
+              <h5 className="text-[9px] md:text-sm xl:text-base font-bold ">Primer pago PYT</h5>
             </td>
-            <td className="hidden p-2.5 text-center sm:block xl:p-5">
-              <h5 className="text-xs font-medium xsm:text-base">Bono segundo trimestre</h5>
+            <td className="p-2.5 text-center xl:p-5">
+              <h5 className="text-[9px] md:text-sm xl:text-base font-bold ">Segundo pago PYT</h5>
             </td>
-            <td className="hidden p-2.5 text-center sm:block xl:p-5">
-              <h5 className="text-xs font-medium xsm:text-base">Bono tercer trimestre</h5>
+            <td className="p-2.5 text-center xl:p-5">
+              <h5 className="text-[9px] md:text-sm xl:text-base font-bold ">Tercer pago PYT</h5>
             </td>
-            <td className="hidden p-2.5 text-center sm:block xl:p-5">
-              <h5 className="text-sm font-medium xsm:text-base">Bono residual</h5>
+            <td className="p-1 pt-2.5 text-center xl:p-5">
+              <h5 className="text-[9px] md:text-sm xl:text-base font-bold ">Pago de beneficios</h5>
             </td>
           </tr>
         </thead>
@@ -48,6 +48,8 @@ const SavingsTable: React.FC<SavingsTableProps> = ({ transactions }) => {
                 hash={tx.hash}
                 value={tx.amount}
                 date={tx.date}
+                pyt={tx.pyt}
+                commissions={tx.commissions}
                 status={tx.status}
                 lengthData={transactions.length}
               />
