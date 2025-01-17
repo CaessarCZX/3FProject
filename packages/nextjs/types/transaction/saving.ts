@@ -7,11 +7,15 @@ export interface Commissions {
   paymentDay: string;
 }
 
+export interface Amount {
+  $numberDecimal: string;
+}
+
 export interface MemberSaving {
   _id: string;
   userId: string;
   hash: string;
-  amount: string;
+  amount: Amount;
   pyt: PYT[];
   commissions: Commissions;
   date: string;

@@ -46,7 +46,7 @@ const SavingsTable: React.FC<SavingsTableProps> = ({ transactions }) => {
                 key={tx._id}
                 index={key}
                 hash={tx.hash}
-                value={tx.amount}
+                value={tx.amount.$numberDecimal}
                 date={tx.date}
                 pyt={tx.pyt}
                 commissions={tx.commissions}
