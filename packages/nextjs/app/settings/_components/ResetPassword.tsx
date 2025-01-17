@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Tooltip } from "./Tooltip";
 import { jwtDecode } from "jwt-decode";
+import { FiHelpCircle } from "react-icons/fi";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
+import { PasswordFeedback } from "~~/components/UI/PasswordFeedback";
 import { notification } from "~~/utils/scaffold-eth/notification";
 
 interface DecodedToken {
@@ -21,7 +24,44 @@ const ResetPassword: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [passwordCriteriaModalVisible, setPasswordCriteriaModalVisible] = useState(false);
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    hasMinLength: false,
+    hasLowercase: false,
+    hasUppercase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
   const router = useRouter();
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (passwordInputRef.current && !passwordInputRef.current.contains(event.target as Node)) {
+        setPasswordCriteriaModalVisible(false);
+      }
+    };
+
+    if (passwordCriteriaModalVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [passwordCriteriaModalVisible]);
+
+  const validatePasswordCriteria = (password: string) => {
+    setPasswordCriteria({
+      hasMinLength: password.length >= 8,
+      hasLowercase: /[a-z]/.test(password),
+      hasUppercase: /[A-Z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[@$!#?]/.test(password),
+    });
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -76,7 +116,6 @@ const ResetPassword: React.FC = () => {
         });
         setPassword("");
         setRepeatPassword("");
-
         // Redirigir al usuario a la página de inicio
         setTimeout(() => {
           router.push("/");
@@ -100,7 +139,7 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div className="mt-8">
-      <div className="mx-auto bg-white  dark:bg-boxdark dark:border-strokedark shadow-default rounded-lg p-6">
+      <div className="mx-auto overflow-hidden bg-white  dark:bg-boxdark dark:border-strokedark shadow-default rounded-lg p-6">
         <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400">Cambiar Contraseña</h2>
 
         <div className="mt-8">
@@ -108,12 +147,23 @@ const ResetPassword: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Contraseña</label>
-              <div className="relative">
+              <div className="relative" ref={passwordInputRef}>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={e => {
+                    setPassword(e.target.value);
+                    validatePasswordCriteria(e.target.value);
+                  }}
                   placeholder="Nueva contraseña"
+                  onFocus={() => {
+                    setPasswordCriteriaModalVisible(true);
+                  }}
+                  onBlur={() => {
+                    if (!password) {
+                      setPasswordCriteriaModalVisible(false);
+                    }
+                  }}
                   className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
                 />
                 <div
@@ -121,11 +171,29 @@ const ResetPassword: React.FC = () => {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <RiEyeLine className="text-gray-600" />
+                    <RiEyeLine className="text-gray-600 dark:text-gray-300" />
                   ) : (
-                    <RiEyeCloseLine className="text-gray-600" />
+                    <RiEyeCloseLine className="text-gray-600 dark:text-gray-300" />
                   )}
                 </div>
+                <div className="absolute inset-y-0 right-10 pr-3 flex items-center">
+                  <Tooltip
+                    content={
+                      <ul>
+                        <li>Al menos 8 caracteres</li>
+                        <li>Al menos una minúscula y una mayúscula</li>
+                        <li>Al menos un número</li>
+                        <li>
+                          Al menos un carácter especial: <span className="font-bold">@ ! # ?</span>
+                        </li>
+                      </ul>
+                    }
+                  >
+                    <FiHelpCircle className="text-gray-400 cursor-pointer" />
+                  </Tooltip>
+                </div>
+                {/* Password Criteria Feedback */}
+                {passwordCriteriaModalVisible && <PasswordFeedback passwordCriteria={passwordCriteria} />}
               </div>
             </div>
             <div>
@@ -143,9 +211,9 @@ const ResetPassword: React.FC = () => {
                   onClick={() => setShowRepeatPassword(!showRepeatPassword)}
                 >
                   {showRepeatPassword ? (
-                    <RiEyeLine className="text-gray-600" />
+                    <RiEyeLine className="text-gray-600 dark:text-gray-300" />
                   ) : (
-                    <RiEyeCloseLine className="text-gray-600" />
+                    <RiEyeCloseLine className="text-gray-600 dark:text-gray-300" />
                   )}
                 </div>
               </div>
@@ -155,7 +223,7 @@ const ResetPassword: React.FC = () => {
           <div className="flex justify-end mt-6">
             <button
               onClick={handlePasswordChange}
-              disabled={isSaving}
+              disabled={isSaving || !Object.values(passwordCriteria).every(Boolean)}
               className={`px-6 py-2 ${
                 isSaving
                   ? "bg-gray-400"

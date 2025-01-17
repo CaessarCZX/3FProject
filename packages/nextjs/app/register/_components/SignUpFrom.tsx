@@ -4,11 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Helper } from "./Helper";
-import { PasswordCriteriaFeedback } from "./PasswordCriteriaFeedback";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { isAddress } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
+import { PasswordFeedback } from "~~/components/UI/PasswordFeedback";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import ApiRateLimiter from "~~/utils/API/ApiRateLimiter";
 import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
@@ -55,7 +55,8 @@ export const SignUpForm = () => {
   });
   //For blockchain
   const currentUser = useAccount();
-
+  // Wallet disconnection
+  const { disconnectAsync } = useDisconnect();
   const router = useRouter();
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
@@ -147,7 +148,7 @@ export const SignUpForm = () => {
       hasLowercase: /[a-z]/.test(password),
       hasUppercase: /[A-Z]/.test(password),
       hasNumber: /[0-9]/.test(password),
-      hasSpecialChar: /[@!#?]/.test(password),
+      hasSpecialChar: /[@$!#?]/.test(password),
     });
   };
 
@@ -298,6 +299,9 @@ export const SignUpForm = () => {
       if (response.ok) {
         await sendRegisterEmail(formData.email, formData.name);
         await sendAffiliateEmail(formData.name, formData.email, formData.referredBy);
+
+        // Disconnect current wallet
+        await disconnectAsync();
 
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
         const saveEmail = formData.email;
@@ -503,7 +507,7 @@ export const SignUpForm = () => {
             )}
           </div>
           {/* Password Criteria Feedback */}
-          {passwordCriteriaModalVisible && <PasswordCriteriaFeedback passwordCriteria={passwordCriteria} />}
+          {passwordCriteriaModalVisible && <PasswordFeedback passwordCriteria={passwordCriteria} />}
         </div>
         {fieldErrors.password && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.password}</p>}
       </div>
@@ -528,11 +532,11 @@ export const SignUpForm = () => {
           <input
             autoComplete="none"
             type="text"
-            id="referredBy"
+            id="referredBy-item"
             name="referredBy"
             value={formData.referredBy}
             onChange={handleChange}
-            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten${
+            className={`block w-full pl-4 pr-20 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten ${
               isReferrerValid === null
                 ? "bg-transparent"
                 : isReferrerValid === false

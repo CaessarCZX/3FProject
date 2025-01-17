@@ -4,37 +4,25 @@ import { useDisconnect } from "wagmi";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { useGlobalState } from "~~/services/store/store";
 
-interface UserInfo {
-  id: string;
-  name: string;
-  email: string;
-  name_beneficiary?: string;
-  email_beneficiary?: string;
-  wallet: string;
-}
-
 const SettingsForm: React.FC = () => {
   const { tokenInfo } = useGetTokenData();
-  const userInfo: UserInfo = {
-    id: tokenInfo.id,
-    name: tokenInfo.name,
-    email: tokenInfo.email,
-    name_beneficiary: tokenInfo.name_beneficiary,
-    email_beneficiary: tokenInfo.email_beneficiary,
-    wallet: tokenInfo.wallet,
-  };
   const [beneficiary, setBeneficiary] = useState({
-    name: "",
-    email: "",
+    name: tokenInfo.name_beneficiary || "",
+    email: tokenInfo.email_beneficiary || "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditingBeneficiary, setIsEditingBeneficiary] = useState(false);
   const { disconnect } = useDisconnect(); // For blockchain
   const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setBeneficiary(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditBeneficiary = () => {
+    setIsEditingBeneficiary(true);
   };
 
   const handleSaveBeneficiary = async () => {
@@ -46,11 +34,7 @@ const SettingsForm: React.FC = () => {
     setIsSaving(true);
 
     try {
-      if (!userInfo) {
-        throw new Error("No se encontró el usuario.");
-      }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/${userInfo.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/${tokenInfo.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -74,6 +58,7 @@ const SettingsForm: React.FC = () => {
       setError("No se pudo actualizar el beneficiario.");
     } finally {
       setIsSaving(false);
+      setIsEditingBeneficiary(false);
     }
   };
 
@@ -83,7 +68,7 @@ const SettingsForm: React.FC = () => {
         <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400">General</h2>
 
         {/* Información del Usuario */}
-        {userInfo ? (
+        {tokenInfo ? (
           <>
             <div className="mt-6">
               <h3 className="text-lg text-right font-medium text-gray-700 dark:text-gray-500">Información Personal</h3>
@@ -92,7 +77,7 @@ const SettingsForm: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Nombre</label>
                   <input
                     type="text"
-                    value={userInfo.name}
+                    value={tokenInfo.name}
                     readOnly
                     className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700 dark:bg-form-strokedark dark:text-whiten cursor-default"
                   />
@@ -101,7 +86,7 @@ const SettingsForm: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Correo</label>
                   <input
                     type="text"
-                    value={userInfo.email}
+                    value={tokenInfo.email}
                     readOnly
                     className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700 dark:bg-form-strokedark dark:text-whiten cursor-default"
                   />
@@ -121,7 +106,7 @@ const SettingsForm: React.FC = () => {
                     <input
                       type="text"
                       name="walletRecipient"
-                      value={userInfo?.wallet}
+                      value={tokenInfo.wallet}
                       readOnly
                       placeholder="Correo de nuevo referido"
                       className="flex-1 block px-4 py-2 border rounded-md bg-gray-100 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten cursor-default"
@@ -151,11 +136,12 @@ const SettingsForm: React.FC = () => {
               <input
                 type="text"
                 name="name"
-                value={beneficiary.name || userInfo?.name_beneficiary || ""}
+                value={beneficiary.name}
                 onChange={handleInputChange}
                 placeholder="Nombre del beneficiario"
-                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
-                readOnly={!!userInfo?.name_beneficiary}
+                className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
+                  isEditingBeneficiary ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
+                }`}
               />
             </div>
             <div>
@@ -163,21 +149,29 @@ const SettingsForm: React.FC = () => {
               <input
                 type="email"
                 name="email"
-                value={beneficiary.email || userInfo?.email_beneficiary || ""}
+                value={beneficiary.email}
                 onChange={handleInputChange}
                 placeholder="Correo del beneficiario"
-                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
-                readOnly={!!userInfo?.email_beneficiary}
+                className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
+                  isEditingBeneficiary ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
+                }`}
               />
             </div>
           </div>
           <div className="flex justify-end mt-6">
             <button
               onClick={handleSaveBeneficiary}
-              disabled={isSaving || !!userInfo?.email_beneficiary}
+              disabled={isSaving || !isEditingBeneficiary}
               className="px-6 py-2 bg-brand-default hover:bg-brand-hover dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-md shadow focus:outline-none"
             >
               {isSaving ? "Guardando..." : "Guardar Beneficiario"}
+            </button>
+            <button
+              onClick={handleEditBeneficiary}
+              disabled={isSaving}
+              className="ml-4 px-6 py-2 bg-gray-400 dark:bg-gray-600 text-white rounded-md shadow focus:outline-none"
+            >
+              Modificar
             </button>
           </div>
         </div>

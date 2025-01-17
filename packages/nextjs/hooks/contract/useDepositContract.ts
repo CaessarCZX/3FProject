@@ -280,6 +280,7 @@ const useDepositContract = () => {
           }));
 
           const amount = parseFloat(depositAmount); // Monto a enviar al servidor convertido a number
+          console.log("for server: ", amount);
           await performHealthCheck(amount, depositContractReceiptHash.transactionHash);
 
           setTimeout(() => {

@@ -9,11 +9,11 @@ interface PasswordCriteriaData {
   hasSpecialChar: boolean;
 }
 
-interface PasswordCriteriaFeedbackProps {
+interface PasswordFeedbackProps {
   passwordCriteria: PasswordCriteriaData;
 }
 
-export const PasswordCriteriaFeedback: React.FC<PasswordCriteriaFeedbackProps> = ({ passwordCriteria }) => {
+export const PasswordFeedback: React.FC<PasswordFeedbackProps> = ({ passwordCriteria }) => {
   return (
     <div className="absolute mt-2 w-[250px] bg-white dark:bg-gray-800  border dark:border-gray-700 rounded-md shadow-md z-10">
       <div className="ml-4 flex flex-col space-y-1 text-sm p-2">
@@ -55,7 +55,7 @@ export const PasswordCriteriaFeedback: React.FC<PasswordCriteriaFeedbackProps> =
           ) : (
             <BsXCircleFill className="text-red-500 mr-1" />
           )}
-          <p className="text-[14px] ">Al menos un carácter especial: @ ! # ?</p>
+          <p className="text-[14px] ">Al menos un carácter especial: @ $ ! # ?</p>
         </div>
       </div>
     </div>

@@ -60,7 +60,7 @@ export const TransactionsTable = ({ transactions }: TransactionTableProps) => {
                 key={tx._id}
                 index={key}
                 hash={tx.hash}
-                value={tx.amount}
+                value={tx.amount.$numberDecimal}
                 date={tx.date}
                 pyt={tx.pyt}
                 status={tx.status}

@@ -13,7 +13,7 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({ title, total, rate, level
       <div className="mt-4 flex items-end justify-between">
         {/* For title */}
         <div>
-          <h4 className="text-title-md font-bold text-black dark:text-white">{total}</h4>
+          <h4 className="text-2xl font-medium text-black dark:text-white">{total}</h4>
           <span className="text-sm font-light">
             {title ?? <span className="loading loading-bars loading-xs"></span>}
           </span>

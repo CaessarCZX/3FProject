@@ -5,21 +5,38 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import { IoWalletOutline } from "react-icons/io5";
 import { useAccount } from "wagmi";
 import { CheckCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 const WalletWidget: React.FC = () => {
   const currentAccount = useAccount();
   const checkSumAddress = currentAccount.address ?? "0x";
   const [addressCopied, setAddressCopied] = useState<boolean>();
+  const [hideBalance, setHideBalance] = useState(false);
+
+  const handleToggleBalanceVisibility = () => {
+    setHideBalance(!hideBalance);
+  };
 
   return (
     <GlasRainbowCard>
       <div className="px-4 py-4 min-w-[254px] max-w-[254px]">
-        <div className="flex items-center mb-2 gap-1">
+        <div className="flex items-center mb-2 gap-1 justify-between">
           <div className="font-light text-sm tracking-wide text-gray-300 group-hover:text-gray-200">Tu Wallet</div>
-          <span>{/* <EyeIcon className="w-3 h-3 text-green-500 group-hover:text-white" /> */}</span>
+          {/* Eye Icon Button */}
+          <button onClick={handleToggleBalanceVisibility}>
+            {hideBalance ? (
+              <EyeSlashIcon className="h-4 w-4 text-gray-400 group-hover:text-gray-200" />
+            ) : (
+              <EyeIcon className="h-4 w-4 text-gray-400 group-hover:text-gray-200" />
+            )}
+          </button>
         </div>
         <div className=" mb-2 space-x-2">
-          <Balance address={currentAccount.address} />
+          {hideBalance ? (
+            <span className={`font-light text-white text-2xl tracking-widest`}>********</span>
+          ) : (
+            <Balance address={currentAccount.address} />
+          )}
         </div>
         <div className="flex items-center mb-1">
           <IoWalletOutline className="w-5 h-5 text-blue-500 group-hover:text-white" />
