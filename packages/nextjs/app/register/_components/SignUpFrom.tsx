@@ -8,7 +8,7 @@ import { PasswordCriteriaFeedback } from "./PasswordCriteriaFeedback";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { isAddress } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useDisconnect } from "wagmi";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import ApiRateLimiter from "~~/utils/API/ApiRateLimiter";
 import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
@@ -55,7 +55,8 @@ export const SignUpForm = () => {
   });
   //For blockchain
   const currentUser = useAccount();
-
+  // Wallet disconnection
+  const { disconnectAsync } = useDisconnect();
   const router = useRouter();
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
@@ -298,6 +299,9 @@ export const SignUpForm = () => {
       if (response.ok) {
         await sendRegisterEmail(formData.email, formData.name);
         await sendAffiliateEmail(formData.name, formData.email, formData.referredBy);
+
+        // Disconnect current wallet
+        await disconnectAsync();
 
         setSuccessMessage("¡Registro exitoso! Redirigiendo...");
         const saveEmail = formData.email;
