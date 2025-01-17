@@ -139,7 +139,7 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div className="mt-8">
-      <div className="mx-auto bg-white  dark:bg-boxdark dark:border-strokedark shadow-default rounded-lg p-6">
+      <div className="mx-auto overflow-hidden bg-white  dark:bg-boxdark dark:border-strokedark shadow-default rounded-lg p-6">
         <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400">Cambiar Contraseña</h2>
 
         <div className="mt-8">
@@ -171,12 +171,12 @@ const ResetPassword: React.FC = () => {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <RiEyeLine className="text-gray-600" />
+                    <RiEyeLine className="text-gray-600 dark:text-gray-300" />
                   ) : (
-                    <RiEyeCloseLine className="text-gray-600" />
+                    <RiEyeCloseLine className="text-gray-600 dark:text-gray-300" />
                   )}
                 </div>
-                <div className="absolute inset-y-0 right-10 pr-3 pt-3 flex items-center">
+                <div className="absolute inset-y-0 right-10 pr-3 flex items-center">
                   <Tooltip
                     content={
                       <ul>
@@ -256,9 +256,9 @@ const ResetPassword: React.FC = () => {
                   onClick={() => setShowRepeatPassword(!showRepeatPassword)}
                 >
                   {showRepeatPassword ? (
-                    <RiEyeLine className="text-gray-600" />
+                    <RiEyeLine className="text-gray-600 dark:text-gray-300" />
                   ) : (
-                    <RiEyeCloseLine className="text-gray-600" />
+                    <RiEyeCloseLine className="text-gray-600 dark:text-gray-300" />
                   )}
                 </div>
               </div>

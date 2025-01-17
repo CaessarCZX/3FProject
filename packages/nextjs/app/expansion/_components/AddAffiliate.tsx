@@ -75,7 +75,7 @@ const AddAffiliate: React.FC = () => {
           <Image
             width={150}
             height={150}
-            className="contrast-75 dark:grayscale dark:contrast-50"
+            className="hidden sm:block contrast-75 dark:grayscale dark:contrast-50"
             src="/vision-images/3-2.png"
             alt="Expansion team FREE"
           />
@@ -96,14 +96,14 @@ const AddAffiliate: React.FC = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`max-w-xs sm:max-w-sm px-6 py-2 text-white rounded-md shadow focus:outline-none 
+                    className={`w-full sm:max-w-sm px-6 py-2 text-white rounded-md shadow focus:outline-none 
                       ${
                         loading
                           ? "bg-[#818f8E] dark:bg-blue-900"
                           : "bg-brand-default hover:bg-brand-hover dark:bg-blue-600 dark:hover:bg-blue-700"
                       }`}
                   >
-                    {loading ? "Registrando..." : "Crear referido"}
+                    {loading ? "Registrando..." : "Crear prospecto"}
                   </button>
                 </div>
               </form>

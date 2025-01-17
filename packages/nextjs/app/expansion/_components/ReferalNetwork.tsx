@@ -139,7 +139,7 @@ const ReferralNetwork: React.FC = () => {
     };
 
     fetchReferersCommissions();
-  }, []);
+  }, [setAffiliatesNumber]);
 
   return (
     <div className="w-full" style={{ height: "90%", marginBottom: "1rem", display: "flex", justifyContent: "center" }}>

@@ -1,45 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDisconnect } from "wagmi";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { useGlobalState } from "~~/services/store/store";
 
-interface UserInfo {
-  id: string;
-  name: string;
-  email: string;
-  name_beneficiary?: string;
-  email_beneficiary?: string;
-  wallet: string;
-}
-
 const SettingsForm: React.FC = () => {
   const { tokenInfo } = useGetTokenData();
-  const userInfo: UserInfo = {
-    id: tokenInfo.id,
-    name: tokenInfo.name,
-    email: tokenInfo.email,
-    name_beneficiary: tokenInfo.name_beneficiary,
-    email_beneficiary: tokenInfo.email_beneficiary,
-    wallet: tokenInfo.wallet,
-  };
-
   const [beneficiary, setBeneficiary] = useState({
-    name: userInfo.name_beneficiary || "",
-    email: userInfo.email_beneficiary || "",
+    name: tokenInfo.name_beneficiary || "",
+    email: tokenInfo.email_beneficiary || "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditingBeneficiary, setIsEditingBeneficiary] = useState(false);
   const { disconnect } = useDisconnect(); // For blockchain
   const router = useRouter();
-
-  useEffect(() => {
-    setBeneficiary({
-      name: userInfo.name_beneficiary || "",
-      email: userInfo.email_beneficiary || "",
-    });
-  }, [userInfo]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -59,7 +34,7 @@ const SettingsForm: React.FC = () => {
     setIsSaving(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/${userInfo.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/${tokenInfo.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -93,7 +68,7 @@ const SettingsForm: React.FC = () => {
         <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400">General</h2>
 
         {/* Información del Usuario */}
-        {userInfo ? (
+        {tokenInfo ? (
           <>
             <div className="mt-6">
               <h3 className="text-lg text-right font-medium text-gray-700 dark:text-gray-500">Información Personal</h3>
@@ -102,7 +77,7 @@ const SettingsForm: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Nombre</label>
                   <input
                     type="text"
-                    value={userInfo.name}
+                    value={tokenInfo.name}
                     readOnly
                     className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700 dark:bg-form-strokedark dark:text-whiten cursor-default"
                   />
@@ -111,7 +86,7 @@ const SettingsForm: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Correo</label>
                   <input
                     type="text"
-                    value={userInfo.email}
+                    value={tokenInfo.email}
                     readOnly
                     className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700 dark:bg-form-strokedark dark:text-whiten cursor-default"
                   />
@@ -131,7 +106,7 @@ const SettingsForm: React.FC = () => {
                     <input
                       type="text"
                       name="walletRecipient"
-                      value={userInfo?.wallet}
+                      value={tokenInfo.wallet}
                       readOnly
                       placeholder="Correo de nuevo referido"
                       className="flex-1 block px-4 py-2 border rounded-md bg-gray-100 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten cursor-default"
