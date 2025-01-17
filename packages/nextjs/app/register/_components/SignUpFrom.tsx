@@ -4,11 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Helper } from "./Helper";
-import { PasswordCriteriaFeedback } from "./PasswordCriteriaFeedback";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { isAddress } from "viem";
 import { useAccount, useDisconnect } from "wagmi";
+import { PasswordFeedback } from "~~/components/UI/PasswordFeedback";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import ApiRateLimiter from "~~/utils/API/ApiRateLimiter";
 import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
@@ -148,7 +148,7 @@ export const SignUpForm = () => {
       hasLowercase: /[a-z]/.test(password),
       hasUppercase: /[A-Z]/.test(password),
       hasNumber: /[0-9]/.test(password),
-      hasSpecialChar: /[@!#?]/.test(password),
+      hasSpecialChar: /[@$!#?]/.test(password),
     });
   };
 
@@ -507,7 +507,7 @@ export const SignUpForm = () => {
             )}
           </div>
           {/* Password Criteria Feedback */}
-          {passwordCriteriaModalVisible && <PasswordCriteriaFeedback passwordCriteria={passwordCriteria} />}
+          {passwordCriteriaModalVisible && <PasswordFeedback passwordCriteria={passwordCriteria} />}
         </div>
         {fieldErrors.password && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.password}</p>}
       </div>

@@ -23,7 +23,7 @@ export const validateField = (name: string, value: string) => {
     case "password":
       if (!value.trim()) return "La contraseña es requerida";
       if (value.length < 8) return "Mínimo 8 caracteres";
-      if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(value))
+      if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!#?]{8,}/.test(value))
         return "Debe contener mayúscula, minúscula, número y carácter especial";
       return "";
 
