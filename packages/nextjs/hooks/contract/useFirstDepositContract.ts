@@ -100,11 +100,11 @@ const useFirstDepositContract = () => {
     notification.error(message, { position: "bottom-right", duration: 5000 });
   };
 
-  // const HandleTest = () => {
-  //   console.log("Im activate");
-  //   setIsStarted(true);
-  //   setIsHandleModalActivate(true);
-  // };
+  const HandleTest = () => {
+    console.log("Im activate");
+    setIsStarted(true);
+    setIsHandleModalActivate(true);
+  };
 
   //Validar el servidor y bd funcionando
   const performHealthCheck = async (amount: number, hash: string) => {
@@ -322,6 +322,7 @@ const useFirstDepositContract = () => {
     error,
     transaction,
     HandleDeposit,
+    HandleTest,
   };
 };
 

@@ -22,24 +22,6 @@ export const TransactionsTableRow = ({
   lengthData,
   index,
 }: TransactionTableRowProps) => {
-  // const getTrimestreDaysLeft = (date: string, targetMonths: number) => {
-  //   const transactionDate = new Date(date);
-  //   const targetDate = new Date(
-  //     transactionDate.getFullYear(),
-  //     transactionDate.getMonth() + targetMonths,
-  //     transactionDate.getDate(),
-  //   );
-
-  //   const currentDate = new Date();
-
-  //   if (currentDate >= targetDate) return "Cumplido";
-
-  //   const diffInMilliseconds = targetDate.getTime() - currentDate.getTime();
-  //   const daysLeft = Math.ceil(diffInMilliseconds / (1000 * 60 * 60 * 24));
-
-  //   return `${daysLeft} días restantes`;
-  // };
-
   function getRemainingDays(targetDate: string) {
     // Crear copia de la fecha actual
     const currentDate = new Date();

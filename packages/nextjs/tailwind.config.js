@@ -304,6 +304,10 @@ export const theme = {
         "0%, 100%": { transform: "translateY(100%)" },
         "50%": { transform: "translateY(0)" },
       },
+      "fade-in": {
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+      },
     },
     animation: {
       "pulse-fast": "pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite",
@@ -321,6 +325,7 @@ export const theme = {
       line1: "line 10s infinite linear",
       line2: "line-revert 8s infinite linear",
       line3: "line 7s infinite linear",
+      fadeIn: "fade-in 0.2s ease-in-out",
     },
   },
 };

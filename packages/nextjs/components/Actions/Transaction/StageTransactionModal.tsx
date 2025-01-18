@@ -46,9 +46,9 @@ export const StageTransactionModal = ({ activate, transaction, transactionDescri
       </button>
       <dialog ref={modalRef} id="my_modal_5" className="modal ml-0">
         <div className="modal-box rounded-md sm:w-11/12 sm:max-w-2xl dark:bg-[#0b1727]">
-          <div className="mx-auto px-4 sm:container">
+          <div className="mx-auto pl-4 sm:container">
             <div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-start sm:items-center justify-between">
                 <h2 className="mb-0 text-2xl font-semibold text-dark dark:text-white">Transacción en proceso</h2>
                 <div className="modal-action mt-0">
                   <form method="dialog">

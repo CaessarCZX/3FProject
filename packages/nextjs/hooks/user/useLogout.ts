@@ -12,7 +12,7 @@ export const useLogout = () => {
     if (localToken && !sessionToken) {
       window.localStorage.removeItem("token");
       useGlobalState.persist.clearStorage();
-      disconnect();
+      return () => disconnect();
     }
   }, [disconnect]);
 };
