@@ -2,14 +2,15 @@
 
 import withAuth from "../hoc/withAuth";
 import HeroHome from "./_components/HeroHome";
+import OneRenderBlockchainNotifications from "~~/components/Actions/NotificationBlockchain";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
-import { useGetNotfications } from "~~/hooks/user/useGetNotifications";
+import { useGlobalState } from "~~/services/store/store";
 
 const HomePage = () => {
-  useGetNotfications();
-
+  const blockchainNotificationsStatus = useGlobalState(state => state.blockchainNotifications);
   return (
     <InternalLayout>
+      {!blockchainNotificationsStatus && <OneRenderBlockchainNotifications />}
       <HeroHome />
     </InternalLayout>
   );
