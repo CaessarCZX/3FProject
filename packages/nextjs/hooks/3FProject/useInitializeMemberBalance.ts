@@ -11,7 +11,6 @@ export const useInitializeMemberBalance = () => {
   useEffect(() => {
     if (tokenInfo && currentBalance === 0) {
       setMemberBalance(tokenInfo.balance || 0);
-      console.log("activate token get balance");
     }
   }, [setMemberBalance, tokenInfo, currentBalance]);
 };
