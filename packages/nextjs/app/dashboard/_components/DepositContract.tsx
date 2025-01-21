@@ -7,6 +7,7 @@ import { TbPigMoney } from "react-icons/tb";
 import { useAccount } from "wagmi";
 import { UsdtInput } from "~~/components/Input/USDT/UsdtInput";
 import CardBox from "~~/components/UI/CardBox";
+import DepositReference from "~~/components/UI/DepositReference";
 import { useGetMemberStatus } from "~~/hooks/user/useGetMemberStatus";
 
 const DepositContract: React.FC = () => {
@@ -39,13 +40,18 @@ const DepositContract: React.FC = () => {
           <p className="text-lg m-0 text-gray-300 dark:text-gray-500">Conecta tu wallet y continua ahorrando</p>
         </article>
       ) : (
-        <article className="flex space-x-4 w-full">
-          <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
-          {memberStatus ? (
-            <DepositDashboardButton depositAmount={deposit} />
-          ) : (
-            <FirstDepositDashboardButton depositAmount={deposit} />
-          )}
+        <article className=" w-full">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <UsdtInput value={deposit} onChange={amount => setDeposit(amount)} />
+            {memberStatus ? (
+              <DepositDashboardButton depositAmount={deposit} />
+            ) : (
+              <FirstDepositDashboardButton depositAmount={deposit} />
+            )}
+          </div>
+          <div className="text-gray-400">
+            <DepositReference isNormalDeposit={memberStatus} />
+          </div>
         </article>
       )}
       {/* Input for savings */}

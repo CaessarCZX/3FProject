@@ -36,6 +36,7 @@ type GlobalState = {
   memberBalance: {
     balance: number;
   };
+  blockchainNotifications: boolean;
 };
 
 type GlobalActions = {
@@ -49,6 +50,7 @@ type GlobalActions = {
   setIsActiveMemberStatus: (newCurrentMemberStatus: boolean | null) => void;
   setMemberAffiliatesCount: (newMemberAffiliatesCount: number) => void;
   setMemberBalance: (newMemberBalance: number) => void;
+  setBlockchainNotifications: (newBlockchainNotificationsState: boolean) => void;
 };
 
 type GlobalStorage = GlobalState & GlobalActions;
@@ -103,6 +105,9 @@ export const useGlobalState = create<GlobalStorage>()(
       },
       setMemberBalance: (newValue: number): void =>
         set(state => ({ memberBalance: { ...state.memberBalance, balance: newValue } })),
+
+      blockchainNotifications: false,
+      setBlockchainNotifications: (newValue: boolean): void => set(() => ({ blockchainNotifications: newValue })),
     }),
     {
       name: "global-storage", // nombre único para localStorage
@@ -112,6 +117,7 @@ export const useGlobalState = create<GlobalStorage>()(
         memberStatus: state.memberStatus,
         memberAffiliates: state.memberAffiliates,
         memberBalance: state.memberBalance,
+        blockchainNotifications: state.blockchainNotifications,
       }),
     },
   ),

@@ -40,16 +40,6 @@ export const projectMenuGoups: SidebarMenuGroup[] = [
         label: "Expansión",
         route: "/expansion",
       },
-      // {
-      //   icon: <CalendarDaysIcon className={defaultSizeIcon} />,
-      //   label: "Calendario",
-      //   route: "/calendar",
-      // },
-      // {
-      //   icon: <UserCircleIcon className={defaultSizeIcon} />,
-      //   label: "Tu perfil",
-      //   route: "/profile",
-      // },
       {
         icon: <CogIcon className={defaultSizeIcon} />,
         label: "Configuraciones",
@@ -66,7 +56,7 @@ export const projectMenuGoups: SidebarMenuGroup[] = [
       },
       {
         icon: <ScaleIcon className={defaultSizeIcon} />,
-        label: "Términos y condiciones",
+        label: "Legal",
         route: "/terms",
       },
     ],

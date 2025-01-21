@@ -52,9 +52,6 @@ const HeroHome: React.FC = () => {
               para un miembro nuevo, al momento de un retiro definitivo de una aportación.
             </p>
             <p className="m-0">
-              Nuestros valores son la transparencia, repartición de la riqueza, conocimiento y honorabilidad.
-            </p>
-            <p className="m-0">
               Nuestros valores son la transparencia, repartición de la riqueza, conocimiento y honorabilidad. Free
               Friends and Family, la abundancia representa las posibilidades y significados que existen detrás de ella,
               como familias unidas, la capacidad de afrontar un imprevisto, planificar vacaciones, un negocio, estudios

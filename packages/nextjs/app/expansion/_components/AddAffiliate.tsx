@@ -75,7 +75,7 @@ const AddAffiliate: React.FC = () => {
           <Image
             width={150}
             height={150}
-            className="hidden sm:block contrast-75 dark:grayscale dark:contrast-50"
+            className="hidden xl:block contrast-75 dark:grayscale dark:contrast-50"
             src="/vision-images/3-2.png"
             alt="Expansion team FREE"
           />
@@ -96,7 +96,7 @@ const AddAffiliate: React.FC = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`w-full sm:max-w-sm px-6 py-2 text-white rounded-md shadow focus:outline-none 
+                    className={`w-full sm:w-auto xl:max-w-50 px-6 py-2 text-white rounded-md shadow focus:outline-none 
                       ${
                         loading
                           ? "bg-[#818f8E] dark:bg-blue-900"
