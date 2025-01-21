@@ -18,6 +18,7 @@ const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 const PATCH_MEMBERSHIP_TO_MAIL = 500;
+const TESTNET_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TESTNET_CONTRACT;
 
 interface UplineMembers {
   uplineAddress: string;
@@ -32,7 +33,17 @@ const useFirstDepositContract = () => {
   const { writeContractAsync } = useWriteContract();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const contractAbi = contract?.abi;
-  const currentContract = contract?.address ?? "0x";
+
+  /**
+   * Mainnet contract address
+   */
+  // const currentContract = contract?.address ?? "0x";
+
+  /**
+   * Warning! for development and test purpose only, this var contains the testnet contract address for project
+   */
+  const currentContract = TESTNET_CONTRACT_ADDRESS;
+
   const member = useAccount();
   const memberAddress = member?.address ?? "0x0";
   const { data: walletBalance } = useWatchBalance({ address: memberAddress });

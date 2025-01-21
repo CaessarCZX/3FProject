@@ -2,7 +2,13 @@ import { Contract } from "ethers";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-const USDT_TOKEN = process.env.TEST_TOKEN_ADDRESS_FUSDT;
+// For development use only
+// const USDT_TOKEN_TEST = process.env.TEST_TOKEN_ADDRESS_FUSDT;
+
+// USDT TETHER CONTRACT ADDRES FOR TRANSACTIONS IN SMART CONTRACT
+const USDT_TETHER = process.env.USDT_TETHER;
+
+// DEVELOPMENT KEY USE
 const MEMBERS_KEY = process.env.INVITATION_MEMBERS_KEY;
 
 const deployFFFBusiness: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -11,7 +17,7 @@ const deployFFFBusiness: DeployFunction = async function (hre: HardhatRuntimeEnv
 
   const deployment = await deploy("FFFBusiness", {
     from: deployer,
-    args: [USDT_TOKEN, MEMBERS_KEY],
+    args: [USDT_TETHER, MEMBERS_KEY],
     log: true,
     autoMine: true,
   });
