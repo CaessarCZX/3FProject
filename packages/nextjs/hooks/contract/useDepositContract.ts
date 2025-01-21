@@ -13,10 +13,11 @@ import { TransactionInfo } from "~~/utils/3FContract/deposit";
 import { DepositErrors as err } from "~~/utils/errors/errors";
 import { notification } from "~~/utils/scaffold-eth";
 
-const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
-const TESTNET_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TESTNET_CONTRACT;
+const tokenUsdt = process.env.NEXT_PUBLIC_USDT_TOKEN;
+// const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
+// const TESTNET_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TESTNET_CONTRACT;
 
 interface UplineMembers {
   uplineAddress: string;
@@ -34,12 +35,12 @@ const useDepositContract = () => {
   /**
    * Mainnet contract address
    */
-  // const currentContract = contract?.address ?? "0x";
+  const currentContract = contract?.address ?? "0x";
 
   /**
    * Warning! for development and test purpose only, this var contains the testnet contract address for project
    */
-  const currentContract = TESTNET_CONTRACT_ADDRESS;
+  // const currentContract = TESTNET_CONTRACT_ADDRESS;
 
   const member = useAccount();
   const memberAddress = member?.address ?? "0x0";
