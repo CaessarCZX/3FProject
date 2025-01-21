@@ -14,10 +14,11 @@ import { TransactionInfo } from "~~/utils/3FContract/deposit";
 import { DepositErrors as err } from "~~/utils/errors/errors";
 import { notification } from "~~/utils/scaffold-eth";
 
-const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
 const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
 const PATCH_MEMBERSHIP_TO_MAIL = 500;
+const tokenUsdt = process.env.NEXT_PUBLIC_USDT_TOKEN;
+// const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
 // const TESTNET_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TESTNET_CONTRACT;
 
 interface UplineMembers {
