@@ -41,7 +41,6 @@ const useDepositContract = () => {
   });
   // For transaction data
   const [id, setId] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
   // Deposit Rules
   const minDeposit = parseUnits("2000", 6);
   const depositMultiple = parseUnits("500", 6);
@@ -62,7 +61,6 @@ const useDepositContract = () => {
       try {
         // Get data for sending transaction to DB
         setId(tokenInfo.id || null);
-        setEmail(tokenInfo.email || null);
         // Get upline referrals for commission
         const uplines: string[] = tokenInfo.ReferersCommissions;
 
@@ -134,11 +132,9 @@ const useDepositContract = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            toEmail: email,
+            userId: id,
             amount: amount,
-            walletFirstLevel: uplineMembers.uplineAddress,
-            walletSecondLevel: uplineMembers.secondLevelUpline,
-            walletThirtLevel: uplineMembers.thirtLevelUpline,
+            hash,
           }),
         });
       } else {
@@ -290,6 +286,10 @@ const useDepositContract = () => {
       ShowNotification(err.general);
       setError(err.general);
       console.error(e.message);
+
+      if (e?.message?.includes("No matching key")) {
+        console.error("🔍 Posible error en el ABI o en la red de la billetera.");
+      }
     } finally {
       resetFlags();
     }
