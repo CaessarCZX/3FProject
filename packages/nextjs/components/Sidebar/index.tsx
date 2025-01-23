@@ -7,12 +7,14 @@ import { PageWalletConnectionBtn } from "../Wallet/WalletInnerConnectionBtn";
 import WalletWidget from "../Wallet/WalletWidget";
 import { projectMenuGoups } from "./SidebarContent";
 import { jwtDecode } from "jwt-decode";
+import { getAddress } from "viem";
 import { useAccount } from "wagmi";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import ClickOutside from "~~/components/Actions/ClickOutside";
 import SidebarItem from "~~/components/Sidebar/SidebarItem";
 import useLocalStorage from "~~/hooks/common/useLocalStorage";
 import { SidebarProps } from "~~/types/sidebar";
+import { INVALID_ADDRESS } from "~~/utils/Transactions/constants";
 
 // Función para decodificar el token y obtener `isAdmin`
 interface DecodedToken {
@@ -41,17 +43,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
   const { isAdmin, wallet } = getInfoFromToken();
   const [isWalletApproved, setIsWalletApproved] = useState(false);
+  const checksumAddress = getAddress(wallet || INVALID_ADDRESS);
 
   useEffect(() => {
     if (currentAccount.status === "connected") {
-      setIsWalletApproved(wallet === currentAccount.address);
+      setIsWalletApproved(checksumAddress === currentAccount.address);
     }
 
     // if (currentUser.status === "disconnected") {
     //   setFormData(prevData => ({ ...prevData, wallet: "" }));
     //   setIsWalletConnected(false);
     // }
-  }, [currentAccount.status, currentAccount.address, wallet]);
+  }, [currentAccount.status, currentAccount.address, wallet, checksumAddress]);
 
   // Filtra el menú según el valor de isAdmin
   const filteredMenuGroups = projectMenuGoups.map(group => ({
