@@ -6,7 +6,7 @@ import { UseBalanceParameters, useBalance, useBlockNumber } from "wagmi";
 /**
  * Wrapper around wagmi's useBalance hook. Updates data on every block change.
  */
-// const Token = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT;
+//const USDT = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_USDT3F; //TEST TOKEN
 const USDT = process.env.NEXT_PUBLIC_USDT_TOKEN;
 
 export const useWatchBalance = (useBalanceParameters: UseBalanceParameters) => {

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Helper } from "./Helper";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
-import { isAddress } from "viem";
+import { getAddress, isAddress } from "viem";
 import { useAccount, useDisconnect } from "wagmi";
 import { PasswordFeedback } from "~~/components/UI/PasswordFeedback";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
@@ -166,6 +166,9 @@ export const SignUpForm = () => {
       return;
     }
 
+    // Convert any entered address to valid wallet address
+    const validWallet = getAddress(formData.referredBy);
+
     try {
       await rateLimiter.current.executeWithRateLimit(async () => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
@@ -173,7 +176,7 @@ export const SignUpForm = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ wallet: formData.referredBy }),
+          body: JSON.stringify({ wallet: validWallet }),
           credentials: "include",
         });
 

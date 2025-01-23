@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
 import { useWatchBalance } from "../scaffold-eth/useWatchBalance";
 import { useGetTokenData } from "../user/useGetTokenData";
+import { useGetTransactionParams } from "./useGetTransactionParams";
 import { readContract, waitForTransactionReceipt } from "@wagmi/core";
-import { Abi } from "abitype";
 import { parseUnits } from "viem";
 import { erc20Abi } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
-import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/useDeployedContractInfo";
 import { useGetMemberSavings } from "~~/hooks/user/useGetMemberSavings";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { TransactionInfo } from "~~/utils/3FContract/deposit";
+import { USTD_APPROVE_ABI } from "~~/utils/Abi/usdt";
+import { GET_KEYS_IN, INVALID_ADDRESS } from "~~/utils/Transactions/constants";
 import { DepositErrors as err } from "~~/utils/errors/errors";
 import { notification } from "~~/utils/scaffold-eth";
-
-const MEMBERS_KEY = process.env.NEXT_PUBLIC_INVITATION_MEMBERS_KEY;
-const INVALID_ADDRESS = "0x0000000000000000000000000000000000000000";
-const tokenUsdt = process.env.NEXT_PUBLIC_USDT_TOKEN;
-// const tokenUsdt = process.env.NEXT_PUBLIC_TEST_TOKEN_ADDRESS_FUSDT ?? "0x";
-// const TESTNET_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TESTNET_CONTRACT;
 
 interface UplineMembers {
   uplineAddress: string;
@@ -26,26 +21,18 @@ interface UplineMembers {
 }
 
 const useDepositContract = () => {
+  // Get params for transaction according to the mode
+  const { CONTRACT_ABI, CONTRACT_ADDRESS, MEMBERS_KEY, TOKEN_ADDRESS } = useGetTransactionParams(
+    GET_KEYS_IN.PRODUCTION,
+  );
+  const currentUser = useAccount();
+  const CURRENT_ADDRESS = currentUser.address ?? "0x0";
   const { tokenInfo, tokenError } = useGetTokenData();
   const { fetchSavings } = useGetMemberSavings();
   const { writeContractAsync } = useWriteContract();
-  const { data: contract } = useDeployedContractInfo("FFFBusiness"); // Mainnet contract Info
-  const contractAbi = contract?.abi;
 
-  /**
-   * Mainnet contract address
-   */
-  const currentContract = contract?.address ?? "0x";
-
-  /**
-   * Warning! for development and test purpose only, this var contains the testnet contract address for project
-   */
-  // const currentContract = TESTNET_CONTRACT_ADDRESS;
-
-  const member = useAccount();
-  const memberAddress = member?.address ?? "0x0";
   // Current wallet balance
-  const { data: walletBalance } = useWatchBalance({ address: memberAddress });
+  const { data: walletBalance } = useWatchBalance({ address: CURRENT_ADDRESS });
   // Upline members for commissions
   const [uplineMembers, setUplineMembers] = useState<UplineMembers>({
     uplineAddress: "",
@@ -54,7 +41,6 @@ const useDepositContract = () => {
   });
   // For transaction data
   const [id, setId] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
   // Deposit Rules
   const minDeposit = parseUnits("2000", 6);
   const depositMultiple = parseUnits("500", 6);
@@ -75,14 +61,9 @@ const useDepositContract = () => {
       try {
         // Get data for sending transaction to DB
         setId(tokenInfo.id || null);
-        setEmail(tokenInfo.email || null);
         // Get upline referrals for commission
-        /**
-         * IMPORTANTT!
-         * @RefererCommissions brings the upline referer from top to bottom
-         * with the direct upline in the last position
-         */
-        const uplines: string[] = tokenInfo.ReferersCommissions.toReversed(); //Copy from ReferersCommmission
+        const uplines: string[] = tokenInfo.ReferersCommissions;
+
         if (uplines) {
           setUplineMembers({
             uplineAddress: uplines[0] || INVALID_ADDRESS, //For direct upline
@@ -151,11 +132,9 @@ const useDepositContract = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            toEmail: email,
+            userId: id,
             amount: amount,
-            walletFirstLevel: uplineMembers.uplineAddress,
-            walletSecondLevel: uplineMembers.secondLevelUpline,
-            walletThirtLevel: uplineMembers.thirtLevelUpline,
+            hash,
           }),
         });
       } else {
@@ -196,9 +175,8 @@ const useDepositContract = () => {
 
     try {
       setIsStarted(true);
-      let allowanceReceiptHash = { status: "success", transactionHash: "previous approve" };
 
-      if (isStarted === true || !tokenUsdt || !currentContract) {
+      if (isStarted === true || !TOKEN_ADDRESS || !CONTRACT_ADDRESS) {
         ShowNotification(err.general);
         setError(err.general);
         resetFlags();
@@ -209,42 +187,40 @@ const useDepositContract = () => {
 
       // Allowance query
       const currentAllowance = await readContract(wagmiConfig, {
-        address: tokenUsdt,
+        address: TOKEN_ADDRESS,
         abi: erc20Abi,
         functionName: "allowance",
-        args: [memberAddress, currentContract],
+        args: [CURRENT_ADDRESS, CONTRACT_ADDRESS],
       });
 
-      console.log("currentAllowance: ", currentAllowance); //For debug
-
-      // To patch previous allowance
-      if (currentAllowance === allowanceAmount) {
-        setTransaction(prev => ({
-          ...prev,
-          allowanceHash: allowanceReceiptHash.transactionHash,
-        }));
-      }
-
-      if (currentAllowance < allowanceAmount) {
-        const allowanceRequest = allowanceAmount - currentAllowance;
-        console.log("currentAllowance: ", allowanceRequest); //For debug
-
-        const allowanceHash = await writeContractAsync({
-          abi: erc20Abi,
-          address: tokenUsdt,
+      // Always set the allowance to 0 if currentAllowance is greater than 0
+      if (currentAllowance > 0n) {
+        const hash = await writeContractAsync({
+          abi: USTD_APPROVE_ABI,
+          address: TOKEN_ADDRESS,
           functionName: "approve",
-          args: [currentContract, allowanceAmount],
+          args: [CONTRACT_ADDRESS, BigInt(0n)],
         });
 
-        setTransaction(prev => ({
-          ...prev,
-          allowanceHash: allowanceHash,
-        }));
-
-        allowanceReceiptHash = await waitForTransactionReceipt(wagmiConfig, {
-          hash: allowanceHash,
-        });
+        const allowanceToZero = await waitForTransactionReceipt(wagmiConfig, { hash });
+        if (!allowanceToZero) throw new Error(err.allowance);
       }
+
+      const allowanceHash = await writeContractAsync({
+        abi: USTD_APPROVE_ABI,
+        address: TOKEN_ADDRESS,
+        functionName: "approve",
+        args: [CONTRACT_ADDRESS, allowanceAmount],
+      });
+
+      setTransaction(prev => ({
+        ...prev,
+        allowanceHash: allowanceHash,
+      }));
+
+      const allowanceReceiptHash = await waitForTransactionReceipt(wagmiConfig, {
+        hash: allowanceHash,
+      });
 
       if (allowanceReceiptHash.status === "success") {
         setTransaction(prev => ({
@@ -264,8 +240,8 @@ const useDepositContract = () => {
         );
 
         const depositContractHash = await writeContractAsync({
-          abi: contractAbi as Abi,
-          address: currentContract,
+          abi: CONTRACT_ABI,
+          address: CONTRACT_ADDRESS,
           functionName: "depositMemberFunds",
           args: [
             allowanceAmount,
@@ -310,6 +286,10 @@ const useDepositContract = () => {
       ShowNotification(err.general);
       setError(err.general);
       console.error(e.message);
+
+      if (e?.message?.includes("No matching key")) {
+        console.error("🔍 Posible error en el ABI o en la red de la billetera.");
+      }
     } finally {
       resetFlags();
     }
