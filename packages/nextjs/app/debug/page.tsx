@@ -1,3 +1,4 @@
+import withAuth from "../hoc/withAuth";
 import { DebugContracts } from "./_components/DebugContracts";
 import type { NextPage } from "next";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
@@ -25,4 +26,4 @@ const Debug: NextPage = () => {
   );
 };
 
-export default Debug;
+export default withAuth(Debug);
