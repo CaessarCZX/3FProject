@@ -23,7 +23,7 @@ interface UplineMembers {
 const useDepositContract = () => {
   // Get params for transaction according to the mode
   const { CONTRACT_ABI, CONTRACT_ADDRESS, MEMBERS_KEY, TOKEN_ADDRESS } = useGetTransactionParams(
-    GET_KEYS_IN.DEVELOPMENT,
+    GET_KEYS_IN.PRODUCTION,
   );
   const currentUser = useAccount();
   const CURRENT_ADDRESS = currentUser.address ?? "0x0";
