@@ -15,6 +15,7 @@ const MESSAGE_HEADERS = {
   "NEW SAVING": "Nuevo ahorro detectado",
   "COMMISSION PAYMENT": "Nuevo pago de comisión detectado",
   "NEW AFFILIATE": "Nuevo Afiliado",
+  "MEMBERSHIP PAYMENT": "Pago de membresia",
 };
 
 export const NotificationsTableRow = ({ type, email, message_ui, amount, date }: MemberActivity) => {

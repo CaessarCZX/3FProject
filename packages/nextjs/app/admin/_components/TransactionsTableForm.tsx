@@ -79,7 +79,7 @@ const TransactionsTable: React.FC = () => {
                     <td className="px-4 py-2">
                       {userTransaction.transactions.map((transaction: any) => (
                         <p key={transaction._id} className="transaction-monto text-sm text-gray-700">
-                          ${transaction.amount}
+                          ${transaction.amount.$numberDecimal}
                         </p>
                       ))}
                     </td>

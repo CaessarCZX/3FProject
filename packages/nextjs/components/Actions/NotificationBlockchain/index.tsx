@@ -16,6 +16,7 @@ const OneRenderBlockchainNotifications = () => {
   const { tokenInfo, tokenError } = useGetTokenData();
   const { data: contract } = useDeployedContractInfo("FFFBusiness");
   const currentContract = contract?.address ?? "0x";
+  // const currentContract = process.env.NEXT_PUBLIC_TESTNET_CONTRACT ?? "0x0";
 
   const { address, isConnected } = useAccount();
 
