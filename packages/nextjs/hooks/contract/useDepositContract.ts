@@ -277,10 +277,12 @@ const useDepositContract = () => {
         } else {
           ShowNotification(err.onTransaction);
           setError(err.onTransaction);
+          throw new Error("Something is wrong");
         }
       } else {
         ShowNotification(err.allowance);
         setError(err.allowance);
+        throw new Error("Something is wrong");
       }
     } catch (e: any) {
       ShowNotification(err.general);
