@@ -56,7 +56,7 @@ const TransactionsAdminTableForm: React.FC = () => {
                     <td className="px-4 py-2">
                       {userTransaction.transactions.map((transaction: any) => (
                         <p key={transaction._id} className="transaction-monto text-sm text-gray-700">
-                          ${Math.round(transaction.amount * 0.92 * 100) / 100}
+                          ${Math.round(transaction.amount.$numberDecimal * 0.92 * 100) / 100}
                         </p>
                       ))}
                     </td>
