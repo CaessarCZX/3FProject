@@ -251,6 +251,9 @@ export const SignUpForm = () => {
   };
 
   const createUser = async (formData: typeof SignUpForm.prototype.formData) => {
+    // Convert any entered address to valid wallet address
+    const validWallet = getAddress(formData.referredBy);
+
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users`, {
       method: "POST",
       headers: {
@@ -258,6 +261,7 @@ export const SignUpForm = () => {
       },
       body: JSON.stringify({
         ...formData,
+        referredBy: validWallet,
         isAdmin: false,
         isActive: true,
       }),
@@ -306,7 +310,7 @@ export const SignUpForm = () => {
         // Disconnect current wallet
         await disconnectAsync();
 
-        setSuccessMessage("¡Registro exitoso! Redirigiendo...");
+        setSuccessMessage("¡Registro exitoso!");
         const saveEmail = formData.email;
         setFormData({
           name: "",
