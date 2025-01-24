@@ -63,7 +63,7 @@ const Header = (props: { sidebarOpen: string | boolean | undefined; setSidebarOp
           {memberStatus && (
             <div className="ml-2 lg:ml-0 flex">
               <Image width={40} height={80} src={"/premium/gold-medal.svg"} alt="usuario premium" />
-              <div className="text-brand-default">
+              <div className="text-brand-default dark:text-slate-200">
                 <h3 className="font-bold m-0">MIEMBRO</h3>
                 <h3 className="font-bold m-0">VIP</h3>
               </div>
