@@ -6,7 +6,7 @@ const CardMembership: React.FC = () => {
   const { memberStatus } = useGetMemberStatus();
   return (
     <div
-      className={`rounded-sm border bg-white border-stroke px-7.5 py-6 shadow-default dark:border-strokedark ${
+      className={`col-span-2 sm:col-span-1 rounded-sm border bg-white border-stroke px-7.5 py-6 shadow-default dark:border-strokedark ${
         memberStatus ? "dark:bg-boxdark" : "dark:bg-boxdark-2"
       } `}
     >

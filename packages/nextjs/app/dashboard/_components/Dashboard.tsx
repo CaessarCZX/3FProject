@@ -13,7 +13,7 @@ const MemberDashboard: React.FC = () => {
   return (
     <>
       <Breadcrumb pageName="Panel de control" />
-      <div className="grid grid-cols-2 gap-4 md:gap-4 xl:grid-cols-6 2xl:gap-7.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 2xl:gap-7.5 gap-4 md:gap-4">
         <DepositContract />
         {ContentStats.map((statInfo, statIndex) => (
           <CardDataStats key={statIndex} title={statInfo.title} total={statInfo.total} rate={statInfo.rate}>
