@@ -1,6 +1,7 @@
 "use client";
 
 import withAuth from "../hoc/withAuth";
+import BeneficiaryForm from "./_components/BeneficiaryForm";
 import ResetPassword from "./_components/ResetPassword";
 import SettingsForm from "./_components/SettingsForm";
 import Breadcrumb from "~~/components/Breadcumbs";
@@ -13,6 +14,7 @@ const Settings = () => {
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <div className="col-span-12">
           <SettingsForm />
+          <BeneficiaryForm currentBeneficiaryEmail="" currentBeneficiaryName="" />
           <ResetPassword />
         </div>
       </div>

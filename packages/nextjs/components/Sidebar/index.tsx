@@ -49,11 +49,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     if (currentAccount.status === "connected") {
       setIsWalletApproved(checksumAddress === currentAccount.address);
     }
-
-    // if (currentUser.status === "disconnected") {
-    //   setFormData(prevData => ({ ...prevData, wallet: "" }));
-    //   setIsWalletConnected(false);
-    // }
   }, [currentAccount.status, currentAccount.address, wallet, checksumAddress]);
 
   // Filtra el menú según el valor de isAdmin
