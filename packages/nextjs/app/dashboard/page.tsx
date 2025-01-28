@@ -10,9 +10,7 @@ const Dashboard = () => {
 
   return (
     <InternalLayout>
-      <div className="max-w-full w-full px-4 sm:px-6 md:px-8">
-        <MemberDashboard />
-      </div>
+      <MemberDashboard />
     </InternalLayout>
   );
 };

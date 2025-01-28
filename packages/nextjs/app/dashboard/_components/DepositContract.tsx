@@ -15,7 +15,7 @@ const DepositContract: React.FC = () => {
   const currentAccount = useAccount();
   const [deposit, setDeposit] = useState("");
   return (
-    <CardBox className="col-span-2 md:col-span-3 lg:col-span-3">
+    <CardBox className="col-span-2 sm:col-span-3 lg:col-span-3">
       <div className="flex items-center space-x-4 mb-4">
         {/* For Icon */}
         <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
