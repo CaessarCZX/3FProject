@@ -2,13 +2,19 @@ import React, { useState } from "react";
 import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { updateUser } from "~~/services/CRUD/users";
+import { validateEmailWithMessage, validateName } from "~~/utils/Form";
 
 interface BeneficiaryProps {
   currentBeneficiaryName: string | undefined;
   currentBeneficiaryEmail: string | undefined;
+  updateFunction: (userId: string) => void;
 }
 
-const BeneficiaryForm: React.FC<BeneficiaryProps> = ({ currentBeneficiaryEmail, currentBeneficiaryName }) => {
+const BeneficiaryForm: React.FC<BeneficiaryProps> = ({
+  currentBeneficiaryEmail,
+  currentBeneficiaryName,
+  updateFunction,
+}) => {
   const { tokenInfo } = useGetTokenData();
   const [isEditing, setIsEditing] = useState<boolean>();
   const [isSaving, setIsSaving] = useState(false);
@@ -32,9 +38,27 @@ const BeneficiaryForm: React.FC<BeneficiaryProps> = ({ currentBeneficiaryEmail, 
     setBeneficiary(prev => ({ ...prev, [name]: value }));
   };
 
+  const changeEditState = () => {
+    setIsEditing(!isEditing);
+    setBeneficiary({ name: "", email: "" });
+  };
+
   const handleSaveBeneficiary = async () => {
     if (!beneficiary.name || !beneficiary.email) {
       setError("Por favor complete todos los campos.");
+      return;
+    }
+
+    // Validators
+    const errorName = validateName(beneficiary.name);
+    const errorEmail = validateEmailWithMessage(beneficiary.email);
+
+    if (errorName) {
+      setError(errorName);
+      return;
+    }
+    if (errorEmail) {
+      setError(errorEmail);
       return;
     }
 
@@ -50,6 +74,7 @@ const BeneficiaryForm: React.FC<BeneficiaryProps> = ({ currentBeneficiaryEmail, 
 
       if (response?.status !== 200) throw new Error("Error al actualizar el beneficiario.");
 
+      if (tokenInfo.id) updateFunction(tokenInfo.id);
       setSuccess("Beneficiario actualizado correctamente.");
     } catch (error) {
       console.error("Error al actualizar el beneficiario:", error);
@@ -72,6 +97,7 @@ const BeneficiaryForm: React.FC<BeneficiaryProps> = ({ currentBeneficiaryEmail, 
               name="name"
               value={beneficiary.name}
               onChange={handleInputChange}
+              readOnly={!isEditing}
               placeholder={currentBeneficiaryName || "Nombre del beneficiario"}
               className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
                 isEditing ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
@@ -85,6 +111,7 @@ const BeneficiaryForm: React.FC<BeneficiaryProps> = ({ currentBeneficiaryEmail, 
               name="email"
               value={beneficiary.email}
               onChange={handleInputChange}
+              readOnly={!isEditing}
               placeholder={currentBeneficiaryEmail || "Correo del beneficiario"}
               className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
                 isEditing ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
@@ -103,7 +130,8 @@ const BeneficiaryForm: React.FC<BeneficiaryProps> = ({ currentBeneficiaryEmail, 
             </button>
           )}
           <button
-            onClick={() => setIsEditing(!isEditing)}
+            // onClick={() => setIsEditing(!isEditing)}
+            onClick={() => changeEditState()}
             disabled={isSaving}
             className={`ml-4 px-6 py-2 ${
               isEditing
