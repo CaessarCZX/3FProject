@@ -5,6 +5,7 @@ import withAuth from "../hoc/withAuth";
 import BeneficiaryForm from "./_components/BeneficiaryForm";
 import ResetPassword from "./_components/ResetPassword";
 import SettingsForm from "./_components/SettingsForm";
+import WalletConfig from "./_components/WalletConfig";
 import Breadcrumb from "~~/components/Breadcumbs";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
@@ -26,6 +27,7 @@ const Settings = () => {
       if (!data) return;
 
       const beneficiary: UserResponse = data.user;
+      console.log(beneficiary);
       setBeneficiary(beneficiary);
     } catch (e) {
       console.error("Something is wrong: ", e);
@@ -43,14 +45,21 @@ const Settings = () => {
   return (
     <InternalLayout>
       <Breadcrumb pageName="Configuraciones" />
-      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
-        <div className="col-span-12">
+      <div className="mt-4 grid grid-cols-5 gap-8">
+        <div className="col-span-5 xl:col-span-3">
           <SettingsForm />
+        </div>
+        <div className="col-span-5 xl:col-span-2">
+          <WalletConfig />
+        </div>
+        <div className="col-span-5 xl:col-span-3">
           <BeneficiaryForm
             updateFunction={fetchUserInfo}
             currentBeneficiaryEmail={beneficiary.email_beneficiary}
             currentBeneficiaryName={beneficiary.name_beneficiary}
           />
+        </div>
+        <div className="col-span-5 xl:col-span-3">
           <ResetPassword />
         </div>
       </div>

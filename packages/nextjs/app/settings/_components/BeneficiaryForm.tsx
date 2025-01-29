@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import BlockContainerWithTitle from "~~/components/UI/BlockContainerWithTitle";
+import { Btn, BtnLoading, BtnStates } from "~~/components/UI/Button";
 import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { updateUser } from "~~/services/CRUD/users";
@@ -86,64 +88,48 @@ const BeneficiaryForm: React.FC<BeneficiaryProps> = ({
   };
 
   return (
-    <div className="mt-8">
-      <div className="mx-auto overflow-hidden bg-white  dark:bg-boxdark dark:border-strokedark shadow-default rounded-lg p-6">
-        <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400">Beneficiario de cuenta</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Nombre</label>
-            <input
-              type="text"
-              name="name"
-              value={beneficiary.name}
-              onChange={handleInputChange}
-              readOnly={!isEditing}
-              placeholder={currentBeneficiaryName || "Nombre del beneficiario"}
-              className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
-                isEditing ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
-              }`}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Correo</label>
-            <input
-              type="email"
-              name="email"
-              value={beneficiary.email}
-              onChange={handleInputChange}
-              readOnly={!isEditing}
-              placeholder={currentBeneficiaryEmail || "Correo del beneficiario"}
-              className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
-                isEditing ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
-              }`}
-            />
-          </div>
+    <BlockContainerWithTitle title="Beneficiario de cuenta">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Nombre</label>
+          <input
+            type="text"
+            name="name"
+            value={beneficiary.name}
+            onChange={handleInputChange}
+            readOnly={!isEditing}
+            placeholder={currentBeneficiaryName || "Nombre del beneficiario"}
+            className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
+              isEditing ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
+            }`}
+          />
         </div>
-        <div className="flex justify-end mt-6 transition-colors">
-          {isEditing && (
-            <button
-              onClick={handleSaveBeneficiary}
-              disabled={isSaving}
-              className={`px-6 py-2 bg-brand-default hover:bg-brand-hover dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-md shadow focus:outline-none animate-fadeIn`}
-            >
-              {isSaving ? "Guardando..." : "Guardar Beneficiario"}
-            </button>
-          )}
-          <button
-            // onClick={() => setIsEditing(!isEditing)}
-            onClick={() => changeEditState()}
-            disabled={isSaving}
-            className={`ml-4 px-6 py-2 ${
-              isEditing
-                ? "bg-red-500 hover:bg-red-700 dark:bg-red-800 dark:hover:bg-red-900"
-                : "bg-brand-default hover:bg-brand-hover dark:bg-blue-600 dark:hover:bg-blue-700"
-            }  disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white rounded-md shadow focus:outline-none`}
-          >
-            {isEditing ? "Cancelar" : "Modificar"}
-          </button>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Correo</label>
+          <input
+            type="email"
+            name="email"
+            value={beneficiary.email}
+            onChange={handleInputChange}
+            readOnly={!isEditing}
+            placeholder={currentBeneficiaryEmail || "Correo del beneficiario"}
+            className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
+              isEditing ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
+            }`}
+          />
         </div>
       </div>
-    </div>
+      <div className="flex justify-end mt-6 transition-colors">
+        {isEditing && (
+          <Btn onClick={handleSaveBeneficiary} disabled={isSaving}>
+            <BtnLoading text="Guardar Beneficiario" changeState={isSaving} />
+          </Btn>
+        )}
+        <BtnStates onClick={() => changeEditState()} disabled={isSaving} changeState={isEditing} className="ml-4">
+          {isEditing ? "Cancelar" : "Modificar"}
+        </BtnStates>
+      </div>
+    </BlockContainerWithTitle>
   );
 };
 

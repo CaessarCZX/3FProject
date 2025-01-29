@@ -16,7 +16,7 @@ const Breadcrumb = ({ pageName, fromPage = "Inicio" }: BreadcrumbProps) => {
               {`${fromPage} /`}
             </Link>
           </li>
-          <li className="font-light text-primary">{pageName}</li>
+          <li className="font-light text-primary">{`Sección de ${pageName}`}</li>
         </ol>
       </nav>
     </div>
