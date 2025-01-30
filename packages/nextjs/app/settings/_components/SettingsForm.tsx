@@ -1,9 +1,12 @@
 import React from "react";
+import { FaRegEnvelope, FaRegUser } from "react-icons/fa6";
 import BlockContainerWithTitle from "~~/components/UI/BlockContainerWithTitle";
+import InputField from "~~/components/UI/Input/InputField";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 
 const SettingsForm: React.FC = () => {
   const { tokenInfo } = useGetTokenData();
+  const iconStyles = "text-gray-400 dark:text-gray-100 w-4 h-4";
 
   return (
     <BlockContainerWithTitle title="Información personal">
@@ -11,24 +14,20 @@ const SettingsForm: React.FC = () => {
       {tokenInfo ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Nombre</label>
-              <input
-                type="text"
-                value={tokenInfo.name}
-                readOnly
-                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700 dark:bg-form-strokedark dark:text-whiten cursor-default"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Correo</label>
-              <input
-                type="text"
-                value={tokenInfo.email}
-                readOnly
-                className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-700 dark:bg-form-strokedark dark:text-whiten cursor-default"
-              />
-            </div>
+            <InputField
+              label="Nombre"
+              type="text"
+              readOnly
+              icon={<FaRegUser className={iconStyles} />}
+              value={tokenInfo.name}
+            />
+            <InputField
+              label="Correo electrónico"
+              type="text"
+              readOnly
+              icon={<FaRegEnvelope className={iconStyles} />}
+              value={tokenInfo.email}
+            />
           </div>
         </>
       ) : (

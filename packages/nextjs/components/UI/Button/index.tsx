@@ -41,5 +41,18 @@ export const BtnStates: React.FC<BtnProps & { changeState: boolean | undefined }
 };
 
 export const BtnLoading: React.FC<BtnLoadingProps> = ({ text, changeState }) => (
-  <>{!changeState ? text : <span className="loading loading-dots loading-lg animate-fadeIn"></span>}</>
+  <>
+    <div className="flex w-full items-center justify-center">
+      {!changeState ? text : <span className="loading loading-dots loading-md animate-fadeIn"></span>}
+    </div>
+  </>
+);
+
+export const SignBtn: React.FC<BtnProps> = ({ children, className, ...props }) => (
+  <button
+    className={`w-full px-4 py-2 border border-transparent bg-gray-900 hover:bg-gray-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white rounded-md shadow-sm focus:outline-none animate-fadeIn ${className}`}
+    {...props}
+  >
+    {children}
+  </button>
 );

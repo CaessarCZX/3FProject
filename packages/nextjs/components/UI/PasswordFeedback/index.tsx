@@ -1,62 +1,43 @@
 import React from "react";
 import { BsCheckCircleFill, BsXCircleFill } from "react-icons/bs";
 
-interface PasswordCriteriaData {
-  hasMinLength: boolean;
-  hasLowercase: boolean;
-  hasUppercase: boolean;
-  hasNumber: boolean;
-  hasSpecialChar: boolean;
+interface PasswordRequirementProps {
+  isMet: boolean;
+  text: string;
 }
 
+const PasswordRequirement: React.FC<PasswordRequirementProps> = ({ isMet, text }) => (
+  <div className="flex items-center py-2">
+    {isMet ? <BsCheckCircleFill className="text-green-500 mr-1" /> : <BsXCircleFill className="text-red-500 mr-1" />}
+    <p className="m-0 text-[14px]">{text}</p>
+  </div>
+);
+
 interface PasswordFeedbackProps {
-  passwordCriteria: PasswordCriteriaData;
+  passwordCriteria: {
+    hasMinLength: boolean;
+    hasLowercase: boolean;
+    hasUppercase: boolean;
+    hasNumber: boolean;
+    hasSpecialChar: boolean;
+  };
 }
 
 export const PasswordFeedback: React.FC<PasswordFeedbackProps> = ({ passwordCriteria }) => {
+  const criteriaList = [
+    { key: "hasMinLength", text: "Al menos 8 caracteres" },
+    { key: "hasLowercase", text: "Al menos una minúscula" },
+    { key: "hasUppercase", text: "Al menos una mayúscula" },
+    { key: "hasNumber", text: "Al menos un número" },
+    { key: "hasSpecialChar", text: "Al menos un carácter especial" },
+  ];
+
   return (
-    <div className="absolute mt-2 w-[250px] bg-white dark:bg-gray-800  border dark:border-gray-700 rounded-md shadow-md z-10">
-      <div className="ml-4 flex flex-col space-y-1 text-sm p-2">
-        <div className="flex items-center">
-          {passwordCriteria.hasMinLength ? (
-            <BsCheckCircleFill className="text-green-500 mr-1" />
-          ) : (
-            <BsXCircleFill className="text-red-500 mr-1" />
-          )}
-          <p className="text-[14px] ">Al menos 8 caracteres</p>
-        </div>
-        <div className="flex items-center">
-          {passwordCriteria.hasLowercase ? (
-            <BsCheckCircleFill className="text-green-500 mr-1" />
-          ) : (
-            <BsXCircleFill className="text-red-500 mr-1" />
-          )}
-          <p className="text-[14px] ">Al menos una minúscula</p>
-        </div>
-        <div className="flex items-center">
-          {passwordCriteria.hasUppercase ? (
-            <BsCheckCircleFill className="text-green-500 mr-1" />
-          ) : (
-            <BsXCircleFill className="text-red-500 mr-1" />
-          )}
-          <p className="text-[14px] ">Al menos una mayúscula</p>
-        </div>
-        <div className="flex items-center">
-          {passwordCriteria.hasNumber ? (
-            <BsCheckCircleFill className="text-green-500 mr-1" />
-          ) : (
-            <BsXCircleFill className="text-red-500 mr-1" />
-          )}
-          <p className="text-[14px] ">Al menos un número</p>
-        </div>
-        <div className="flex items-center">
-          {passwordCriteria.hasSpecialChar ? (
-            <BsCheckCircleFill className="text-green-500 mr-1" />
-          ) : (
-            <BsXCircleFill className="text-red-500 mr-1" />
-          )}
-          <p className="text-[14px] ">Al menos un carácter especial: @ $ ! # ?</p>
-        </div>
+    <div className="absolute mt-2 w-full bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-md z-10">
+      <div className="grid grid-cols-2 xl:block text-xs p-4">
+        {criteriaList.map(({ key, text }) => (
+          <PasswordRequirement key={key} isMet={passwordCriteria[key as keyof typeof passwordCriteria]} text={text} />
+        ))}
       </div>
     </div>
   );

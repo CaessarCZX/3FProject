@@ -1,9 +1,9 @@
 import React from "react";
-import { Tooltip } from "./Tooltip";
 import { FiHelpCircle } from "react-icons/fi";
+import { CustomTooltip } from "~~/components/UI/CustomTooltip";
 
-export const Helper = () => (
-  <Tooltip
+export const HelperPassword = () => (
+  <CustomTooltip
     content={
       <ul>
         <li>Al menos 8 caracteres</li>
@@ -16,5 +16,5 @@ export const Helper = () => (
     }
   >
     <FiHelpCircle className="text-gray-300 dark:text-gray-600 cursor-pointer" />
-  </Tooltip>
+  </CustomTooltip>
 );

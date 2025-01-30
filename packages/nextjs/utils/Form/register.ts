@@ -1,4 +1,4 @@
-import { validateAddress, validateEmailWithMessage, validateName, validatePassword } from ".";
+import { validateAddress, validateEmailWithMessage, validateName } from ".";
 import { notification } from "../scaffold-eth";
 
 export const validateField = (name: string, value: string) => {
@@ -8,9 +8,6 @@ export const validateField = (name: string, value: string) => {
 
     case "email":
       return validateEmailWithMessage(value);
-
-    case "password":
-      return validatePassword(value);
 
     case "wallet":
       return validateAddress(value);
@@ -23,7 +20,6 @@ export const validateField = (name: string, value: string) => {
 export interface ValidateFormData {
   name: string;
   email: string;
-  password: string;
   wallet: string;
 }
 

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { FaRegEnvelope, FaRegUser } from "react-icons/fa6";
 import BlockContainerWithTitle from "~~/components/UI/BlockContainerWithTitle";
 import { Btn, BtnLoading, BtnStates } from "~~/components/UI/Button";
+import InputField from "~~/components/UI/Input/InputField";
 import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { updateUser } from "~~/services/CRUD/users";
@@ -17,6 +19,7 @@ const BeneficiaryForm: React.FC<BeneficiaryProps> = ({
   currentBeneficiaryName,
   updateFunction,
 }) => {
+  const iconStyles = "text-gray-400 dark:text-gray-100 w-4 h-4";
   const { tokenInfo } = useGetTokenData();
   const [isEditing, setIsEditing] = useState<boolean>();
   const [isSaving, setIsSaving] = useState(false);
@@ -90,34 +93,26 @@ const BeneficiaryForm: React.FC<BeneficiaryProps> = ({
   return (
     <BlockContainerWithTitle title="Beneficiario de cuenta">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Nombre</label>
-          <input
-            type="text"
-            name="name"
-            value={beneficiary.name}
-            onChange={handleInputChange}
-            readOnly={!isEditing}
-            placeholder={currentBeneficiaryName || "Nombre del beneficiario"}
-            className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
-              isEditing ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
-            }`}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Correo</label>
-          <input
-            type="email"
-            name="email"
-            value={beneficiary.email}
-            onChange={handleInputChange}
-            readOnly={!isEditing}
-            placeholder={currentBeneficiaryEmail || "Correo del beneficiario"}
-            className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten ${
-              isEditing ? "" : "bg-gray-100 dark:bg-form-strokedark dark:text-whiten"
-            }`}
-          />
-        </div>
+        <InputField
+          label="Nombre"
+          type="text"
+          name="name"
+          value={beneficiary.name}
+          onChange={handleInputChange}
+          readOnly={!isEditing}
+          placeholder={currentBeneficiaryName || "Nombre del beneficiario"}
+          icon={<FaRegUser className={iconStyles} />}
+        />
+        <InputField
+          label="Correo"
+          type="email"
+          name="email"
+          value={beneficiary.email}
+          onChange={handleInputChange}
+          readOnly={!isEditing}
+          placeholder={currentBeneficiaryEmail || "Correo del beneficiario"}
+          icon={<FaRegEnvelope className={iconStyles} />}
+        />
       </div>
       <div className="flex justify-end mt-6 transition-colors">
         {isEditing && (

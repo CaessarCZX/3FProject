@@ -5,7 +5,7 @@ interface TooltipProps {
   children: React.ReactNode;
 }
 
-export const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
+export const CustomTooltip: React.FC<TooltipProps> = ({ content, children }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (

@@ -53,14 +53,14 @@ const Settings = () => {
           <WalletConfig />
         </div>
         <div className="col-span-5 xl:col-span-3">
+          <ResetPassword />
+        </div>
+        <div className="col-span-5 xl:col-span-3">
           <BeneficiaryForm
             updateFunction={fetchUserInfo}
             currentBeneficiaryEmail={beneficiary.email_beneficiary}
             currentBeneficiaryName={beneficiary.name_beneficiary}
           />
-        </div>
-        <div className="col-span-5 xl:col-span-3">
-          <ResetPassword />
         </div>
       </div>
     </InternalLayout>
