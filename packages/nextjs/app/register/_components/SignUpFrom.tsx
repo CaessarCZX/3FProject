@@ -1,50 +1,43 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Helper } from "./Helper";
+import TermsAgree from "./TermsAgree";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
-import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { getAddress, isAddress } from "viem";
 import { useAccount, useDisconnect } from "wagmi";
-import { PasswordFeedback } from "~~/components/UI/PasswordFeedback";
+import { BtnLoading, SignBtn } from "~~/components/UI/Button";
+import InputField from "~~/components/UI/Input/InputField";
+import InputPassword from "~~/components/UI/Input/InputPassword";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
+import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
 import ApiRateLimiter from "~~/utils/API/ApiRateLimiter";
+import { validatePassword } from "~~/utils/Form";
 import { RenderWarningMessages, validateFormData } from "~~/utils/Form/register";
 import { notification } from "~~/utils/scaffold-eth/notification";
 
 const ETH_WALLET_LENGTH = 42;
 
+const FieldErrorMessage = ({ error }: { error: string }) => (
+  <>{error && <p className="text-red-500 text-sm my-0 mx-1">{error}</p>}</>
+);
+
 export const SignUpForm = () => {
-  // Show password feature
-  const [showpass, setShowpass] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const [passwordCriteriaModalVisible, setPasswordCriteriaModalVisible] = useState(false);
+  const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
+  const [isValidPassword, setIsValidPassword] = useState<boolean | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: "",
     wallet: "",
     referredBy: "",
     terms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  // Validador de referido
   const [isReferrerValid, setIsReferrerValid] = useState<boolean | null>(null);
-  // Mensajes
-  const [successMessage, setSuccessMessage] = useState("");
-  const [singleErrorMessage, setSingleErrorMessage] = useState("");
-  // Password criteria states
-  const [passwordCriteria, setPasswordCriteria] = useState({
-    hasMinLength: false,
-    hasLowercase: false,
-    hasUppercase: false,
-    hasNumber: false,
-    hasSpecialChar: false,
-  });
-  // Error states for each field
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({
     name: "",
     email: "",
@@ -53,30 +46,38 @@ export const SignUpForm = () => {
     referredBy: "",
     terms: "",
   });
-  //For blockchain
   const currentUser = useAccount();
-  // Wallet disconnection
   const { disconnectAsync } = useDisconnect();
   const router = useRouter();
-  const passwordInputRef = useRef<HTMLInputElement>(null);
+  // Prevent double send
+  const [isRegistered, setIsRegistered] = useState(false);
 
+  // Message ui
+  useShowUiNotifications({
+    success,
+    setSuccess,
+    error,
+    setError,
+  });
+
+  // Password validation handler
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (passwordInputRef.current && !passwordInputRef.current.contains(event.target as Node)) {
-        setPasswordCriteriaModalVisible(false);
-      }
-    };
-
-    if (passwordCriteriaModalVisible) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+    if (password.length === 0) {
+      setIsValidPassword(null);
+      setFieldErrors(prev => ({ ...prev, password: "" }));
+      return;
     }
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [passwordCriteriaModalVisible]);
+    if (password) {
+      const validateResponse = validatePassword(password);
+      setIsValidPassword(validateResponse.length === 0);
+      if (validateResponse.length > 0) {
+        setFieldErrors(prev => ({ ...prev, password: validateResponse }));
+      } else {
+        setFieldErrors(prev => ({ ...prev, password: "" }));
+      }
+    }
+  }, [password]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -86,25 +87,6 @@ export const SignUpForm = () => {
     }
   }, []);
 
-  // Mensajes a ui
-  useEffect(() => {
-    if (singleErrorMessage) {
-      notification.error(singleErrorMessage, {
-        position: "bottom-right",
-        duration: 5000,
-      });
-      setSingleErrorMessage("");
-    }
-
-    if (successMessage) {
-      notification.success(successMessage, {
-        position: "bottom-right",
-        duration: 5000,
-      });
-      setSuccessMessage("");
-    }
-  }, [singleErrorMessage, successMessage]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, type, value } = e.target;
 
@@ -113,26 +95,15 @@ export const SignUpForm = () => {
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
 
-    // Password validation on change
-    if (name === "password") {
-      validatePasswordCriteria(value);
-      // Clear password error message
-      setFieldErrors(prev => ({ ...prev, password: "" }));
-    }
-
     // Reset validation when "wallet" changes
     if (name === "wallet") {
       setIsWalletConnected(false);
-      setSingleErrorMessage("");
-      setSuccessMessage("");
       setFieldErrors(prev => ({ ...prev, wallet: "" }));
     }
 
     // Reset validation when "referredBy" changes
     if (name === "referredBy") {
       setIsReferrerValid(false);
-      setSingleErrorMessage("");
-      setSuccessMessage("");
       setFieldErrors(prev => ({ ...prev, referredBy: "" }));
     }
 
@@ -142,27 +113,16 @@ export const SignUpForm = () => {
     }
   };
 
-  const validatePasswordCriteria = (password: string) => {
-    setPasswordCriteria({
-      hasMinLength: password.length >= 8,
-      hasLowercase: /[a-z]/.test(password),
-      hasUppercase: /[A-Z]/.test(password),
-      hasNumber: /[0-9]/.test(password),
-      hasSpecialChar: /[@$!#?]/.test(password),
-    });
-  };
-
   // Limitador para llamadas a la API
   const rateLimiter = useRef(new ApiRateLimiter());
 
   const handleValidateReferrer = useCallback(async () => {
-    setSingleErrorMessage("");
-    setSuccessMessage("");
+    setError("");
+    setSuccess("");
 
     if (!formData.referredBy) {
-      setSingleErrorMessage("Por favor, introduce una wallet de referido.");
+      setError("Por favor, introduce una wallet de referido.");
       setFieldErrors(prev => ({ ...prev, referredBy: "Por favor, introduce una wallet de referido." }));
-
       return;
     }
 
@@ -183,17 +143,17 @@ export const SignUpForm = () => {
         if (response.ok) {
           const data = await response.json();
           if (data.exists) {
-            setSuccessMessage("Wallet de referido válida.");
+            setSuccess("Wallet de referido válida.");
             setIsReferrerValid(true);
             setFieldErrors(prev => ({ ...prev, referredBy: "" }));
           } else {
-            setSingleErrorMessage("La wallet de referido no está registrada.");
+            setError("La wallet de referido no está registrada.");
             setIsReferrerValid(false);
             setFieldErrors(prev => ({ ...prev, referredBy: "La wallet de referido no está registrada." }));
           }
         } else {
           const errorData = await response.json();
-          setSingleErrorMessage(errorData.message || "Error al validar la wallet de referido.");
+          setError(errorData.message || "Error al validar la wallet de referido.");
           setIsReferrerValid(false);
           setFieldErrors(prev => ({
             ...prev,
@@ -202,7 +162,7 @@ export const SignUpForm = () => {
         }
       });
     } catch (error) {
-      setSingleErrorMessage("No se pudo conectar con el servidor.");
+      setError("No se pudo conectar con el servidor.");
       setFieldErrors(prev => ({ ...prev, referredBy: "No se pudo conectar con el servidor." }));
 
       setIsReferrerValid(false);
@@ -250,21 +210,24 @@ export const SignUpForm = () => {
     });
   };
 
-  const createUser = async (formData: typeof SignUpForm.prototype.formData) => {
+  const createUser = async (formData: typeof SignUpForm.prototype.formData, password: string) => {
     // Convert any entered address to valid wallet address
     const validWallet = getAddress(formData.referredBy);
+
+    const registerData = {
+      ...formData,
+      password,
+      referredBy: validWallet,
+      isAdmin: false,
+      isActive: true,
+    };
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        ...formData,
-        referredBy: validWallet,
-        isAdmin: false,
-        isActive: true,
-      }),
+      body: JSON.stringify(registerData),
       credentials: "include",
     });
     return response;
@@ -273,19 +236,33 @@ export const SignUpForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSuccessMessage("");
-    setSingleErrorMessage("");
+    setSuccess("");
+    setError("");
 
     //For wallet connection
     if (!isWalletConnected) {
-      setSingleErrorMessage("No tienes conectada una wallet");
+      setError("No tienes conectada una wallet");
       setFieldErrors(prev => ({ ...prev, wallet: "No tienes conectada una wallet" }));
-
       setIsSubmitting(true);
       return;
     }
 
     // For validations
+    if (!formData.terms) {
+      setFieldErrors(prev => ({ ...prev, terms: "Debes aceptar los términos y condiciones" }));
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!password || !repeatPassword) {
+      setError("Por favor, completa ambos campos.");
+      return;
+    }
+    if (password !== repeatPassword) {
+      setError("Las contraseñas no coinciden.");
+      return;
+    }
+
     const validation = validateFormData(formData);
 
     if (Object.keys(validation).length > 0) {
@@ -294,41 +271,29 @@ export const SignUpForm = () => {
       setFieldErrors(prev => ({ ...prev, ...validation }));
       return;
     }
-    if (!formData.terms) {
-      setFieldErrors(prev => ({ ...prev, terms: "Debes aceptar los términos y condiciones" }));
-      setIsSubmitting(false);
-      return;
-    }
 
     try {
-      const response = await createUser(formData);
+      const response = await createUser(formData, password);
 
       if (response.ok) {
         await sendRegisterEmail(formData.email, formData.name);
         await sendAffiliateEmail(formData.name, formData.email, formData.referredBy);
+        setIsRegistered(true);
 
         // Disconnect current wallet
         await disconnectAsync();
 
-        setSuccessMessage("¡Registro exitoso!");
+        setSuccess("¡Registro exitoso!");
         const saveEmail = formData.email;
         setFormData({
           name: "",
           email: "",
-          password: "",
           wallet: "",
           referredBy: "",
           terms: false,
         });
         setIsWalletConnected(false);
         setIsReferrerValid(false);
-        setPasswordCriteria({
-          hasMinLength: false,
-          hasLowercase: false,
-          hasUppercase: false,
-          hasNumber: false,
-          hasSpecialChar: false,
-        });
         setFieldErrors({
           name: "",
           email: "",
@@ -343,18 +308,18 @@ export const SignUpForm = () => {
         router.push(loginUrl);
       } else {
         const errorData = await response.json();
-        setSingleErrorMessage(errorData.message || "Error en el registro.");
+        setError(errorData.message || "Error en el registro.");
       }
     } catch (error) {
-      setSingleErrorMessage("No se pudo conectar con el servidor.");
+      setError("No se pudo conectar con el servidor.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleConnectWallet = useCallback(async () => {
-    setSingleErrorMessage("");
-    setSuccessMessage("");
+    setError("");
+    setSuccess("");
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
@@ -370,22 +335,22 @@ export const SignUpForm = () => {
         const data = await response.json();
 
         if (data.exists) {
-          setSingleErrorMessage("Esta wallet ya está registrada.");
+          setError("Esta wallet ya está registrada.");
           setFieldErrors(prev => ({ ...prev, wallet: "Esta wallet ya está registrada." }));
           setIsWalletConnected(false);
         } else {
-          setSuccessMessage("Wallet conectada con éxito.");
+          setSuccess("Wallet conectada con éxito.");
           setIsWalletConnected(true);
           setFieldErrors(prev => ({ ...prev, wallet: "" }));
         }
       } else {
         const errorData = await response.json();
         setFieldErrors(prev => ({ ...prev, wallet: errorData.message || "Error al verificar la wallet." }));
-        setSingleErrorMessage(errorData.message || "Error al verificar la wallet.");
+        setError(errorData.message || "Error al verificar la wallet.");
         setIsWalletConnected(false);
       }
     } catch (error) {
-      setSingleErrorMessage("No se pudo conectar con el servidor.");
+      setError("No se pudo conectar con el servidor.");
       setFieldErrors(prev => ({ ...prev, wallet: "No se pudo conectar con el servidor." }));
       setIsWalletConnected(false);
     }
@@ -416,107 +381,57 @@ export const SignUpForm = () => {
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
       {/* Name */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-          Nombre
-        </label>
-        <div className="mt-1 relative">
-          <input
+      <div className="grid grid-cols-2 gap-6">
+        <div className="col-span-2 xl:col-span-1">
+          <InputField
+            label="Nombre"
             type="text"
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className={`block w-full pr-10 pl-4 font-light text-gray-700 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten ${
-              fieldErrors.name ? "border-red-500" : ""
-            }`}
-            placeholder="Ingresa tu nombre"
-            required
+            validationState={fieldErrors.name ? "error" : "default"}
+            icon={<FiUser />}
           />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiUser />
-          </div>
+          <FieldErrorMessage error={fieldErrors.name} />
         </div>
-        {fieldErrors.name && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.name}</p>}
-      </div>
-
-      {/* Email */}
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-          Email
-        </label>
-        <div className="mt-1 relative">
-          <input
+        {/* Email */}
+        <div className="col-span-2 xl:col-span-1">
+          <InputField
+            label="Email"
             type="email"
             id="email"
             name="email"
             autoComplete="new-username"
             value={formData.email}
             readOnly
-            className={`block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm dark:bg-form-strokedark dark:text-whiten${
-              fieldErrors.email ? "border-red-500" : ""
-            }`}
+            validationState={fieldErrors.email ? "error" : "default"}
+            icon={<FiMail />}
           />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FiMail />
-          </div>
+          <FieldErrorMessage error={fieldErrors.email} />
         </div>
-        {fieldErrors.email && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.email}</p>}
       </div>
-
       {/* Password */}
       <div>
-        <div className="flex justify-between items-center mr-3">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-            Contraseña
-          </label>
-          <Helper />
-        </div>
-        <div className="mt-1 relative" ref={passwordInputRef}>
-          <input
-            type={showpass ? "text" : "password"}
-            id="password"
-            name="password"
-            autoComplete="new-password"
-            value={formData.password}
-            onChange={handleChange}
-            onFocus={() => {
-              setIsFocused(true);
-              setPasswordCriteriaModalVisible(true);
-            }}
-            onBlur={() => {
-              if (!formData.password) {
-                setIsFocused(false);
-                setPasswordCriteriaModalVisible(false);
-              }
-            }}
-            className={`block w-full pl-4 pr-10 py-2 font-light text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten ${
-              fieldErrors.password ? "border-red-500" : ""
-            }`}
-            placeholder="Ingresa una nueva contraseña"
-            required
-          />
-          <div
-            className={`absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto ${
-              isFocused && "cursor-pointer"
-            }`}
-            onClick={e => {
-              e.stopPropagation();
-              isFocused && setShowpass(!showpass);
-            }}
-          >
-            {!isFocused ? (
-              <FiLock className="text-gray-400" />
-            ) : showpass ? (
-              <RiEyeLine className="text-gray-600" />
-            ) : (
-              <RiEyeCloseLine className="text-gray-600" />
-            )}
-          </div>
-          {/* Password Criteria Feedback */}
-          {passwordCriteriaModalVisible && <PasswordFeedback passwordCriteria={passwordCriteria} />}
-        </div>
-        {fieldErrors.password && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.password}</p>}
+        <InputPassword
+          label="Contraseña"
+          showValidator
+          validationState={isValidPassword === null ? "default" : isValidPassword === false ? "error" : "success"}
+          enableHelper
+          icon={<FiLock />}
+          password={password}
+          setPassword={setPassword}
+        />
+        <FieldErrorMessage error={fieldErrors.password} />
+      </div>
+      <div>
+        <InputPassword
+          label="Repetir Contraseña"
+          validationState={password.length === 0 ? "default" : password !== repeatPassword ? "error" : "success"}
+          icon={<FiLock />}
+          password={repeatPassword}
+          setPassword={setRepeatPassword}
+        />
       </div>
 
       {/* Wallet */}
@@ -527,7 +442,7 @@ export const SignUpForm = () => {
         <div className="mt-1 relative flex">
           <WalletConnectionBtn enableWallet={isWalletConnected} classBtn="w-full rounded-md" />
         </div>
-        {fieldErrors.wallet && <p className="text-red-500 text-sm mt-1 ml-1">{fieldErrors.wallet}</p>}
+        <FieldErrorMessage error={fieldErrors.wallet} />
       </div>
 
       {/* Referred Wallet */}
@@ -560,63 +475,38 @@ export const SignUpForm = () => {
         </div>
       </div>
       {/* Terms and Conditions */}
-      <div className="flex items-center">
-        <input
-          type="checkbox"
+      <div>
+        <TermsAgree
           id="terms"
           name="terms"
           checked={formData.terms}
-          onChange={handleChange}
-          className={`mr-2 h-4 w-4 rounded focus:ring-blue-500 border-gray-300  ${
-            fieldErrors.terms ? "border-red-500" : ""
-          }`}
-          required
+          changeFunction={handleChange}
+          className={fieldErrors.email ? "border-red-500" : ""}
         />
-        <label htmlFor="terms" className="text-sm font-medium text-gray-700 dark:text-gray-400">
-          Acepto los{" "}
-          <Link href="/terms" className="text-blue-500 hover:underline">
-            Términos y condiciones
-          </Link>
-        </label>
+        <FieldErrorMessage error={fieldErrors.terms} />
       </div>
-      {fieldErrors.terms && <p className="text-red-500 text-sm mt-1 ml-5">{fieldErrors.terms}</p>}
 
       {/* Login link */}
       <div className="text-sm text-center">
-        <p>
+        <p className="m-0">
           ¿Ya tienes una cuenta?{" "}
           <a href="#" className="text-blue-600 hover:text-blue-800" onClick={handleLoginClick}>
             Inicia sesión aquí
           </a>
         </p>
       </div>
-
-      {/* Submit */}
-      <button
+      <SignBtn
         type="submit"
         disabled={
-          isSubmitting ||
-          !isWalletConnected ||
-          !isReferrerValid ||
-          !Object.values(passwordCriteria).every(Boolean) ||
-          !formData.terms
+          isSubmitting || !isWalletConnected || !isReferrerValid || !isValidPassword || !formData.terms || isRegistered
         }
-        className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed ${
-          isSubmitting ||
-          !isWalletConnected ||
-          !isReferrerValid ||
-          !Object.values(passwordCriteria).every(Boolean) ||
-          !formData.terms
-            ? "bg-gray-500"
-            : "bg-gray-900 hover:bg-gray-700"
-        }`}
       >
-        {isSubmitting ? "Registrando..." : "Registrar"}
-      </button>
+        <BtnLoading text="Registrar" changeState={isSubmitting || isRegistered} />
+      </SignBtn>
 
       {/* Mensajes de éxito o error */}
-      {successMessage && <p className="text-green-600 text-sm mt-2">{successMessage}</p>}
-      {singleErrorMessage && <p className="text-red-600 text-sm mt-2">{singleErrorMessage}</p>}
+      {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
+      {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
     </form>
   );
 };

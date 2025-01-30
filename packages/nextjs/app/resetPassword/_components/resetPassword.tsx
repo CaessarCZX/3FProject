@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Tooltip } from "./Tooltip";
-import { BsCheckCircleFill, BsXCircleFill } from "react-icons/bs";
-import { FiHelpCircle, FiLock } from "react-icons/fi";
+import { FiLock } from "react-icons/fi";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
+import { HelperPassword } from "~~/components/UI/Helper/Password";
+import { PasswordFeedback } from "~~/components/UI/PasswordFeedback";
+import { PasswordRegex } from "~~/utils/Form";
 import { notification } from "~~/utils/scaffold-eth/notification";
 
 export const ResetPassword = () => {
@@ -49,10 +50,10 @@ export const ResetPassword = () => {
   const validatePasswordCriteria = (password: string) => {
     setPasswordCriteria({
       hasMinLength: password.length >= 8,
-      hasLowercase: /[a-z]/.test(password),
-      hasUppercase: /[A-Z]/.test(password),
-      hasNumber: /[0-9]/.test(password),
-      hasSpecialChar: /[@!#?]/.test(password),
+      hasLowercase: PasswordRegex.hasLowercase.test(password),
+      hasUppercase: PasswordRegex.hasUppercase.test(password),
+      hasNumber: PasswordRegex.hasNumber.test(password),
+      hasSpecialChar: PasswordRegex.hasSpecialChar.test(password),
     });
   };
 
@@ -144,9 +145,12 @@ export const ResetPassword = () => {
 
       {/* New Password */}
       <div>
-        <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-          Nueva contraseña
-        </label>
+        <div className="flex justify-between items-center mr-3">
+          <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+            Nueva contraseña
+          </label>
+          <HelperPassword />
+        </div>
         <div className="mt-1 relative" ref={passwordInputRef}>
           <input
             type={showpass ? "text" : "password"}
@@ -182,69 +186,8 @@ export const ResetPassword = () => {
               <RiEyeCloseLine className="text-gray-600" />
             )}
           </div>
-          <div className="absolute inset-y-0 right-10 pr-3 pt-3 flex items-center">
-            <Tooltip
-              content={
-                <ul>
-                  <li>Al menos 8 caracteres</li>
-                  <li>Al menos una minúscula y una mayúscula</li>
-                  <li>Al menos un número</li>
-                  <li>
-                    Al menos un carácter especial: <span className="font-bold">@ ! # ?</span>
-                  </li>
-                </ul>
-              }
-            >
-              <FiHelpCircle className="text-gray-400 cursor-pointer" />
-            </Tooltip>
-          </div>
           {/* Password Criteria Feedback */}
-          {passwordCriteriaModalVisible && (
-            <div className="absolute mt-2 w-[250px] bg-white dark:bg-gray-800  border dark:border-gray-700 rounded-md shadow-md z-10">
-              <div className="ml-4 flex flex-col space-y-1 text-sm p-2">
-                <div className="flex items-center">
-                  {passwordCriteria.hasMinLength ? (
-                    <BsCheckCircleFill className="text-green-500 mr-1" />
-                  ) : (
-                    <BsXCircleFill className="text-red-500 mr-1" />
-                  )}
-                  <p className="text-[14px] ">Al menos 8 caracteres</p>
-                </div>
-                <div className="flex items-center">
-                  {passwordCriteria.hasLowercase ? (
-                    <BsCheckCircleFill className="text-green-500 mr-1" />
-                  ) : (
-                    <BsXCircleFill className="text-red-500 mr-1" />
-                  )}
-                  <p className="text-[14px] ">Al menos una minúscula</p>
-                </div>
-                <div className="flex items-center">
-                  {passwordCriteria.hasUppercase ? (
-                    <BsCheckCircleFill className="text-green-500 mr-1" />
-                  ) : (
-                    <BsXCircleFill className="text-red-500 mr-1" />
-                  )}
-                  <p className="text-[14px] ">Al menos una mayúscula</p>
-                </div>
-                <div className="flex items-center">
-                  {passwordCriteria.hasNumber ? (
-                    <BsCheckCircleFill className="text-green-500 mr-1" />
-                  ) : (
-                    <BsXCircleFill className="text-red-500 mr-1" />
-                  )}
-                  <p className="text-[14px] ">Al menos un número</p>
-                </div>
-                <div className="flex items-center">
-                  {passwordCriteria.hasSpecialChar ? (
-                    <BsCheckCircleFill className="text-green-500 mr-1" />
-                  ) : (
-                    <BsXCircleFill className="text-red-500 mr-1" />
-                  )}
-                  <p className="text-[14px] ">Al menos un carácter especial: @ ! # ?</p>
-                </div>
-              </div>
-            </div>
-          )}
+          {passwordCriteriaModalVisible && <PasswordFeedback passwordCriteria={passwordCriteria} />}
         </div>
       </div>
 

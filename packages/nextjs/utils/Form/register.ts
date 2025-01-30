@@ -1,35 +1,16 @@
+import { validateAddress, validateEmailWithMessage, validateName } from ".";
 import { notification } from "../scaffold-eth";
-import { isAddress } from "viem";
-
-const validateAddress = (address: string) => {
-  return isAddress(address);
-};
 
 export const validateField = (name: string, value: string) => {
   switch (name) {
     case "name":
-      if (!value.trim()) return "El nombre es requerido";
-      if (value.trim().length < 2) return "Mínimo 2 caracteres";
-      if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value)) return "Solo se permiten letras";
-      return "";
+      return validateName(value);
 
-    case "email": {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!value.trim()) return "El correo es requerido";
-      if (!emailRegex.test(value)) return "Correo inválido";
-      return "";
-    }
-
-    case "password":
-      if (!value.trim()) return "La contraseña es requerida";
-      if (value.length < 8) return "Mínimo 8 caracteres";
-      if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!#?]{8,}/.test(value))
-        return "Debe contener mayúscula, minúscula, número y carácter especial";
-      return "";
+    case "email":
+      return validateEmailWithMessage(value);
 
     case "wallet":
-      if (!validateAddress(value)) return "Ingrese una direccion de wallet valida";
-      return "";
+      return validateAddress(value);
 
     default:
       return "";
@@ -39,7 +20,6 @@ export const validateField = (name: string, value: string) => {
 export interface ValidateFormData {
   name: string;
   email: string;
-  password: string;
   wallet: string;
 }
 

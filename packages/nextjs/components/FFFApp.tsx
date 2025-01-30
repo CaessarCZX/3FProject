@@ -3,13 +3,11 @@ import Loader from "./UI/Loader";
 import { Toaster } from "react-hot-toast";
 import { useInitializeMexicanPesoPrice } from "~~/hooks/3FProject/useInitializeMexicanPesoPrice";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
-import { useLogout } from "~~/hooks/user/useLogout";
 
 export const FFFApp = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
   useInitializeNativeCurrencyPrice();
   useInitializeMexicanPesoPrice();
-  useLogout();
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);

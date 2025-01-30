@@ -4,31 +4,39 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { FiLock, FiMail } from "react-icons/fi";
-import { RiEyeLine } from "react-icons/ri";
-import { RiEyeCloseLine } from "react-icons/ri";
 import { useAccount } from "wagmi";
+import { BtnLoading, SignBtn } from "~~/components/UI/Button";
+import InputField from "~~/components/UI/Input/InputField";
+import InputPassword from "~~/components/UI/Input/InputPassword";
 import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
+import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
 import { useGlobalState } from "~~/services/store/store";
-import { notification } from "~~/utils/scaffold-eth/notification";
 
 interface DecodedToken {
   membership: number;
 }
 
 export const SignInForm = () => {
-  // Show password feature
-  const [showpass, setShowpass] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-
-  const [formData, setFormData] = useState({ email: "", password: "", wallet: "" });
-  const [errorMessage, setErrorMessage] = useState("");
+  const [formData, setFormData] = useState({ email: "", wallet: "" });
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [success, setSuccess] = useState("");
   const router = useRouter();
   const memebershipStatus = useGlobalState(state => state.setIsActiveMemberStatus);
+  // Prevent double send
+  const [isLogged, setIsLogged] = useState(false);
 
   const currentUser = useAccount();
+
+  // Message ui
+  useShowUiNotifications({
+    success,
+    setSuccess,
+    error,
+    setError,
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -42,18 +50,6 @@ export const SignInForm = () => {
       setFormData(prevData => ({ ...prevData, email }));
     }
   }, [formData]);
-
-  useEffect(() => {
-    if (errorMessage) {
-      notification.error(errorMessage, { position: "bottom-right", duration: 5000 });
-      setErrorMessage("");
-    }
-
-    if (successMessage) {
-      notification.success(successMessage, { position: "bottom-right", duration: 5000 });
-      setSuccessMessage("");
-    }
-  }, [errorMessage, successMessage]);
 
   const handleWalletLogin = useCallback(
     async (wallet: string) => {
@@ -69,6 +65,7 @@ export const SignInForm = () => {
 
           localStorage.setItem("token", data.token);
           sessionStorage.setItem("sessionToken", data.token);
+          setIsLogged(true);
 
           // Update membership status
           const token: DecodedToken = jwtDecode(data.token);
@@ -77,18 +74,18 @@ export const SignInForm = () => {
           router.push("/home");
         } else {
           const errorData = await response.json();
-          setErrorMessage(errorData.message || "Error al iniciar sesión.");
+          setError(errorData.message || "Error al iniciar sesión.");
         }
       } catch (error) {
-        setErrorMessage("No se pudo conectar al servidor.");
+        setError("No se pudo conectar al servidor.");
       }
     },
     [memebershipStatus, router],
   );
 
   const handleConnectWallet = useCallback(async () => {
-    setErrorMessage("");
-    setSuccessMessage("");
+    setError("");
+    setSuccess("");
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/check-wallet`, {
@@ -104,21 +101,21 @@ export const SignInForm = () => {
         const data = await response.json();
 
         if (data.exists) {
-          setSuccessMessage("Wallet conectada con éxito.");
+          setSuccess("Wallet conectada con éxito.");
           setIsWalletConnected(true);
           // Iniciar sesión automáticamente con la wallet conectada
           await handleWalletLogin(formData.wallet);
         } else {
-          setErrorMessage("Esta wallet no está registrada.");
+          setError("Esta wallet no está registrada.");
           setIsWalletConnected(false);
         }
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || "Error al verificar la wallet.");
+        setError(errorData.message || "Error al verificar la wallet.");
         setIsWalletConnected(false);
       }
     } catch (error) {
-      setErrorMessage("No se pudo conectar con el servidor.");
+      setError("No se pudo conectar con el servidor.");
       setIsWalletConnected(false);
     }
   }, [formData.wallet, handleWalletLogin]);
@@ -139,20 +136,24 @@ export const SignInForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setErrorMessage("");
+    setError("");
 
-    // Confirmar que las credenciales de email y password estén completas
-    if (!(formData.email && formData.password)) {
-      setErrorMessage("Debe ingresar un correo y contraseña.");
+    if (!(formData.email && password)) {
+      setError("Debe ingresar un correo y contraseña.");
       setIsSubmitting(false);
       return;
     }
+
+    const loginData = {
+      ...formData,
+      password,
+    };
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(loginData),
         credentials: "include",
       });
 
@@ -161,6 +162,7 @@ export const SignInForm = () => {
 
         localStorage.setItem("token", data.token);
         sessionStorage.setItem("sessionToken", data.token);
+        setIsLogged(true);
 
         // Update membership status
         const token: DecodedToken = jwtDecode(data.token);
@@ -169,10 +171,10 @@ export const SignInForm = () => {
         router.push("/home");
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || "Error al iniciar sesión.");
+        setError(errorData.message || "Error al iniciar sesión.");
       }
     } catch (error) {
-      setErrorMessage("No se pudo conectar al servidor.");
+      setError("No se pudo conectar al servidor.");
     } finally {
       setIsSubmitting(false);
     }
@@ -196,82 +198,24 @@ export const SignInForm = () => {
     <>
       <form className="space-y-6" onSubmit={handleSubmit}>
         {/* Email */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-            Email
-          </label>
-          <div className="mt-1 relative">
-            <input
-              type="email"
-              id="email"
-              autoComplete="username"
-              readOnly
-              value={formData.email}
-              onChange={handleChange}
-              className="block w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none sm:text-sm dark:bg-form-strokedark dark:text-whiten"
-              required
-            />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <FiMail />
-            </div>
-          </div>
-        </div>
+        <InputField
+          label="Email"
+          type="email"
+          id="email"
+          autoComplete="username"
+          readOnly
+          value={formData.email}
+          onChange={handleChange}
+          icon={<FiMail />}
+        />
 
         {/* Password */}
         <div className="pb-6">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-            Contraseña
-          </label>
-          <div className="mt-1 relative">
-            <input
-              type={showpass ? "text" : "password"}
-              id="password"
-              name="password"
-              autoComplete="new-password"
-              value={formData.password}
-              onChange={handleChange}
-              onFocus={() => {
-                setIsFocused(true);
-              }}
-              onBlur={() => {
-                if (!formData.password) {
-                  setIsFocused(false);
-                }
-              }}
-              className="block w-full pl-4 pr-10 py-2 font-light text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-form-strokedark dark:text-whiten"
-              placeholder="Ingresa una nueva contraseña"
-              required
-            />
-            <div
-              className={`absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto ${
-                isFocused && "cursor-pointer"
-              }`}
-              onClick={e => {
-                e.stopPropagation();
-                isFocused && setShowpass(!showpass);
-              }}
-            >
-              {!isFocused ? (
-                <FiLock className="text-gray-400" />
-              ) : showpass ? (
-                <RiEyeLine className="text-gray-600 dark:text-gray-200" />
-              ) : (
-                <RiEyeCloseLine className="text-gray-600 dark:text-gray-200" />
-              )}
-            </div>
-          </div>
+          <InputPassword label="Contraseña" icon={<FiLock />} password={password} setPassword={setPassword} />
           {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSubmitting || !(formData.email && formData.password)}
-            className={`w-full mt-8 py-2 px-4 border border-transparent transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-700 dark:disabled:text-gray-500 disabled:cursor-not-allowed rounded-md shadow-sm text-base font-medium text-white ${
-              isSubmitting || !(formData.email && formData.password)
-                ? "bg-gray-500 dark:bg-gray-900"
-                : "bg-gray-900 hover:bg-gray-700 dark:bg-blue-600 dark:hover:bg-blue-900"
-            }`}
-          >
-            {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
-          </button>
+          <SignBtn className="mt-8" type="submit" disabled={isSubmitting || !(formData.email && password) || isLogged}>
+            <BtnLoading text="Iniciar sesión" changeState={isSubmitting || isLogged} />
+          </SignBtn>
         </div>
       </form>
 
@@ -312,8 +256,8 @@ export const SignInForm = () => {
         </p>
       </div>
 
-      {errorMessage && <p className="text-red-600 text-sm mt-2">{errorMessage}</p>}
-      {successMessage && <p className="text-green-600 text-sm mt-2">{successMessage}</p>}
+      {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+      {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
     </>
   );
 };

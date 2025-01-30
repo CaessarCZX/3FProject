@@ -1,241 +1,107 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Tooltip } from "./Tooltip";
-import { jwtDecode } from "jwt-decode";
-import { FiHelpCircle } from "react-icons/fi";
-import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
-import { PasswordFeedback } from "~~/components/UI/PasswordFeedback";
-import { notification } from "~~/utils/scaffold-eth/notification";
-
-interface DecodedToken {
-  id: string;
-  name: string;
-  email: string;
-  wallet: string;
-}
+import React, { useEffect, useState } from "react";
+import { LuKeyRound } from "react-icons/lu";
+import BlockContainerWithTitle from "~~/components/UI/BlockContainerWithTitle";
+import { Btn, BtnLoading } from "~~/components/UI/Button";
+import InputPassword from "~~/components/UI/Input/InputPassword";
+import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
+import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
+import { validatePassword } from "~~/utils/Form";
 
 const ResetPassword: React.FC = () => {
-  const [userInfo, setUserInfo] = useState<{
-    email: string;
-    wallet: string;
-  } | null>(null);
+  const iconStyles = "text-gray-400 dark:text-gray-100 w-4 h-4";
   const [password, setPassword] = useState("");
+  const { tokenInfo } = useGetTokenData();
   const [repeatPassword, setRepeatPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const [isValidPassword, setIsValidPassword] = useState<boolean | null>(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [passwordCriteriaModalVisible, setPasswordCriteriaModalVisible] = useState(false);
-  const [passwordCriteria, setPasswordCriteria] = useState({
-    hasMinLength: false,
-    hasLowercase: false,
-    hasUppercase: false,
-    hasNumber: false,
-    hasSpecialChar: false,
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  // Message ui
+  useShowUiNotifications({
+    success,
+    setSuccess,
+    error,
+    setError,
   });
-  const router = useRouter();
-  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (passwordInputRef.current && !passwordInputRef.current.contains(event.target as Node)) {
-        setPasswordCriteriaModalVisible(false);
-      }
-    };
-
-    if (passwordCriteriaModalVisible) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+    if (password.length === 0) {
+      setIsValidPassword(null);
+      return;
     }
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [passwordCriteriaModalVisible]);
-
-  const validatePasswordCriteria = (password: string) => {
-    setPasswordCriteria({
-      hasMinLength: password.length >= 8,
-      hasLowercase: /[a-z]/.test(password),
-      hasUppercase: /[A-Z]/.test(password),
-      hasNumber: /[0-9]/.test(password),
-      hasSpecialChar: /[@$!#?]/.test(password),
-    });
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decodedToken: DecodedToken = jwtDecode(token);
-        setUserInfo({
-          email: decodedToken.email,
-          wallet: decodedToken.wallet,
-        });
-      } catch (error) {
-        console.error("Error al decodificar el token:", error);
-      }
+    if (password) {
+      const validateResponse = validatePassword(password);
+      setIsValidPassword(validateResponse.length === 0);
     }
-  }, []);
+  }, [password]);
 
   const handlePasswordChange = async () => {
     if (!password || !repeatPassword) {
-      notification.error("Por favor, completa ambos campos.", {
-        position: "bottom-right",
-        duration: 5000,
-      });
+      setError("Por favor, completa ambos campos.");
       return;
     }
     if (password !== repeatPassword) {
-      notification.error("Las contraseñas no coinciden.", {
-        position: "bottom-right",
-        duration: 5000,
-      });
+      setError("Las contraseñas no coinciden.");
       return;
     }
 
     setIsSaving(true);
+    setIsValidPassword(true);
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND}/f3api/users/resetPassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: userInfo?.email,
-          wallet: userInfo?.wallet,
+          email: tokenInfo.email,
+          wallet: tokenInfo.wallet,
           newPassword: password,
         }),
       });
 
       const result = await response.json();
 
-      if (response.ok) {
-        notification.success(result.message || "¡Contraseña cambiada exitosamente!", {
-          position: "bottom-right",
-          duration: 5000,
-        });
-        setPassword("");
-        setRepeatPassword("");
-        // Redirigir al usuario a la página de inicio
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
-      } else {
-        notification.error(result.message || "Error al cambiar la contraseña.", {
-          position: "bottom-right",
-          duration: 5000,
-        });
-      }
+      if (!response.ok) throw new Error("Error al cambiar de contraseña");
+
+      setSuccess(result.message || "¡Contraseña cambiada exitosamente!");
+      setPassword("");
+      setRepeatPassword("");
     } catch (error) {
       console.error("Error al llamar a la API:", error);
-      notification.error("Hubo un error al cambiar la contraseña. Inténtalo de nuevo.", {
-        position: "bottom-right",
-        duration: 5000,
-      });
+      setError("Hubo un error al cambiar la contraseña. Inténtalo de nuevo.");
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="mt-8">
-      <div className="mx-auto overflow-hidden bg-white  dark:bg-boxdark dark:border-strokedark shadow-default rounded-lg p-6">
-        <h2 className="text-3xl font-light text-gray-500 dark:text-gray-400">Cambiar Contraseña</h2>
+    <BlockContainerWithTitle title="Cambiar contraseña">
+      <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <InputPassword
+          label="Contraseña"
+          showValidator
+          validationState={isValidPassword === null ? "default" : isValidPassword === false ? "error" : "success"}
+          enableHelper
+          icon={<LuKeyRound className={iconStyles} />}
+          password={password}
+          setPassword={setPassword}
+        />
+        <InputPassword
+          label="Repetir Contraseña"
+          validationState={password.length === 0 ? "default" : password !== repeatPassword ? "error" : "success"}
+          icon={<LuKeyRound className={iconStyles} />}
+          password={repeatPassword}
+          setPassword={setRepeatPassword}
+        />
+      </form>
 
-        <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-700 dark:text-gray-500">Nueva Contraseña</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Contraseña</label>
-              <div className="relative" ref={passwordInputRef}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={e => {
-                    setPassword(e.target.value);
-                    validatePasswordCriteria(e.target.value);
-                  }}
-                  placeholder="Nueva contraseña"
-                  onFocus={() => {
-                    setPasswordCriteriaModalVisible(true);
-                  }}
-                  onBlur={() => {
-                    if (!password) {
-                      setPasswordCriteriaModalVisible(false);
-                    }
-                  }}
-                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
-                />
-                <div
-                  className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <RiEyeLine className="text-gray-600 dark:text-gray-300" />
-                  ) : (
-                    <RiEyeCloseLine className="text-gray-600 dark:text-gray-300" />
-                  )}
-                </div>
-                <div className="absolute inset-y-0 right-10 pr-3 flex items-center">
-                  <Tooltip
-                    content={
-                      <ul>
-                        <li>Al menos 8 caracteres</li>
-                        <li>Al menos una minúscula y una mayúscula</li>
-                        <li>Al menos un número</li>
-                        <li>
-                          Al menos un carácter especial: <span className="font-bold">@ ! # ?</span>
-                        </li>
-                      </ul>
-                    }
-                  >
-                    <FiHelpCircle className="text-gray-400 cursor-pointer" />
-                  </Tooltip>
-                </div>
-                {/* Password Criteria Feedback */}
-                {passwordCriteriaModalVisible && <PasswordFeedback passwordCriteria={passwordCriteria} />}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-500">Repetir Contraseña</label>
-              <div className="relative">
-                <input
-                  type={showRepeatPassword ? "text" : "password"}
-                  value={repeatPassword}
-                  onChange={e => setRepeatPassword(e.target.value)}
-                  placeholder="Repite la nueva contraseña"
-                  className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-form-strokedark dark:text-whiten"
-                />
-                <div
-                  className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-                  onClick={() => setShowRepeatPassword(!showRepeatPassword)}
-                >
-                  {showRepeatPassword ? (
-                    <RiEyeLine className="text-gray-600 dark:text-gray-300" />
-                  ) : (
-                    <RiEyeCloseLine className="text-gray-600 dark:text-gray-300" />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end mt-6">
-            <button
-              onClick={handlePasswordChange}
-              disabled={isSaving || !Object.values(passwordCriteria).every(Boolean)}
-              className={`px-6 py-2 ${
-                isSaving
-                  ? "bg-gray-400"
-                  : "bg-brand-default hover:bg-brand-hover dark:bg-blue-600 dark:hover:bg-blue-700"
-              } text-white rounded-md shadow focus:outline-none`}
-            >
-              {isSaving ? "Guardando..." : "Cambiar Contraseña"}
-            </button>
-          </div>
-        </div>
+      <div className="flex justify-end mt-6">
+        <Btn onClick={handlePasswordChange} disabled={isSaving || !isValidPassword}>
+          <BtnLoading text="Cambiar Contraseña" changeState={isSaving} />
+        </Btn>
       </div>
-    </div>
+    </BlockContainerWithTitle>
   );
 };
 

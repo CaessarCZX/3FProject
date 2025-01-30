@@ -3,9 +3,11 @@
 import Image from "next/image";
 import type { NextPage } from "next";
 import { SubscribeForm } from "~~/components/Actions/Email";
+import { useLogout } from "~~/hooks/user/useLogout";
 import logo_white from "~~/public/logo/logo_white.svg";
 
 const Home: NextPage = () => {
+  useLogout();
   return (
     <>
       <header

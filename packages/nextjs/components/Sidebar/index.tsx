@@ -6,50 +6,42 @@ import Link from "next/link";
 import { PageWalletConnectionBtn } from "../Wallet/WalletInnerConnectionBtn";
 import WalletWidget from "../Wallet/WalletWidget";
 import { projectMenuGoups } from "./SidebarContent";
-import { jwtDecode } from "jwt-decode";
 import { getAddress } from "viem";
 import { useAccount } from "wagmi";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import ClickOutside from "~~/components/Actions/ClickOutside";
 import SidebarItem from "~~/components/Sidebar/SidebarItem";
+import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
 import useLocalStorage from "~~/hooks/common/useLocalStorage";
+import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { SidebarProps } from "~~/types/sidebar";
 import { INVALID_ADDRESS } from "~~/utils/Transactions/constants";
 
-// Función para decodificar el token y obtener `isAdmin`
-interface DecodedToken {
-  isAdmin?: boolean;
-  wallet: string | null;
-}
-
-const getInfoFromToken = (): DecodedToken => {
-  const token = localStorage.getItem("token");
-  if (!token) return { isAdmin: false, wallet: null };
-
-  try {
-    const decoded: DecodedToken = jwtDecode(token);
-    return {
-      isAdmin: decoded.isAdmin || false,
-      wallet: decoded.wallet || null,
-    };
-  } catch (error) {
-    console.error("Error decoding token:", error);
-    return { isAdmin: false, wallet: null };
-  }
-};
-
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const currentAccount = useAccount();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
-  const { isAdmin, wallet } = getInfoFromToken();
+  const {
+    tokenInfo: { isAdmin, wallet },
+  } = useGetTokenData();
   const [isWalletApproved, setIsWalletApproved] = useState(false);
   const checksumAddress = getAddress(wallet || INVALID_ADDRESS);
+  useShowUiNotifications({
+    success,
+    setSuccess,
+    error,
+    setError,
+  });
 
   useEffect(() => {
     if (currentAccount.status === "connected") {
+      if (checksumAddress === INVALID_ADDRESS) return; // For prenvent double rendering in login
       setIsWalletApproved(checksumAddress === currentAccount.address);
+      setSuccess(checksumAddress === currentAccount.address ? "Wallet aprobada" : "");
+      setError(checksumAddress === currentAccount.address ? "" : "Wallet no aprobada");
     }
-  }, [currentAccount.status, currentAccount.address, wallet, checksumAddress]);
+  }, [checksumAddress, currentAccount.address, currentAccount.status]);
 
   // Filtra el menú según el valor de isAdmin
   const filteredMenuGroups = projectMenuGoups.map(group => ({
