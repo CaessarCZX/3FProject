@@ -45,11 +45,11 @@ const Settings = () => {
   return (
     <InternalLayout>
       <Breadcrumb pageName="Configuraciones" />
-      <div className="mt-4 grid grid-cols-5 gap-8">
+      <div className="mt-4 grid grid-cols-5 grid-row-auto gap-8">
         <div className="col-span-5 xl:col-span-3">
           <SettingsForm />
         </div>
-        <div className="col-span-5 xl:col-span-2">
+        <div className="col-span-5 xl:col-span-2 row-span-2">
           <WalletConfig />
         </div>
         <div className="col-span-5 xl:col-span-3">
