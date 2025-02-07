@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useWatchBalance } from "../scaffold-eth/useWatchBalance";
 import { useGetTokenData } from "../user/useGetTokenData";
 import { useGetTransactionParams } from "./useGetTransactionParams";
@@ -48,7 +49,7 @@ const useFirstDepositContract = () => {
     depositContractHash: "",
     depositContractReceiptHash: "",
   });
-
+  const router = useRouter();
   const [isStarted, setIsStarted] = useState(false);
   const [isHandleModalActivate, setIsHandleModalActivate] = useState(false);
   const [error, setError] = useState<string | null>();
@@ -313,6 +314,7 @@ const useFirstDepositContract = () => {
             // Force member status
             setIsActiveMemberStatus(true);
             fetchSavings(1);
+            router.push("/dashboard");
           }, 3000);
         } else {
           ShowNotification(err.onTransaction);
