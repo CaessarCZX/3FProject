@@ -34,7 +34,7 @@ export const PasswordFeedback: React.FC<PasswordFeedbackProps> = ({ passwordCrit
 
   return (
     <div className="absolute mt-2 w-full bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-md z-10">
-      <div className="grid grid-cols-2 xl:block text-xs p-4">
+      <div className="text-xs p-4">
         {criteriaList.map(({ key, text }) => (
           <PasswordRequirement key={key} isMet={passwordCriteria[key as keyof typeof passwordCriteria]} text={text} />
         ))}
