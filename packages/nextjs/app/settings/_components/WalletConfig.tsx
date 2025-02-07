@@ -1,43 +1,32 @@
 import React from "react";
-import WalletConfigCard, { WalletConfigCardProps } from "./WalletConfigCard";
-import { IoWalletOutline } from "react-icons/io5";
+import { WithdrawalWallet } from "../page";
+import WalletConfigActivator from "./WalletConfigActivator";
+import WalletConfigBadge from "./WalletConfigBadge";
+import WalletConfigChange from "./WalletConfigChange";
+import WalletConfigDelete from "./WalletConfigDelete";
 import BlockContainerWithTitle from "~~/components/UI/BlockContainerWithTitle";
-// import { AddressInput } from "~~/components/scaffold-eth";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 
-const WalletConfig: React.FC = () => {
+interface WalletConfigProps {
+  withdrawalWallet: WithdrawalWallet;
+  updateFunction: (userId: string) => void;
+}
+
+const WalletConfig: React.FC<WalletConfigProps> = ({ withdrawalWallet, updateFunction }) => {
   const {
-    tokenInfo: { wallet },
+    tokenInfo: { id },
   } = useGetTokenData();
 
-  const walletInfo: WalletConfigCardProps[] = [
-    {
-      icon: <IoWalletOutline className="w-12 h-12 text-brand-default" />,
-      title: "Wallet registrada en cuenta",
-      walletAddress: wallet,
-      colorBadge: "bg-orange-300",
-    },
-    {
-      icon: <IoWalletOutline className="w-12 h-12 text-brand-default" />,
-      title: "Wallet para recepcion de pagos",
-      walletAddress: wallet,
-      colorBadge: "bg-green-200",
-    },
-  ];
   return (
-    <BlockContainerWithTitle title="Recepción de pagos">
-      <article className="grid grid-cols-4 gap-4">
-        {walletInfo.map((card, index) => (
-          <WalletConfigCard
-            className="col-span-4 md:col-span-2 xl:col-span-4"
-            key={index}
-            icon={card.icon}
-            title={card.title}
-            walletAddress={card.walletAddress}
-            colorBadge={card.colorBadge}
-          />
-        ))}
-      </article>
+    <BlockContainerWithTitle title="Pago de comisiones">
+      <WalletConfigActivator updateFunction={updateFunction} id={id} withdrawalWallet={withdrawalWallet} />
+      <div className="my-4">
+        <WalletConfigChange updateFunction={updateFunction} id={id} secondWallet={withdrawalWallet.wallet} />
+      </div>
+      <div className="border-t border-stroke grid grid-cols-2 gap-4">
+        {withdrawalWallet.wallet && <WalletConfigDelete id={id} />}
+        <WalletConfigBadge withdrawalWallet={withdrawalWallet} />
+      </div>
     </BlockContainerWithTitle>
   );
 };

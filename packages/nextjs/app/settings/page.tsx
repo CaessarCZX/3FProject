@@ -6,19 +6,36 @@ import BeneficiaryForm from "./_components/BeneficiaryForm";
 import ResetPassword from "./_components/ResetPassword";
 import SettingsForm from "./_components/SettingsForm";
 import WalletConfig from "./_components/WalletConfig";
+import WalletDisplayInfo from "./_components/WalletDisplayInfo";
 import Breadcrumb from "~~/components/Breadcumbs";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { getUser } from "~~/services/CRUD/users";
 
+export interface WithdrawalWallet {
+  wallet: string;
+  isActive: boolean;
+  isUsable: boolean;
+  releaseDate: string;
+  updateDate: string;
+}
+
 interface UserResponse {
-  email_beneficiary: string | undefined;
-  name_beneficiary: string | undefined;
+  email_beneficiary?: string | undefined;
+  name_beneficiary?: string | undefined;
+  withdrawalWallet?: WithdrawalWallet;
 }
 
 const Settings = () => {
   const { tokenInfo } = useGetTokenData();
-  const [beneficiary, setBeneficiary] = useState<UserResponse>({ email_beneficiary: "", name_beneficiary: "" });
+  const [userData, setUserData] = useState<UserResponse>({ email_beneficiary: "", name_beneficiary: "" });
+  const [secondaryWallet, setSecondaryWallet] = useState<WithdrawalWallet | undefined>({
+    wallet: "",
+    isActive: false,
+    isUsable: false,
+    releaseDate: "",
+    updateDate: "",
+  });
 
   const fetchUserInfo = async (userId: string) => {
     try {
@@ -26,9 +43,9 @@ const Settings = () => {
 
       if (!data) return;
 
-      const beneficiary: UserResponse = data.user;
-      console.log(beneficiary);
-      setBeneficiary(beneficiary);
+      const user: UserResponse = data.user;
+      setUserData(user);
+      setSecondaryWallet(user.withdrawalWallet);
     } catch (e) {
       console.error("Something is wrong: ", e);
     }
@@ -49,8 +66,11 @@ const Settings = () => {
         <div className="col-span-5 xl:col-span-3">
           <SettingsForm />
         </div>
-        <div className="col-span-5 xl:col-span-2 row-span-2">
-          <WalletConfig />
+        <div className="col-span-5 xl:col-span-2 row-span-3">
+          <div className="flex flex-col gap-8">
+            <WalletDisplayInfo />
+            <WalletConfig updateFunction={fetchUserInfo} withdrawalWallet={secondaryWallet as WithdrawalWallet} />
+          </div>
         </div>
         <div className="col-span-5 xl:col-span-3">
           <ResetPassword />
@@ -58,8 +78,8 @@ const Settings = () => {
         <div className="col-span-5 xl:col-span-3">
           <BeneficiaryForm
             updateFunction={fetchUserInfo}
-            currentBeneficiaryEmail={beneficiary.email_beneficiary}
-            currentBeneficiaryName={beneficiary.name_beneficiary}
+            currentBeneficiaryEmail={userData.email_beneficiary}
+            currentBeneficiaryName={userData.name_beneficiary}
           />
         </div>
       </div>
