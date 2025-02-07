@@ -113,13 +113,10 @@ export const PageWalletConnectionBtn: React.FC<RainbowKitCustomConnectButtonProp
                     onClick={() => disconnect()}
                     className="px-4 py-4 min-w-[254px] max-w-[254px] w-full flex items-center justify-center gap-2 cursor-pointer"
                   >
+                    <ExclamationCircleIcon className="h-8 w-8 text-white" />
+                    {enableWallet && "Desconectar wallet"}
                     {!enableWallet && (
-                      <>
-                        <ExclamationCircleIcon className="h-8 w-8 text-white" />
-                        <span className="text-white">
-                          {!delayDisconnection ? "Wallet no aprobada" : "Desconectando"}
-                        </span>
-                      </>
+                      <span className="text-white">{!delayDisconnection ? "Wallet no aprobada" : "Desconectando"}</span>
                     )}
                   </div>
                 </GlasRainbowCard>

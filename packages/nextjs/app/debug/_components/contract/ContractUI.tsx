@@ -5,6 +5,8 @@ import { useReducer } from "react";
 import { ContractReadMethods } from "./ContractReadMethods";
 import { ContractVariables } from "./ContractVariables";
 import { ContractWriteMethods } from "./ContractWriteMethods";
+import Breadcrumb from "~~/components/Breadcumbs";
+import { WalletConnectionBtn } from "~~/components/Wallet/WalletConectionBtn";
 import { Address, Balance } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo, useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
@@ -42,6 +44,9 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
 
   return (
     <div className={`grid grid-cols-1 lg:grid-cols-6 px-6 lg:px-10 lg:gap-12 w-full max-w-7xl my-0 ${className}`}>
+      <div className="col-span-full">
+        <Breadcrumb pageName="Smart Contract Admin" />
+      </div>
       <div className="col-span-5 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
         <div className="col-span-1 flex flex-col">
           <div className="bg-base-100 border-base-300 border shadow-md shadow-secondary rounded-3xl px-6 lg:px-8 mb-6 space-y-1 py-4">
@@ -62,6 +67,11 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
               </p>
             )}
           </div>
+          {/* Connetion Button */}
+          <div className="mb-6">
+            <WalletConnectionBtn classBtn="w-full" enableWallet />
+          </div>
+          {/* Connetion Button */}
           <div className="bg-base-300 rounded-3xl px-6 lg:px-8 py-4 shadow-lg shadow-base-300">
             <ContractVariables
               refreshDisplayVariables={refreshDisplayVariables}
