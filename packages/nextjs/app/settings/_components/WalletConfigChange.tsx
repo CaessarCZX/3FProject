@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import UpdateWalletModal from "./UpdateWalletModal";
 import { IoWalletOutline } from "react-icons/io5";
-import { Btn, BtnLoading } from "~~/components/UI/Button";
+import { Btn } from "~~/components/UI/Button";
 import InputField from "~~/components/UI/Input/InputField";
-import { useAddWithdrawalWallet } from "~~/hooks/withdrawalWallet/useAddWithdrawalWallet";
+import { useModal } from "~~/hooks/3FProject/useModal";
 
 interface WalletConfigChangeProps {
   secondWallet: string;
@@ -13,19 +14,16 @@ interface WalletConfigChangeProps {
 const WalletConfigChange: React.FC<WalletConfigChangeProps> = ({ secondWallet, id, updateFunction }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newSecWallet, setNewSecWallet] = useState("");
-  const { isLoading, addWallet } = useAddWithdrawalWallet();
-
-  const handleAddWallet = async () => {
-    const done = await addWallet({ wallet: newSecWallet, id });
-    if (done) {
-      setIsEditing(false);
-      updateFunction(id);
-    }
-  };
+  const { modalRef, openModal, closeModal } = useModal();
 
   const handleEditing = () => {
     setIsEditing(!isEditing);
     setNewSecWallet("");
+  };
+
+  const handleCloseModal = () => {
+    closeModal();
+    handleEditing();
   };
 
   return (
@@ -39,7 +37,7 @@ const WalletConfigChange: React.FC<WalletConfigChangeProps> = ({ secondWallet, i
         label="Wallet secundaria"
         icon={<IoWalletOutline className="text-gray-400" />}
       />
-      <div className={`flex ${isEditing && "justify-between gap-8"}`}>
+      <div className={`flex ${isEditing && "flex-col xsm:flex-row sm:justify-between gap-8"}`}>
         {!isEditing && (
           <Btn onClick={handleEditing} className="flex-1 animate-fadeIn">
             {secondWallet ? "Modificar wallet secundaria" : "Agregar wallet secundaria"}
@@ -47,9 +45,17 @@ const WalletConfigChange: React.FC<WalletConfigChangeProps> = ({ secondWallet, i
         )}
         {isEditing && (
           <>
-            <Btn onClick={handleAddWallet} className="flex-1" disabled={isLoading}>
-              <BtnLoading text="Guardar wallet" changeState={isLoading} />
+            <Btn onClick={openModal} className="flex-1">
+              Guardar wallet
             </Btn>
+            <dialog id="my_modal_3" className="modal" ref={modalRef}>
+              <UpdateWalletModal
+                id={id}
+                wallet={newSecWallet}
+                closeFunction={handleCloseModal}
+                updateFunction={updateFunction}
+              />
+            </dialog>
             <button onClick={handleEditing} className="btn btn-outline btn-error flex-1">
               Cancelar
             </button>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { WithdrawalWallet } from "../page";
 import ToggleConfig from "./ToggleConfig";
+import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
 import { useWithdrawalWalletActivator } from "~~/hooks/withdrawalWallet/useWithdrawalWalletActivator";
 
 interface WalletConfigActivatorProps {
@@ -12,12 +13,28 @@ interface WalletConfigActivatorProps {
 const WalletConfigActivator: React.FC<WalletConfigActivatorProps> = ({ withdrawalWallet, id, updateFunction }) => {
   const [useSecWallet, setUseSecWallet] = useState(withdrawalWallet.isActive ?? false);
   const { isLoading, walletActivator } = useWithdrawalWalletActivator();
+  const [error, setError] = useState("");
+  useShowUiNotifications({ error, setError });
 
   useEffect(() => {
     setUseSecWallet(withdrawalWallet.isActive ?? false);
   }, [withdrawalWallet.isActive]);
 
+  const calculateReleaseDate = () => {
+    const releaseTimestamp = new Date(withdrawalWallet.releaseDate).getTime();
+    const currentTimestamp = Date.now();
+    if (releaseTimestamp > currentTimestamp) {
+      const diffTimestamp = releaseTimestamp - currentTimestamp;
+      const hours = Math.floor(diffTimestamp / (1000 * 60 * 60));
+      const minutes = Math.floor((diffTimestamp % (1000 * 60 * 60)) / (1000 * 60));
+      setError(`Wallet no es accesible hasta dentro de ${hours} horas con ${minutes} minutos`);
+      return null;
+    }
+    return true;
+  };
+
   const handleWalletActivator = async () => {
+    if (!calculateReleaseDate()) return;
     const done = await walletActivator({ isActive: !useSecWallet, id });
     if (done) {
       setUseSecWallet(prev => !prev);

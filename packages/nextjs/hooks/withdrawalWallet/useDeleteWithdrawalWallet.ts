@@ -22,7 +22,7 @@ export const useDeleteWithdrawalWallet = () => {
 
       if (!data) throw new Error("Un error ha ocurrido al tratar de eliminar una wallet");
 
-      setSuccess("¡Wallet secundaria agregada exitosamente!");
+      setSuccess("¡Wallet secundaria eliminada exitosamente!");
       return true;
     } catch (e: any) {
       setError(e.message);
