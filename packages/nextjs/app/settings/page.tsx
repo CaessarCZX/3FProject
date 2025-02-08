@@ -68,7 +68,7 @@ const Settings = () => {
         </div>
         <div className="col-span-5 xl:col-span-2 row-span-3">
           <div className="flex flex-col gap-8">
-            <WalletDisplayInfo />
+            <WalletDisplayInfo secondWallet={secondaryWallet as WithdrawalWallet} />
             <WalletConfig updateFunction={fetchUserInfo} withdrawalWallet={secondaryWallet as WithdrawalWallet} />
           </div>
         </div>

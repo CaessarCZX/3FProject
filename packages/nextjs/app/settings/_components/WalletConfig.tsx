@@ -1,9 +1,8 @@
 import React from "react";
 import { WithdrawalWallet } from "../page";
 import WalletConfigActivator from "./WalletConfigActivator";
-import WalletConfigBadge from "./WalletConfigBadge";
 import WalletConfigChange from "./WalletConfigChange";
-// import WalletConfigDelete from "./WalletConfigDelete";
+import WalletConfigDelete from "./WalletConfigDelete";
 import BlockContainerWithTitle from "~~/components/UI/BlockContainerWithTitle";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 
@@ -23,10 +22,11 @@ const WalletConfig: React.FC<WalletConfigProps> = ({ withdrawalWallet, updateFun
       <div className="my-4">
         <WalletConfigChange updateFunction={updateFunction} id={id} secondWallet={withdrawalWallet.wallet} />
       </div>
-      <div className="border-t border-stroke grid grid-cols-2 gap-4">
-        {/* {withdrawalWallet.wallet && <WalletConfigDelete id={id} />} */}
-        <WalletConfigBadge withdrawalWallet={withdrawalWallet} />
-      </div>
+      {withdrawalWallet.wallet && (
+        <div className="border-t border-stroke">
+          <WalletConfigDelete id={id} />
+        </div>
+      )}
     </BlockContainerWithTitle>
   );
 };
