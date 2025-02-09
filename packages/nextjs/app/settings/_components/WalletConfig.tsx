@@ -1,5 +1,5 @@
 import React from "react";
-import { WithdrawalWallet } from "../page";
+import { WithdrawalWallet } from "../_types";
 import WalletConfigActivator from "./WalletConfigActivator";
 import WalletConfigChange from "./WalletConfigChange";
 import WalletConfigDelete from "./WalletConfigDelete";
@@ -24,7 +24,7 @@ const WalletConfig: React.FC<WalletConfigProps> = ({ withdrawalWallet, updateFun
       </div>
       {withdrawalWallet.wallet && (
         <div className="border-t border-stroke">
-          <WalletConfigDelete id={id} />
+          <WalletConfigDelete updateFunction={updateFunction} id={id} />
         </div>
       )}
     </BlockContainerWithTitle>

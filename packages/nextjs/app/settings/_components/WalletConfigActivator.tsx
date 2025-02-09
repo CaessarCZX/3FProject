@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { WithdrawalWallet } from "../page";
+import { WithdrawalWallet } from "../_types";
 import ToggleConfig from "./ToggleConfig";
 import { useShowUiNotifications } from "~~/hooks/3FProject/useShowUiNotifications";
 import { useWithdrawalWalletActivator } from "~~/hooks/withdrawalWallet/useWithdrawalWalletActivator";
@@ -21,6 +21,7 @@ const WalletConfigActivator: React.FC<WalletConfigActivatorProps> = ({ withdrawa
   }, [withdrawalWallet.isActive]);
 
   const calculateReleaseDate = () => {
+    if (!withdrawalWallet.wallet) return setError("Wallet secundaria no disponible");
     const releaseTimestamp = new Date(withdrawalWallet.releaseDate).getTime();
     const currentTimestamp = Date.now();
     if (releaseTimestamp > currentTimestamp) {

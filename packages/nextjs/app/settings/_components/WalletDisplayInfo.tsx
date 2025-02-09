@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { WithdrawalWallet } from "../page";
+import { WithdrawalWallet } from "../_types";
 import WalletConfigCard, { WalletConfigCardProps } from "./WalletConfigCard";
 import { BiMoneyWithdraw } from "react-icons/bi";
 import { IoWalletOutline } from "react-icons/io5";

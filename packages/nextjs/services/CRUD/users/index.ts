@@ -1,26 +1,7 @@
-import { getDataApi, putDataApi } from "..";
+import apiRequest from "..";
 
-export const updateUser = async (userId: string, payload: object) => {
-  try {
-    const response = await putDataApi(`users/${userId}`, payload);
-    return response;
-  } catch (e) {
-    console.error("An unespected mistake has occurred", e);
-  }
-};
+const updateUser = async (userId: string, payload: object) => apiRequest("PUT", `users/${userId}`, payload);
 
-export const getUser = async (userId: string) => {
-  try {
-    const response = await getDataApi(`users/${userId}`);
+const getUser = async (userId: string) => apiRequest("GET", `users/${userId}`);
 
-    if (response.status !== 200) {
-      throw new Error("A bad response was received");
-    }
-
-    const { data } = response;
-
-    return data;
-  } catch (e) {
-    console.error("An unespected mistake has occurred", e);
-  }
-};
+export { updateUser, getUser };

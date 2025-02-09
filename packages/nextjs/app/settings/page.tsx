@@ -7,24 +7,11 @@ import ResetPassword from "./_components/ResetPassword";
 import SettingsForm from "./_components/SettingsForm";
 import WalletConfig from "./_components/WalletConfig";
 import WalletDisplayInfo from "./_components/WalletDisplayInfo";
+import { UserResponse, WithdrawalWallet } from "./_types";
 import Breadcrumb from "~~/components/Breadcumbs";
 import InternalLayout from "~~/components/Layouts/InternalLayout";
 import { useGetTokenData } from "~~/hooks/user/useGetTokenData";
 import { getUser } from "~~/services/CRUD/users";
-
-export interface WithdrawalWallet {
-  wallet: string;
-  isActive: boolean;
-  isUsable: boolean;
-  releaseDate: string;
-  updateDate: string;
-}
-
-interface UserResponse {
-  email_beneficiary?: string | undefined;
-  name_beneficiary?: string | undefined;
-  withdrawalWallet?: WithdrawalWallet;
-}
 
 const Settings = () => {
   const { tokenInfo } = useGetTokenData();

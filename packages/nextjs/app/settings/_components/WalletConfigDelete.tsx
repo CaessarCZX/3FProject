@@ -3,13 +3,15 @@ import { useDeleteWithdrawalWallet } from "~~/hooks/withdrawalWallet/useDeleteWi
 
 interface WalletConfigDeleteProps {
   id: string;
+  updateFunction: (userId: string) => void;
 }
 
-const WalletConfigDelete: React.FC<WalletConfigDeleteProps> = ({ id }) => {
+const WalletConfigDelete: React.FC<WalletConfigDeleteProps> = ({ id, updateFunction }) => {
   const { isLoading, deleteWallet } = useDeleteWithdrawalWallet();
 
   const handleDeleteWallet = async () => {
-    await deleteWallet({ id });
+    const done = await deleteWallet({ id });
+    if (done) updateFunction(id);
   };
 
   return (
