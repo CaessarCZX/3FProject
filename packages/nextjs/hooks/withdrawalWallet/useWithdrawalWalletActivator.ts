@@ -1,5 +1,3 @@
-// import { useCallback, useState } from "react";
-// import { useShowUiNotifications } from "../3FProject/useShowUiNotifications";
 import { useCallback } from "react";
 import { ValidateInObject, findKeyWithType, useApiRequest } from "../api/useApiRequest";
 import { updateWithdrawalWallet } from "~~/services/CRUD/withdrawalWallet";
